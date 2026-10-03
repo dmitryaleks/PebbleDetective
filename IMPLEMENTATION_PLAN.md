@@ -529,10 +529,11 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
 ### Post-release — the README caught up with the app
 
 - **Every screenshot regenerated from the current build**, in English, and
-  the walkthrough reordered to run the way the app does: the titles, then
-  Planets around where it lands, then the pebble. The planets section had
-  been numbered 5b because it was written last, which by now said the
-  opposite of what the app did.
+  the walkthrough reordered to run the way the app is played: the titles,
+  then Planets around where it lands, then Radar, then the camera and the
+  pebble. The planets section had been numbered 5b because it was written
+  last, and Radar had a section of its own at the back of the document -
+  between them they described a game nobody plays in that order.
 - **The meteor is a GIF**, because a still cannot show a thing that falls,
   and two new stills cover what the journey GIF passes through too quickly
   to see: the cruise, where both worlds are photographs, and the descent

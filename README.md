@@ -91,7 +91,39 @@ accuracy is the phone’s compass, which is routinely ten degrees out indoors.
 
 <br clear="right" />
 
-### 2 · Find a pebble
+### 2 · Scan the ground for it
+
+<img src="docs/screen-radar.png" width="260" align="right" alt="The radar scope over the camera" />
+
+Next along the chain. The app **hides a virtual pebble somewhere within
+thirty metres** and sends the child out to find it — a reason to walk
+somewhere and look down, which is the whole point of the game.
+
+The scope is drawn over the live rear camera: range rings, a rotating sweep,
+a pulsing blip and an arrow pointing the way. Your own position is the centre
+and moves as you walk, and the whole display turns with the phone — the arrow
+keeps pointing at the same patch of ground however you hold it, because the
+target is a real coordinate rather than a spot on the screen.
+
+Tapping radar again hides a new pebble from scratch. You can switch on to
+Detection at any point, whether or not you reached the target, and the globe
+in the top bar goes back up to the sky.
+
+With sound on it plays like a detector: a room tone under the scope, a ping
+each time the sweep comes round, and a proximity beep that **quickens as you
+close in** — lazy at thirty metres, an urgent chatter at arm's length. The
+ping and the drawn sweep share one clock, so the beep lands with the beam
+crossing the top rather than drifting against it.
+
+**Radar asks for precise location**, and it is the only part of the app that
+does. The logbook is content with coarse accuracy; a thirty-metre hunt is not,
+since coarse location is accurate to roughly a city block. The permission is
+requested the first time radar is opened, never at startup, and everything
+else works without it.
+
+<br clear="right" />
+
+### 3 · Find a pebble
 
 <img src="docs/screen-capture.png" width="260" align="right" alt="Camera view with the targeting reticle" />
 
@@ -112,7 +144,7 @@ portrait, and it is the exact image the app analyses.
 
 <br clear="right" />
 
-### 3 · Run a Deep Research
+### 4 · Run a Deep Research
 
 <img src="docs/screen-prompt.png" width="260" align="right" alt="Deep Research prompt over the frozen photograph" />
 
@@ -122,7 +154,7 @@ Saying *Not now* throws the stone back and returns to the camera.
 
 <br clear="right" />
 
-### 4 · Watch the scan
+### 5 · Watch it think
 
 <img src="docs/research.gif" width="260" align="right" alt="The five second research sequence" />
 
@@ -138,7 +170,7 @@ It can be skipped at any point.
 
 <br clear="right" />
 
-### 5 · Meet the world
+### 6 · Meet the world
 
 <img src="docs/screen-result.png" width="260" align="right" alt="Result screen showing Jupiter" />
 
@@ -152,7 +184,7 @@ planet every time you looked at it would be no fun at all.
 
 <br clear="right" />
 
-### 6 · Fly it home
+### 7 · Fly it home
 
 <img src="docs/journey.gif" width="260" align="right" alt="The pebble's twenty second flight to Earth" />
 
@@ -184,7 +216,7 @@ film again.
 <img src="docs/screen-landing.png" width="190" alt="Landed in Koto, Tokyo" />
 </p>
 
-### 7 · Keep the collection
+### 8 · Keep the collection
 
 <p>
 <img src="docs/screen-logbook.png" width="250" alt="The pebble logbook" />
@@ -213,43 +245,10 @@ coordinates are where a child was standing.
 
 ---
 
-## Radar mode
-
-<img src="docs/screen-radar.png" width="260" align="right" alt="The radar scope over the camera" />
-
-Tap the radar button in the top bar and the app **hides a virtual pebble
-somewhere within thirty metres** and sends the child out to find it.
-
-The scope is drawn over the live rear camera: range rings, a rotating sweep,
-a pulsing blip and an arrow pointing the way. Your own position is the centre
-and moves as you walk, and the whole display turns with the phone — the arrow
-keeps pointing at the same patch of ground however you hold it, because the
-target is a real coordinate rather than a spot on the screen.
-
-Tapping radar again hides a new pebble from scratch. You can switch on to
-Detection at any point, whether or not you reached the target, and the globe
-in the top bar goes back up to **Planets around**.
-
-With sound on it plays like a detector: a room tone under the scope, a ping
-each time the sweep comes round, and a proximity beep that **quickens as you
-close in** — lazy at thirty metres, an urgent chatter at arm's length. The
-ping and the drawn sweep share one clock, so the beep lands with the beam
-crossing the top rather than drifting against it.
-
-**Radar asks for precise location**, and it is the only part of the app that
-does. The logbook is content with coarse accuracy; a thirty-metre hunt is not,
-since coarse location is accurate to roughly a city block. The permission is
-requested the first time radar is opened, never at startup, and everything
-else works without it.
-
-<br clear="right" />
-
----
-
 ## Three languages, at any moment
 
 **English, Russian and Japanese**, switched with the globe button on *every*
-screen — including halfway through the scan or mid-flight.
+screen — including halfway through the research or mid-flight.
 
 The language is applied inside the composition rather than by restarting the
 activity, so switching it never interrupts the camera and never restarts an
