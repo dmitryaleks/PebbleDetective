@@ -63,6 +63,7 @@ fun CaptureScreen(
     onCaptured: (Bitmap, Offset) -> Unit,
     onOpenHistory: () -> Unit,
     onRadar: () -> Unit,
+    onSky: () -> Unit,
 ) {
     val context = LocalContext.current
     val language by session.language.collectAsStateWithLifecycle()
@@ -114,6 +115,7 @@ fun CaptureScreen(
                 onToggleSound = session::toggleSound,
                 onOpenHistory = onOpenHistory,
                 onRadar = onRadar,
+                onSky = onSky,
             )
         }
     }

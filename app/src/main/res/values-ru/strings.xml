@@ -128,4 +128,32 @@
     <string name="splash_tagline">У КАЖДОГО КАМНЯ ЕСТЬ РОДИНА</string>
     <string name="splash_subtitle">Найди камешек. Просканируй. Узнай, с какой он планеты.</string>
     <string name="splash_hint">нажми, чтобы пропустить</string>
+
+    <!-- Planets around -->
+    <string name="sky_above">Сейчас видно</string>
+    <string name="sky_below">Под землёй</string>
+    <string name="sky_count">Сейчас над горизонтом: %1$d</string>
+    <string name="sky_locating">Ищем, где ты…</string>
+    <string name="sky_needs_location">Для карты неба нужно примерное местоположение</string>
+    <string name="sky_focus_above">%1$s · %2$d° над горизонтом, на %3$s</string>
+    <string name="sky_focus_below">%1$s · %2$d° под тобой, на %3$s</string>
+    <string name="sky_tap_hint">Нажми на планету — прилетит метеорит</string>
+    <string name="sky_incoming">Летит!</string>
+    <string name="sky_sun_warning">Никогда не смотри прямо на Солнце</string>
+    <string name="sky_cd_above">%1$s, %2$d градусов над горизонтом</string>
+    <string name="sky_cd_below">%1$s, под горизонтом</string>
+    <string name="cd_sky">Планеты вокруг</string>
+    <string name="cd_sky_all">Показать все планеты</string>
+    <string-array name="compass_points">
+        <item>север</item>
+        <item>северо-восток</item>
+        <item>восток</item>
+        <item>юго-восток</item>
+        <item>юг</item>
+        <item>юго-запад</item>
+        <item>запад</item>
+        <item>северо-запад</item>
+    </string-array>
+    <string name="sky_remembered_place">По месту последнего камешка</string>
+    <string name="sky_follow">следи за ним</string>
 </resources>

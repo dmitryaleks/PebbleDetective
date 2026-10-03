@@ -125,4 +125,32 @@
     <string name="splash_tagline">どの いしにも ふるさとが ある</string>
     <string name="splash_subtitle">こいしを さがして、スキャンして、どの ほしから きたか しらべよう。</string>
     <string name="splash_hint">タップで スキップ</string>
+
+    <!-- Planets around -->
+    <string name="sky_above">いま みえる</string>
+    <string name="sky_below">じめんの した</string>
+    <string name="sky_count">いま %1$d こ みえるよ</string>
+    <string name="sky_locating">いまの ばしょを しらべている…</string>
+    <string name="sky_needs_location">そらの ちずには だいたいの ばしょが いるよ</string>
+    <string name="sky_focus_above">%1$s · ちへいせんの うえ %2$d°、%3$s</string>
+    <string name="sky_focus_below">%1$s · した %2$d°、%3$s</string>
+    <string name="sky_tap_hint">ほしを タップすると いんせかが ふってくるよ</string>
+    <string name="sky_incoming">きたっ！</string>
+    <string name="sky_sun_warning">たいようを じかに みちゃ だめ！</string>
+    <string name="sky_cd_above">%1$s、ちへいせんの うえ %2$dど</string>
+    <string name="sky_cd_below">%1$s、ちへいせんの した</string>
+    <string name="cd_sky">まわりの ほし</string>
+    <string name="cd_sky_all">ぜんぶの ほしを みる</string>
+    <string-array name="compass_points">
+        <item>きた</item>
+        <item>きたひがし</item>
+        <item>ひがし</item>
+        <item>みなみひがし</item>
+        <item>みなみ</item>
+        <item>みなみにし</item>
+        <item>にし</item>
+        <item>きたにし</item>
+    </string-array>
+    <string name="sky_remembered_place">このまえの こいしの ばしょを つかっているよ</string>
+    <string name="sky_follow">おいかけよう</string>
 </resources>

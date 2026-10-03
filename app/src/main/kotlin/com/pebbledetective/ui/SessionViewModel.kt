@@ -14,11 +14,13 @@ import com.pebbledetective.data.AppLanguage
 import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PebbleStatus
 import com.pebbledetective.data.ShareCardText
+import com.pebbledetective.domain.Astronomy
 import com.pebbledetective.domain.Geo
 import com.pebbledetective.domain.GeoPoint
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.domain.RadarTimeline
 import com.pebbledetective.domain.JourneyTimeline
+import com.pebbledetective.domain.MeteorTimeline
 import com.pebbledetective.domain.ResearchTimeline
 import com.pebbledetective.domain.dominantColour
 import com.pebbledetective.domain.pickPlanet
@@ -66,8 +68,15 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     private val _radar = MutableStateFlow(RadarState())
     val radar: StateFlow<RadarState> = _radar.asStateFlow()
 
+    private val _sky = MutableStateFlow(SkyState())
+    val sky: StateFlow<SkyState> = _sky.asStateFlow()
+
     private var radarJob: Job? = null
     private var radarSoundJob: Job? = null
+    private var skyJob: Job? = null
+    private var skyClockJob: Job? = null
+    private var skySoundJob: Job? = null
+    private var meteorJob: Job? = null
     private var detectionSoundJob: Job? = null
 
     private val _journeyStartedAt = MutableStateFlow<Long?>(null)
@@ -265,6 +274,9 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
 
     fun hasPreciseLocation(): Boolean = container.location.hasPreciseLocation()
 
+    /** Coarse is enough for the sky; a kilometre does not move a planet. */
+    fun hasLocationPermission(): Boolean = container.location.hasPermission()
+
     /** Called after the radar permission dialog closes, whatever the answer. */
     fun onRadarPermissionResult() {
         if (container.location.hasPreciseLocation()) {
@@ -358,6 +370,185 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
                 }
             }
         }
+    }
+
+    // ---- planets around --------------------------------------------------
+
+    /**
+     * Starts the sky mode: find out where we are, then keep working out
+     * where everything is from there.
+     *
+     * Coarse location is plenty. A kilometre of error moves a planet by
+     * nothing at all, and asking a child for precise location just to look
+     * at Jupiter would be a poor trade.
+     */
+    fun startSky() {
+        if (!container.location.hasPermission()) {
+            _sky.value = SkyState(locationKnown = false)
+            return
+        }
+        skyJob?.cancel()
+        skyClockJob?.cancel()
+        startSkySounds()
+
+        // Somewhere to stand, before any satellite has been heard from.
+        // The logbook already knows where the last pebble was found, and a
+        // few kilometres of error does not move a planet, so the sky can be
+        // drawn straight away from there. Waiting on a fix would leave a
+        // child looking at an empty screen indoors, which is exactly where
+        // they are most likely to try this.
+        lastLoggedPlace()?.let { (latitude, longitude) ->
+            _sky.value = _sky.value.copy(
+                locationKnown = true,
+                latitude = latitude,
+                longitude = longitude,
+                remembered = true,
+            )
+            refreshSky()
+        }
+
+        skyJob = viewModelScope.launch {
+            // locationUpdates hands over the last known fix before it waits
+            // for a new one, so there is nothing to gain from asking for a
+            // single fix first - and that call can block for its whole
+            // timeout, which is what it used to do here.
+            container.location.locationUpdates(minIntervalMs = 10_000L).collectLatest { fix ->
+                _sky.value = _sky.value.copy(
+                    locationKnown = true,
+                    latitude = fix.latitude,
+                    longitude = fix.longitude,
+                    remembered = false,
+                )
+                refreshSky()
+            }
+        }
+
+        // The planets barely move; the sky turns. A second is finer than
+        // anyone can see and costs a few hundred floating point operations.
+        skyClockJob = viewModelScope.launch {
+            while (true) {
+                refreshSky()
+                delay(1_000)
+            }
+        }
+    }
+
+    fun stopSky() {
+        skyJob?.cancel(); skyJob = null
+        skyClockJob?.cancel(); skyClockJob = null
+        skySoundJob?.cancel(); skySoundJob = null
+        meteorJob?.cancel(); meteorJob = null
+        container.sound.stop(SoundCue.SCANNER_AMBIENT)
+        _sky.value = _sky.value.copy(meteor = null)
+    }
+
+    /** Called after the location dialog closes, whatever the answer was. */
+    fun onSkyPermissionResult() {
+        if (container.location.hasPermission()) {
+            startSky()
+        } else {
+            _sky.value = SkyState(locationKnown = false)
+        }
+    }
+
+    /** Where the newest pebble with coordinates was picked up. */
+    private fun lastLoggedPlace(): Pair<Double, Double>? =
+        container.pebbles.entries.value
+            .sortedByDescending { it.capturedAtEpochMs }
+            .firstNotNullOfOrNull { entry ->
+                val latitude = entry.latitude
+                val longitude = entry.longitude
+                if (latitude != null && longitude != null) latitude to longitude else null
+            }
+
+    private fun refreshSky() {
+        val state = _sky.value
+        val latitude = state.latitude ?: return
+        val longitude = state.longitude ?: return
+        val now = System.currentTimeMillis()
+        _sky.value = state.copy(
+            sightings = Astronomy.sky(now, latitude, longitude),
+            declinationDegrees = declinationAt(latitude, longitude, now),
+        )
+    }
+
+    /**
+     * How far magnetic north is from true north here.
+     *
+     * The phone compass points at the magnetic pole; the planets are worked
+     * out against the real one. Ignoring the difference would be a silent
+     * error of up to twenty degrees depending on where in the world you are
+     * standing - bigger than everything else in this feature put together.
+     *
+     * GeomagneticField is the world magnetic model built into Android, so
+     * this costs nothing and needs no network.
+     */
+    private fun declinationAt(latitude: Double, longitude: Double, epochMillis: Long): Double =
+        runCatching {
+            android.hardware.GeomagneticField(
+                latitude.toFloat(), longitude.toFloat(), 0f, epochMillis,
+            ).declination.toDouble()
+        }.getOrDefault(0.0)
+
+    fun clearSkyFocus() {
+        container.sound.play(SoundCue.UI_TAP)
+        _sky.value = _sky.value.copy(focus = null)
+    }
+
+    /** Tapping an icon singles that body out; tapping it again brings the rest back. */
+    fun toggleSkyFocus(planet: Planet) {
+        container.sound.play(SoundCue.UI_TAP)
+        _sky.value = _sky.value.copy(
+            focus = if (_sky.value.focus == planet) null else planet,
+        )
+    }
+
+    /**
+     * Drops a piece of that planet on the neighbourhood.
+     *
+     * The impact point is pinned to a direction in the world rather than to
+     * a place on the screen, so the meteor stays where it fell while the
+     * phone moves. That is the whole difference between augmented reality
+     * and a video playing over a camera.
+     */
+    fun launchMeteor(planet: Planet) {
+        val sighting = _sky.value.sightings.firstOrNull { it.planet == planet } ?: return
+        meteorJob?.cancel()
+        _sky.value = _sky.value.copy(
+            meteor = MeteorShot(
+                planet = planet,
+                startedAtElapsedMs = SystemClock.elapsedRealtime(),
+                fromAzimuthDegrees = sighting.azimuthDegrees,
+                fromAltitudeDegrees = sighting.altitudeDegrees,
+                // Down and a little to one side of where it came from: it
+                // lands in the street, not on the observer. The spread is
+                // kept narrow because the whole fall has to stay findable
+                // by swinging the phone down the way it came.
+                toAzimuthDegrees = sighting.azimuthDegrees + Random.nextDouble(-12.0, 12.0),
+                toAltitudeDegrees = Random.nextDouble(-13.0, -5.0),
+            ),
+        )
+
+        meteorJob = viewModelScope.launch {
+            delay(MeteorTimeline.CUE_IGNITE_MS)
+            container.sound.play(SoundCue.LAUNCH_WHOOSH)
+            delay(MeteorTimeline.CUE_ENTRY_MS - MeteorTimeline.CUE_IGNITE_MS)
+            container.sound.play(SoundCue.ENTRY_RUMBLE)
+            delay(MeteorTimeline.CUE_IMPACT_MS - MeteorTimeline.CUE_ENTRY_MS)
+            container.sound.play(SoundCue.ENTRY_RUMBLE)
+            delay(MeteorTimeline.CUE_SETTLED_MS - MeteorTimeline.CUE_IMPACT_MS)
+            container.sound.play(SoundCue.ARRIVAL_CHIME)
+            delay(MeteorTimeline.TOTAL_MS - MeteorTimeline.CUE_SETTLED_MS)
+            _sky.value = _sky.value.copy(meteor = null)
+        }
+    }
+
+    fun meteorElapsedMs(): Long =
+        _sky.value.meteor?.let { SystemClock.elapsedRealtime() - it.startedAtElapsedMs } ?: 0L
+
+    private fun startSkySounds() {
+        skySoundJob?.cancel()
+        skySoundJob = viewModelScope.launch { holdAmbience(SoundCue.SCANNER_AMBIENT) }
     }
 
     // ---- detection ambience ---------------------------------------------
@@ -530,6 +721,10 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
 
     override fun onCleared() {
         titleCueJob?.cancel()
+        skyJob?.cancel()
+        skyClockJob?.cancel()
+        skySoundJob?.cancel()
+        meteorJob?.cancel()
         radarJob?.cancel()
         radarSoundJob?.cancel()
         detectionSoundJob?.cancel()
@@ -582,3 +777,36 @@ data class RadarState(
     /** The outer ring. Targets are hidden within 30m, so this always contains one. */
     val rangeMetres: Double get() = 30.0
 }
+
+/**
+ * What the sky mode knows: where the observer is, where everything is from
+ * there, and whether anything is currently falling out of it.
+ */
+data class SkyState(
+    val locationKnown: Boolean = true,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    /** True while standing on the last place the logbook knows about. */
+    val remembered: Boolean = false,
+    val sightings: List<Astronomy.Sighting> = emptyList(),
+    /** Magnetic north minus true north here, which the compass needs. */
+    val declinationDegrees: Double = 0.0,
+    /** The one body being tracked, or null to show them all. */
+    val focus: Planet? = null,
+    val meteor: MeteorShot? = null,
+) {
+    val above: List<Astronomy.Sighting> get() = sightings.filter { it.isUp }
+    val below: List<Astronomy.Sighting> get() = sightings.filter { !it.isUp }
+
+    fun of(planet: Planet): Astronomy.Sighting? = sightings.firstOrNull { it.planet == planet }
+}
+
+/** A meteor on its way down, held in world directions rather than in pixels. */
+data class MeteorShot(
+    val planet: Planet,
+    val startedAtElapsedMs: Long,
+    val fromAzimuthDegrees: Double,
+    val fromAltitudeDegrees: Double,
+    val toAzimuthDegrees: Double,
+    val toAltitudeDegrees: Double,
+)

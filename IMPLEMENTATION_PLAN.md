@@ -373,3 +373,51 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
 - **Verified on device** in all three languages, that a tap skips without
   the tap reaching the camera screen underneath, and that back from the
   camera leaves the app rather than replaying the titles.
+
+### Post-release — Planets around
+
+- **The ephemeris is arithmetic, not data.** JPL’s fitted Keplerian elements
+  for 1800–2050 - six numbers and six rates per body - plus Kepler’s
+  equation and two coordinate transforms. No file to bundle, nothing to
+  expire, nothing to fetch, and accurate to a few arcminutes across the
+  whole span. A table of precomputed positions for ten years would have been
+  larger, less accurate at the edges and would have run out.
+- **Tested against the solar system rather than against a copied table.**
+  The equinoxes and solstices pin the obliquity; the midday Sun on the
+  Greenwich meridian pins sidereal time and the azimuth convention, which
+  the declinations alone would not; Mercury and Venus never straying more
+  than 29° and 48° from the Sun pins the geocentric vector; and the
+  opposition cycle of each outer planet (Jupiter every 399 days, Saturn
+  every 378) pins its mean longitude rate, which is the one error the other
+  tests would have let through. Confirmed on device too: from Tokyo on the
+  evening of 3 October 2026 it put Saturn 48° up in the south-east, which is
+  where a planet at opposition the following day belongs, with Neptune five
+  degrees off it - the two really are that close together in 2026.
+- **Magnetic declination is not optional.** The rotation vector reports
+  bearings from magnetic north; the sky is computed from true north. Up to
+  twenty degrees apart depending on where you are, which is larger than
+  every other error in the feature combined. `GeomagneticField` is in the
+  platform and works offline.
+- **The field of view has to be read off the lens.** Drawing the overlay at
+  the wrong scale puts every planet at the right bearing and the wrong
+  distance from the middle of the screen. The preview is pinned to four by
+  three so the sensor’s long axis fills the height of the screen, and the
+  focal length and physical sensor size give the angle that fills it.
+- **Attitude is smoothed as a quaternion.** The radar smooths one angle the
+  short way round, which does not generalise to three axes; interpolating
+  the quaternion and renormalising is both correct and cheaper.
+- **Waiting for a fix was the wrong default.** The first build asked for a
+  single location and then subscribed to updates, so indoors it showed an
+  empty sky for the full 25-second timeout. It now subscribes directly, and
+  falls back to the place the last pebble was logged - which is in the
+  logbook already, needs no permission prompt of its own, and is accurate to
+  far better than a planet cares about.
+- **The meteor falls through more sky than the camera can see** - fifty-odd
+  degrees against a sixty-degree view - so it leaves the frame on the way
+  down. Rather than cheat and pin it to the screen, which would stop it
+  being augmented reality at all, an arrow says follow it down.
+- **Verified on device** in all three languages, including the planet
+  toolbar splitting above and below the horizon, focusing a single body, the
+  guide arrow, and a meteor called down from Saturn and followed to the
+  ground. The merged manifest still holds exactly CAMERA and the two
+  location permissions: a planetarium that needs no network at all.

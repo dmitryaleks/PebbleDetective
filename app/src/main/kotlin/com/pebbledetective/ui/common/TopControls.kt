@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
@@ -42,6 +43,9 @@ fun TopControls(
     onRadar: (() -> Unit)? = null,
     /** Tints the radar button while radar mode is the screen you are on. */
     radarActive: Boolean = false,
+    onSky: (() -> Unit)? = null,
+    /** Likewise for the sky. */
+    skyActive: Boolean = false,
 ) {
     Row(
         // statusBarsPadding is load-bearing: the app draws edge to edge, and
@@ -69,6 +73,21 @@ fun TopControls(
                     if (soundEnabled) R.string.cd_sound_on else R.string.cd_sound_off
                 ),
             )
+        }
+        if (onSky != null) {
+            IconButton(onClick = onSky, modifier = Modifier.size(TOUCH_TARGET)) {
+                Icon(
+                    imageVector = Icons.Filled.Public,
+                    contentDescription = stringResource(
+                        if (skyActive) R.string.cd_sky_all else R.string.cd_sky
+                    ),
+                    tint = if (skyActive) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        LocalContentColor.current
+                    },
+                )
+            }
         }
         if (onRadar != null) {
             IconButton(onClick = onRadar, modifier = Modifier.size(TOUCH_TARGET)) {

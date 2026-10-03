@@ -15,6 +15,7 @@ import com.pebbledetective.ui.radar.RadarScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
 import com.pebbledetective.ui.screens.CreditsScreen
+import com.pebbledetective.ui.sky.SkyScreen
 import com.pebbledetective.ui.splash.SplashScreen
 
 @Composable
@@ -44,6 +45,7 @@ fun PebbleNavHost(session: SessionViewModel) {
                 },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
                 onRadar = { navController.navigate(Routes.RADAR) },
+                onSky = { navController.navigate(Routes.SKY) },
             )
         }
         composable(Routes.RESEARCH) {
@@ -108,6 +110,16 @@ fun PebbleNavHost(session: SessionViewModel) {
                 session = session,
                 onSwitchToDetection = {
                     session.stopRadar()
+                    navController.popBackStack(Routes.CAPTURE, inclusive = false)
+                },
+                onOpenHistory = { navController.navigate(Routes.HISTORY) },
+            )
+        }
+        composable(Routes.SKY) {
+            SkyScreen(
+                session = session,
+                onSwitchToDetection = {
+                    session.stopSky()
                     navController.popBackStack(Routes.CAPTURE, inclusive = false)
                 },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },

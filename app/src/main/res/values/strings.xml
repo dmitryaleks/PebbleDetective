@@ -127,4 +127,32 @@
     <string name="splash_tagline">EVERY STONE CAME FROM SOMEWHERE</string>
     <string name="splash_subtitle">Find a pebble. Scan it. Discover which world it fell from.</string>
     <string name="splash_hint">tap to skip</string>
+
+    <!-- Planets around -->
+    <string name="sky_above">Up now</string>
+    <string name="sky_below">Below</string>
+    <string name="sky_count">%1$d worlds are up right now</string>
+    <string name="sky_locating">Working out where you are…</string>
+    <string name="sky_needs_location">Sky mode needs to know roughly where you are</string>
+    <string name="sky_focus_above">%1$s · %2$d° above the horizon, to the %3$s</string>
+    <string name="sky_focus_below">%1$s · %2$d° below you, to the %3$s</string>
+    <string name="sky_tap_hint">Tap a planet to call down a meteor</string>
+    <string name="sky_incoming">Incoming!</string>
+    <string name="sky_sun_warning">Never look straight at the Sun</string>
+    <string name="sky_cd_above">%1$s, %2$d degrees above the horizon</string>
+    <string name="sky_cd_below">%1$s, below the horizon</string>
+    <string name="cd_sky">Planets around</string>
+    <string name="cd_sky_all">Show every planet again</string>
+    <string-array name="compass_points">
+        <item>north</item>
+        <item>north-east</item>
+        <item>east</item>
+        <item>south-east</item>
+        <item>south</item>
+        <item>south-west</item>
+        <item>west</item>
+        <item>north-west</item>
+    </string-array>
+    <string name="sky_remembered_place">Using where your last pebble was found</string>
+    <string name="sky_follow">follow it down</string>
 </resources>

@@ -128,6 +128,34 @@ film again.
 <img src="docs/screen-landing.png" width="250" alt="Landed in Koto, Tokyo" />
 </p>
 
+### 5b · Find the planets around you
+
+<p>
+<img src="docs/screen-sky.png" width="250" alt="Saturn and Neptune labelled over the live camera" />
+&nbsp;
+<img src="docs/screen-meteor.png" width="250" alt="A meteor landing in the street" />
+</p>
+
+Hold the phone up and the solar system is drawn over whatever the camera can
+see, each world a real NASA photograph hanging in the place it actually
+occupies in the sky. The toolbar splits them into what is **up now** and what
+is **below** your feet; tap one to follow just that body, and an arrow points
+the way until you have swung the phone round to it.
+
+Tap a planet on the screen and a piece of it comes down. The fireball is
+pinned to a direction in the world rather than to a place on the screen, so
+it keeps falling where it fell while you turn to follow it, and the crater it
+leaves in the street stays put.
+
+**Where the positions come from.** Nowhere. There is no ephemeris file and no
+network call: each planet is six numbers and six rates of change, and solving
+Kepler’s equation on the phone gives its position at any instant. That is
+why it works in a field with no signal, and why it will still be right in
+2050. The orbits are good to a few arcminutes; what actually limits the
+accuracy is the phone’s compass, which is routinely ten degrees out indoors.
+
+<br clear="right" />
+
 ### 6 · Keep the collection
 
 <p>
@@ -311,6 +339,17 @@ A few decisions worth knowing about:
 - **The capture is rotated in memory, never by EXIF.** Writing orientation into
   EXIF and decoding it later makes the picture on screen and the pixels being
   analysed disagree by ninety degrees on most phones.
+- **The sky is computed, not downloaded.** JPL’s approximate Keplerian
+  elements for 1800 to 2050, Kepler’s equation solved by Newton’s method, and
+  two coordinate transforms. The whole planetarium is one file of arithmetic
+  with no assets behind it, and the unit tests check it against things that
+  are true of the solar system - the equinoxes, the maximum elongations of
+  Mercury and Venus, and the opposition cycle of each outer planet - rather
+  than against a copied table.
+- **The compass needs correcting before it can point at a planet.** It reports
+  bearings from magnetic north and the sky is worked out from true north, a
+  difference of up to twenty degrees depending where you are standing.
+  Android’s built-in world magnetic model supplies the correction offline.
 - **The journey is drawn, not rendered.** A hand-rolled perspective projection
   on a Compose canvas, with the starfield in flat arrays so the draw phase
   allocates nothing per frame.
