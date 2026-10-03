@@ -77,10 +77,13 @@
     <string name="journey_done">Done</string>
 
     <!-- Logbook -->
-    <string name="history_count">%1$d pebbles collected</string>
     <string name="history_storage">Using %1$s</string>
     <string name="history_unknown_planet">Not researched yet</string>
     <string name="history_delete">Delete this pebble</string>
     <string name="history_replay">Watch the journey again</string>
     <string name="history_no_place">Place not recorded</string>
+    <plurals name="history_count">
+        <item quantity="one">%1$d pebble collected</item>
+        <item quantity="other">%1$d pebbles collected</item>
+    </plurals>
 </resources>

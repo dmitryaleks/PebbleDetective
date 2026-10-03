@@ -76,10 +76,15 @@
     <string name="journey_done">Готово</string>
 
     <!-- Logbook -->
-    <string name="history_count">Собрано камешков: %1$d</string>
     <string name="history_storage">Занято: %1$s</string>
     <string name="history_unknown_planet">Ещё не исследован</string>
     <string name="history_delete">Удалить камешек</string>
     <string name="history_replay">Посмотреть полёт снова</string>
     <string name="history_no_place">Место не записано</string>
+    <plurals name="history_count">
+        <item quantity="one">Собран %1$d камешек</item>
+        <item quantity="few">Собрано %1$d камешка</item>
+        <item quantity="many">Собрано %1$d камешков</item>
+        <item quantity="other">Собрано %1$d камешка</item>
+    </plurals>
 </resources>
