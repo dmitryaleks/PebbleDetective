@@ -12,11 +12,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -71,7 +77,9 @@ import java.time.format.FormatStyle
  * Swipe left or right to move between stones without going back to the list,
  * which is how anyone actually wants to look through a collection. Arrows and
  * a position counter sit above the page so the gesture is discoverable and so
- * it still works for someone who cannot swipe.
+ * it still works for someone who cannot swipe, and a thumbnail strip along the
+ * bottom jumps straight to any pebble - thirty swipes to reach the far end of
+ * a collection is no way to browse one.
  */
 @Composable
 fun HistoryDetailScreen(
@@ -124,7 +132,7 @@ fun HistoryDetailScreen(
 
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f),
         ) { page ->
             // The list can shrink mid-swipe when a pebble is deleted.
             val entry = entries.getOrNull(page) ?: return@HorizontalPager
@@ -138,6 +146,17 @@ fun HistoryDetailScreen(
                 },
                 onDelete = { confirmDelete = entry },
                 onBack = onBack,
+            )
+        }
+
+        // Thirty swipes to reach the far end of a collection is no way to
+        // browse one, so the strip jumps straight there.
+        if (entries.size > 1) {
+            ThumbnailStrip(
+                session = session,
+                entries = entries,
+                current = pagerState.currentPage,
+                onSelect = { index -> scope.launch { pagerState.animateScrollToPage(index) } },
             )
         }
     }
@@ -190,28 +209,11 @@ private fun PagerControls(
             )
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            // Dots for a small collection, a counter once they would not fit.
-            if (total in 2..8) {
-                repeat(total) { index ->
-                    Box(
-                        modifier = Modifier
-                            .size(if (index == position) 9.dp else 7.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (index == position) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                            )
-                    )
-                }
-            } else {
-                Text(
-                    text = stringResource(R.string.gallery_position, position + 1, total),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
+        Text(
+            text = stringResource(R.string.gallery_position, position + 1, total),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
 
         IconButton(
             onClick = onNext,
@@ -329,6 +331,96 @@ private fun PebblePage(
         TextButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             Text(stringResource(R.string.cd_back), modifier = Modifier.padding(start = 8.dp))
+        }
+    }
+}
+
+/**
+ * A row of every pebble, for jumping straight to one.
+ *
+ * Follows the pager rather than driving it, and keeps a couple of
+ * thumbnails visible ahead of the selection so there is somewhere obvious
+ * to go next.
+ */
+@Composable
+private fun ThumbnailStrip(
+    session: SessionViewModel,
+    entries: List<PebbleEntry>,
+    current: Int,
+    onSelect: (Int) -> Unit,
+) {
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(current) {
+        // Leave a little context before the selection rather than pinning it
+        // to the left edge.
+        listState.animateScrollToItem((current - 2).coerceAtLeast(0))
+    }
+
+    LazyRow(
+        state = listState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(84.dp)
+            .padding(vertical = 8.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
+            ThumbnailChip(
+                session = session,
+                entry = entry,
+                position = index,
+                total = entries.size,
+                selected = index == current,
+                onClick = { onSelect(index) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ThumbnailChip(
+    session: SessionViewModel,
+    entry: PebbleEntry,
+    position: Int,
+    total: Int,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    var thumb by remember(entry.id) { mutableStateOf<Bitmap?>(null) }
+    LaunchedEffect(entry.id) { thumb = session.thumbnail(entry.id) }
+
+    val label = stringResource(R.string.gallery_jump_to, position + 1, total)
+
+    Box(
+        modifier = Modifier
+            .size(68.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.Black)
+            .border(
+                border = BorderStroke(
+                    width = if (selected) 3.dp else 1.dp,
+                    color = if (selected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                    },
+                ),
+                shape = RoundedCornerShape(10.dp),
+            )
+            .clickable(onClick = onClick)
+            .semantics { contentDescription = label },
+    ) {
+        thumb?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                // The unselected ones recede so the current pebble reads first.
+                alpha = if (selected) 1f else 0.55f,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
 }

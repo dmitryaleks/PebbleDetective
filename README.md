@@ -117,8 +117,10 @@ shows how much space the collection is using.
 
 Open one and **swipe left or right to walk through the whole collection**
 without going back to the list. Arrows and a position counter sit above the
-page, so the gesture is discoverable and so it still works for anyone who
-cannot swipe.
+page so the gesture is discoverable and still works for anyone who cannot
+swipe, and a **thumbnail strip along the bottom jumps straight to any
+pebble** — thirty swipes to reach the far end of a collection is no way to
+browse one.
 
 **The coordinates are tappable** and open the spot in a map. This is the one
 place the app reaches outside itself: it still holds no network permission and

@@ -93,4 +93,5 @@
     <string name="gallery_previous">まえの こいし</string>
     <string name="gallery_next">つぎの こいし</string>
     <string name="gallery_position">%2$d この うち %1$d こめ</string>
+    <string name="gallery_jump_to">%2$d この うち %1$d こめの こいし</string>
 </resources>

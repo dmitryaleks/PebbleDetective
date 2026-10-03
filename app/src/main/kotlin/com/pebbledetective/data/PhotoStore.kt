@@ -3,6 +3,7 @@ package com.pebbledetective.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.LruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -22,6 +23,18 @@ class PhotoStore(context: Context) {
 
     private val root = File(context.filesDir, "pebbles").apply { mkdirs() }
     private val thumbs = File(root, "thumbs").apply { mkdirs() }
+
+    /**
+     * Decoded thumbnails, bounded by bytes.
+     *
+     * The logbook list and the gallery's thumbnail strip both scroll through
+     * these, and decoding a JPEG from disk on every recycle is visible as
+     * stutter. Full photographs are deliberately *not* cached - they are
+     * ~6MB decoded and only one is on screen at a time.
+     */
+    private val thumbCache = object : LruCache<String, Bitmap>(THUMB_CACHE_BYTES) {
+        override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
+    }
 
     fun photoFile(id: String) = File(root, "$id.jpg")
 
@@ -43,11 +56,17 @@ class PhotoStore(context: Context) {
         photoFile(id).takeIf { it.exists() }?.let { BitmapFactory.decodeFile(it.path) }
     }
 
-    suspend fun loadThumb(id: String): Bitmap? = withContext(Dispatchers.IO) {
-        thumbFile(id).takeIf { it.exists() }?.let { BitmapFactory.decodeFile(it.path) }
+    suspend fun loadThumb(id: String): Bitmap? {
+        thumbCache.get(id)?.let { return it }
+        val decoded = withContext(Dispatchers.IO) {
+            thumbFile(id).takeIf { it.exists() }?.let { BitmapFactory.decodeFile(it.path) }
+        }
+        if (decoded != null) thumbCache.put(id, decoded)
+        return decoded
     }
 
     suspend fun delete(id: String): Unit = withContext(Dispatchers.IO) {
+        thumbCache.remove(id)
         photoFile(id).delete()
         thumbFile(id).delete()
     }
@@ -69,6 +88,10 @@ class PhotoStore(context: Context) {
         const val FULL_QUALITY = 88
         const val THUMB_QUALITY = 80
         const val THUMB_PX = 256
+
+        /** Enough for a few dozen thumbnails, and a small slice of the heap. */
+        val THUMB_CACHE_BYTES =
+            (Runtime.getRuntime().maxMemory() / 8).coerceAtMost(8L * 1024 * 1024).toInt()
     }
 }
 
