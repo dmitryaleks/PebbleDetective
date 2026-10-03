@@ -91,4 +91,9 @@
     <!-- Map link -->
     <string name="map_open">Открыть на карте</string>
     <string name="map_pin_label">Здесь найден камешек</string>
+
+    <!-- Logbook gallery -->
+    <string name="gallery_previous">Предыдущий камешек</string>
+    <string name="gallery_next">Следующий камешек</string>
+    <string name="gallery_position">%1$d из %2$d</string>
 </resources>

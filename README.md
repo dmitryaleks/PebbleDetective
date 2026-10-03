@@ -112,9 +112,13 @@ film again.
 </p>
 
 Every stone is kept: its photograph, the world it came from, when it was found
-and — if location was allowed — where. Tap one to see it full size and watch its
-journey again. Each can be deleted, and the logbook shows how much space the
-collection is using.
+and — if location was allowed — where. Each can be deleted, and the logbook
+shows how much space the collection is using.
+
+Open one and **swipe left or right to walk through the whole collection**
+without going back to the list. Arrows and a position counter sit above the
+page, so the gesture is discoverable and so it still works for anyone who
+cannot swipe.
 
 **The coordinates are tappable** and open the spot in a map. This is the one
 place the app reaches outside itself: it still holds no network permission and

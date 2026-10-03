@@ -88,4 +88,9 @@
     <!-- Map link -->
     <string name="map_open">ちずで ひらく</string>
     <string name="map_pin_label">ここで こいしを みつけた</string>
+
+    <!-- Logbook gallery -->
+    <string name="gallery_previous">まえの こいし</string>
+    <string name="gallery_next">つぎの こいし</string>
+    <string name="gallery_position">%2$d この うち %1$d こめ</string>
 </resources>
