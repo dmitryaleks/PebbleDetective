@@ -85,4 +85,12 @@
     <string name="journey_arrived">Landed on Earth!</string>
     <string name="journey_distance">%1$d%% of the way to go</string>
     <string name="journey_done">Done</string>
+
+    <!-- Logbook -->
+    <string name="history_count">%1$d pebbles collected</string>
+    <string name="history_storage">Using %1$s</string>
+    <string name="history_unknown_planet">Not researched yet</string>
+    <string name="history_delete">Delete this pebble</string>
+    <string name="history_replay">Watch the journey again</string>
+    <string name="history_no_place">Place not recorded</string>
 </resources>

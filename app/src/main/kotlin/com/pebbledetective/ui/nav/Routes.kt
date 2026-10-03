@@ -8,4 +8,7 @@ object Routes {
     const val JOURNEY = "journey"
     const val HISTORY = "history"
     const val CREDITS = "credits"
+    const val HISTORY_DETAIL = "history/{id}"
+
+    fun historyDetail(id: String) = "history/$id"
 }

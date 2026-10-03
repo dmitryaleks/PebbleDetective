@@ -83,4 +83,12 @@
     <string name="journey_arrived">ちきゅうに とうちゃく！</string>
     <string name="journey_distance">のこり %1$d%%</string>
     <string name="journey_done">おわり</string>
+
+    <!-- Logbook -->
+    <string name="history_count">あつめた こいし: %1$d こ</string>
+    <string name="history_storage">つかっている ようりょう: %1$s</string>
+    <string name="history_unknown_planet">まだ しらべてないよ</string>
+    <string name="history_delete">この こいしを けす</string>
+    <string name="history_replay">たびを もういちど みる</string>
+    <string name="history_no_place">ばしょは きろくなし</string>
 </resources>

@@ -83,4 +83,12 @@
     <string name="journey_arrived">Приземлились на Земле!</string>
     <string name="journey_distance">Осталось %1$d%%</string>
     <string name="journey_done">Готово</string>
+
+    <!-- Logbook -->
+    <string name="history_count">Собрано камешков: %1$d</string>
+    <string name="history_storage">Занято: %1$s</string>
+    <string name="history_unknown_planet">Ещё не исследован</string>
+    <string name="history_delete">Удалить камешек</string>
+    <string name="history_replay">Посмотреть полёт снова</string>
+    <string name="history_no_place">Место не записано</string>
 </resources>

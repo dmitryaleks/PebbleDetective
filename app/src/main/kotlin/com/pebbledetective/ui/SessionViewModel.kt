@@ -223,6 +223,27 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         if (_result.value?.id == located.id) _result.value = located
     }
 
+    // ---- logbook --------------------------------------------------------
+
+    /** The logbook list only ever decodes thumbnails, never full frames. */
+    suspend fun thumbnail(id: String): Bitmap? = container.photos.loadThumb(id)
+
+    suspend fun photo(id: String): Bitmap? = container.photos.loadPhoto(id)
+
+    fun entry(id: String): PebbleEntry? = container.pebbles.find(id)
+
+    suspend fun deleteEntry(id: String) {
+        container.pebbles.delete(id)
+    }
+
+    suspend fun storageBytes(): Long = container.photos.bytesUsed()
+
+    /** Re-runs the flight for an entry opened from the logbook. */
+    fun replay(entry: PebbleEntry) {
+        _result.value = entry
+        resetJourney()
+    }
+
     // ---- journey --------------------------------------------------------
 
     fun journeyElapsedMs(): Long =

@@ -1,12 +1,16 @@
 package com.pebbledetective.ui.nav
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pebbledetective.R
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.capture.CaptureScreen
+import com.pebbledetective.ui.history.HistoryDetailScreen
+import com.pebbledetective.ui.history.HistoryScreen
 import com.pebbledetective.ui.journey.JourneyScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
@@ -63,13 +67,22 @@ fun PebbleNavHost(session: SessionViewModel) {
             )
         }
         composable(Routes.HISTORY) {
-            PlaceholderScreen(
+            HistoryScreen(
                 session = session,
-                titleRes = R.string.screen_history,
-                bodyRes = R.string.history_empty,
-                onOpenHistory = null,
+                onOpen = { id -> navController.navigate(Routes.historyDetail(id)) },
                 onBack = navController::popBackStack,
                 onOpenCredits = { navController.navigate(Routes.CREDITS) },
+            )
+        }
+        composable(
+            route = Routes.HISTORY_DETAIL,
+            arguments = listOf(navArgument("id") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            HistoryDetailScreen(
+                session = session,
+                entryId = backStackEntry.arguments?.getString("id").orEmpty(),
+                onBack = navController::popBackStack,
+                onReplay = { navController.navigate(Routes.JOURNEY) },
             )
         }
         composable(Routes.CREDITS) {
