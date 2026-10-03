@@ -471,15 +471,24 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
             delay(1_400)
             container.sound.play(SoundCue.LAUNCH_WHOOSH)
             container.sound.loop(SoundCue.SPACE_DRONE)
-            delay(8_100)
+            delay(7_600)
             container.sound.stop(SoundCue.SPACE_DRONE)
             container.sound.play(SoundCue.ENTRY_RUMBLE)
-            delay(1_500)
+            // Falling through the map: an altimeter ping every second,
+            // quickening as the ground comes up.
+            delay(2_500)
+            container.sound.play(SoundCue.SERVO)
+            // Eight pings over the seven seconds of the descent, each gap a
+            // little shorter than the last, landing on touchdown.
+            repeat(8) {
+                container.sound.play(SoundCue.SCANNER_BLIP)
+                delay(1_050 - it * 50L)
+            }
             container.sound.play(SoundCue.ARRIVAL_CHIME)
         }
     }
 
-    /** By the third pebble an unskippable twelve-second film is hostile. */
+    /** By the third pebble an unskippable twenty-second film is hostile. */
     fun skipJourney() {
         val started = _journeyStartedAt.value ?: return
         val target = JourneyTimeline.skippedStart(started, SystemClock.elapsedRealtime())

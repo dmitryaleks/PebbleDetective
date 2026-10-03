@@ -71,7 +71,11 @@
     <string name="journey_departing">Улетаем с %1$s</string>
     <string name="journey_cruising">Летим через космос</string>
     <string name="journey_entering">Входим в атмосферу</string>
-    <string name="journey_arrived">Приземлились на Земле!</string>
+    <string name="journey_arrived">Приземлились в Токио!</string>
+    <string name="journey_approach">Над Японией</string>
+    <string name="journey_descent">Над Токио</string>
+    <string name="journey_altitude">Высота %1$d км</string>
+    <string name="journey_site">Кото, Токио</string>
     <string name="journey_distance">Осталось %1$d%%</string>
     <string name="journey_done">Готово</string>
 

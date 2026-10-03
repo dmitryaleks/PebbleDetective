@@ -94,16 +94,26 @@ planet every time you looked at it would be no fun at all.
 
 ### 5 · Fly it home
 
-<img src="docs/journey.gif" width="260" align="right" alt="The pebble's twelve second flight to Earth" />
+<img src="docs/journey.gif" width="260" align="right" alt="The pebble's twenty second flight to Earth" />
 
-Twelve seconds of schematic space flight. The pebble launches, tumbles along a
-curving arc through a warping starfield, its home world shrinking behind it,
-Earth swelling ahead, and the air glowing orange as it comes in to land.
+Twenty seconds of schematic space flight. The pebble launches, tumbles along a
+curving arc through a warping starfield, its home world shrinking behind it and
+Earth swelling ahead, until the air starts to glow orange around it.
+
+Then it keeps going. The fireball gives way to a map of Japan, the view falls
+and closes in through Kanto and over Tokyo Bay, and the pebble finally comes
+down between the Sumida and the Arakawa, in Koto.
 
 Also skippable — by the third pebble, nobody wants to sit through the whole
 film again.
 
 <br clear="right" />
+
+<p>
+<img src="docs/screen-descent.png" width="250" alt="Falling towards Japan" />
+&nbsp;
+<img src="docs/screen-landing.png" width="250" alt="Landed in Koto, Tokyo" />
+</p>
 
 ### 6 · Keep the collection
 
@@ -291,6 +301,12 @@ A few decisions worth knowing about:
 - **The journey is drawn, not rendered.** A hand-rolled perspective projection
   on a Compose canvas, with the starfield in flat arrays so the draw phase
   allocates nothing per frame.
+- **The landing is a map, drawn the same way.** Coastlines as lists of degrees,
+  projected with the longitude squeezed by the cosine of the latitude, at three
+  levels of detail that hand over as the scale drops - the islands of Japan,
+  then the coast of Kanto with Tokyo Bay cut into it, then the streets. The pan
+  is tied to the zoom scale rather than to elapsed time, which is what keeps
+  the landing site in frame the whole way down.
 
 ---
 

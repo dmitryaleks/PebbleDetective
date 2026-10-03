@@ -72,7 +72,11 @@
     <string name="journey_departing">Leaving %1$s</string>
     <string name="journey_cruising">Crossing space</string>
     <string name="journey_entering">Entering the atmosphere</string>
-    <string name="journey_arrived">Landed on Earth!</string>
+    <string name="journey_arrived">Landed in Tokyo!</string>
+    <string name="journey_approach">Over Japan</string>
+    <string name="journey_descent">Over Tokyo</string>
+    <string name="journey_altitude">%1$d km up</string>
+    <string name="journey_site">Koto, Tokyo</string>
     <string name="journey_distance">%1$d%% of the way to go</string>
     <string name="journey_done">Done</string>
 

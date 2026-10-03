@@ -28,6 +28,7 @@ PKG = "com.pebbledetective"
 TAP_CAPTURE = (540, 1150)
 TAP_YES = (539, 1226)
 TAP_JOURNEY = (539, 1842)
+TAP_DONE = (540, 2198)
 TAP_HISTORY = (985, 212)
 # The top controls are right-aligned, so the globe sits further right on
 # screens that have no logbook button of their own.
@@ -61,21 +62,32 @@ def save(image: Image.Image, name: str, width: int = 420) -> None:
     print(f"  {name}  {os.path.getsize(path)//1024} kB")
 
 
-def burst(seconds: float, name: str, width: int = 300, frame_ms: int = 220) -> None:
-    """Grab frames as fast as screencap allows, then write them as a GIF."""
+def burst(
+    seconds: float,
+    name: str,
+    width: int = 300,
+    frame_ms: int = 220,
+    stride: int = 1,
+) -> None:
+    """Grab frames as fast as screencap allows, then write them as a GIF.
+
+    A long sequence keeps only every `stride`-th frame, with the frame
+    duration scaled to match, so the GIF still runs at wall-clock speed
+    without the file growing past what a README should carry.
+    """
     frames: list[Image.Image] = []
     end = time.time() + seconds
     while time.time() < end:
         frames.append(shot())
     small = []
-    for f in frames:
+    for f in frames[::stride]:
         g = f.copy()
         g.thumbnail((width, width * 4), Image.LANCZOS)
         small.append(g.convert("P", palette=Image.ADAPTIVE, colors=128))
     path = os.path.join(DOCS, name)
     small[0].save(
         path, save_all=True, append_images=small[1:],
-        duration=frame_ms, loop=0, optimize=True,
+        duration=frame_ms * stride, loop=0, optimize=True,
     )
     print(f"  {name}  {len(small)} frames  {os.path.getsize(path)//1024} kB")
 
@@ -107,10 +119,19 @@ def main() -> int:
     time.sleep(2)
     save(shot(), "screen-result.png")
 
-    # 4. The journey, as a GIF.
+    # 4. The journey, as a GIF, and the landing it ends on.
     tap(TAP_JOURNEY)
-    burst(12.5, "journey.gif")
+    burst(20.5, "journey.gif", stride=2)
     time.sleep(1)
+    save(shot(), "screen-landing.png")
+
+    # 4b. One still from over Japan. The descent passes through it quickly
+    # and it is the part of the flight the GIF shows worst.
+    tap(TAP_DONE)
+    time.sleep(1.5)
+    tap(TAP_JOURNEY)
+    time.sleep(12.8)
+    save(shot(), "screen-descent.png")
 
     # 5. The logbook.
     restart()

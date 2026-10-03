@@ -71,7 +71,11 @@
     <string name="journey_departing">%1$s を しゅっぱつ</string>
     <string name="journey_cruising">うちゅうを おうだんちゅう</string>
     <string name="journey_entering">たいきけんに とつにゅう</string>
-    <string name="journey_arrived">ちきゅうに とうちゃく！</string>
+    <string name="journey_arrived">とうきょうに とうちゃく！</string>
+    <string name="journey_approach">にほんの うえ</string>
+    <string name="journey_descent">とうきょうの うえ</string>
+    <string name="journey_altitude">こうど %1$d キロ</string>
+    <string name="journey_site">とうきょうと こうとうく</string>
     <string name="journey_distance">のこり %1$d%%</string>
     <string name="journey_done">おわり</string>
 

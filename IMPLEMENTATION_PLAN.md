@@ -318,3 +318,35 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
 - **Verified on device:** EN → RU → JA relabels every string live with no Activity restart and no flicker; language and the sound setting both survive a `force-stop`; sound is off on first run; navigation to the logbook works and correctly hides its own icon.
 
 **Still owed from Phase 1:** `Locale.getDefault()` is deliberately not changed by the in-composition override, so date formatting must take the locale explicitly once the logbook shows timestamps — see `AppLanguage.locale`.
+
+### Post-release — the landing sequence
+
+- **The Done button had never worked from the logbook.** `onFinished` called
+  `popBackStack(Routes.RESULT, inclusive = false)`, but a journey started from
+  a logbook entry has a stack of `[CAPTURE, HISTORY, HISTORY_DETAIL, JOURNEY]`
+  with no RESULT on it, so the pop matched nothing and silently did nothing.
+  A plain `popBackStack()` returns to whichever screen the journey was started
+  from. The frame loop also used to call `onFinished()` itself the moment the
+  timeline completed, so the button was only on screen for about a second even
+  on the path where it did work; the landed scene now stays up and Done is the
+  only way out of it.
+- **The flight is twenty seconds, not twelve.** Atmospheric entry used to be
+  the end of it. It now carries on: the fireball covers a cut from the
+  starfield to a schematic map, which falls and closes in through Japan and
+  Kanto to the streets of Koto. The old `LANDING` phase is split into
+  `APPROACH`, `DESCENT` and `TOUCHDOWN`.
+- **A linear zoom was wrong twice over.** The map scale is interpolated
+  geometrically across a factor of about ninety, so a linear parameter spends
+  almost the whole descent at the close end — Japan was visible for about half
+  a second. Smoothstep on the parameter holds the wide shot. Separately, the
+  *pan* had to be tied to the span rather than to the parameter: with a linear
+  pan the scale collapses far faster than the camera travels, and Tokyo slid
+  off the edge of the screen two thirds of the way down.
+- **One set of coastlines cannot cover a ninety-fold zoom.** The outline of
+  Honshu is unreadable blown up to 200km across. Three levels of detail now
+  hand over as the scale drops: the islands of Japan, the coast of Kanto with
+  Tokyo Bay cut into it as a single land polygon, then the city — block grid,
+  loop line, radial roads and both rivers, all clipped to the land.
+- **Verified on device** along both paths: Done from the post-research journey
+  returns to the result screen, and Done from a logbook replay returns to that
+  logbook entry. Skip still lands on the same final frame.

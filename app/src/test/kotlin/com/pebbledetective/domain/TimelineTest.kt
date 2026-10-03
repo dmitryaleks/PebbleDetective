@@ -65,10 +65,16 @@ class ResearchTimelineTest {
 
 class JourneyTimelineTest {
 
-    /** The brief asks for a flight of ten to fifteen seconds. */
+    /**
+     * The brief asked for ten to fifteen seconds, which covered the flight
+     * through space only. The landing sequence - atmosphere, Japan, Tokyo -
+     * was added afterwards and takes the whole thing to twenty. Long enough
+     * to matter, short enough that the skip button is a courtesy rather
+     * than a necessity.
+     */
     @Test
-    fun `the journey lasts between ten and fifteen seconds`() {
-        assertTrue(JourneyTimeline.TOTAL_MS in 10_000..15_000)
+    fun `the journey lasts twenty seconds`() {
+        assertEquals(20_000L, JourneyTimeline.TOTAL_MS)
     }
 
     @Test
@@ -88,7 +94,9 @@ class JourneyTimelineTest {
                 JourneyPhase.LAUNCH,
                 JourneyPhase.CRUISE,
                 JourneyPhase.ENTRY,
-                JourneyPhase.LANDING,
+                JourneyPhase.APPROACH,
+                JourneyPhase.DESCENT,
+                JourneyPhase.TOUCHDOWN,
             ),
             order,
         )
@@ -99,8 +107,61 @@ class JourneyTimelineTest {
         assertEquals(0f, JourneyTimeline.travel(0), 0.001f)
         assertEquals(0f, JourneyTimeline.travel(2_000), 0.001f)
         assertTrue(JourneyTimeline.travel(6_000) > 0.3f)
-        assertEquals(1f, JourneyTimeline.travel(11_000), 0.001f)
+        assertEquals(1f, JourneyTimeline.travel(11_500), 0.001f)
         assertEquals(1f, JourneyTimeline.travel(JourneyTimeline.TOTAL_MS), 0.001f)
+    }
+
+    @Test
+    fun `the descent zooms from the whole country down to the street`() {
+        // Nothing happens until the atmosphere has been crossed.
+        assertEquals(0f, JourneyTimeline.descentZoom(0), 0.001f)
+        assertEquals(0f, JourneyTimeline.descentZoom(11_500), 0.001f)
+        val middle = JourneyTimeline.descentZoom(15_000)
+        assertTrue("halfway down was $middle", middle in 0.4f..0.6f)
+        assertEquals(1f, JourneyTimeline.descentZoom(18_500), 0.001f)
+        assertEquals(1f, JourneyTimeline.descentZoom(JourneyTimeline.TOTAL_MS), 0.001f)
+    }
+
+    @Test
+    fun `the zoom never runs backwards`() {
+        var last = -1f
+        for (t in 0..JourneyTimeline.TOTAL_MS step 25) {
+            val zoom = JourneyTimeline.descentZoom(t)
+            assertTrue("zoom went backwards at ${t}ms", zoom >= last)
+            last = zoom
+        }
+    }
+
+    /**
+     * The cut from starfield to map has to happen while the entry glow is
+     * bright enough to hide it, or the scene visibly swaps.
+     */
+    @Test
+    fun `the map fades in under the brightest part of the entry glow`() {
+        assertEquals(0f, JourneyTimeline.mapReveal(9_000), 0.001f)
+        assertEquals(1f, JourneyTimeline.mapReveal(11_500), 0.001f)
+        val midway = JourneyTimeline.mapReveal(10_900)
+        assertTrue("reveal was $midway", midway in 0.2f..0.8f)
+        assertTrue(
+            "the glow must still be strong while the map appears",
+            JourneyTimeline.entryHeat(10_900) > 0.6f,
+        )
+    }
+
+    @Test
+    fun `altitude counts down to the ground and stops there`() {
+        assertEquals(120, JourneyTimeline.altitudeKm(0))
+        assertEquals(120, JourneyTimeline.altitudeKm(9_000))
+        assertTrue(JourneyTimeline.altitudeKm(14_000) in 1..119)
+        assertEquals(0, JourneyTimeline.altitudeKm(18_500))
+        assertEquals(0, JourneyTimeline.altitudeKm(99_999))
+    }
+
+    @Test
+    fun `the impact only spreads once the pebble is down`() {
+        assertEquals(0f, JourneyTimeline.landedFraction(18_000), 0.001f)
+        assertEquals(0f, JourneyTimeline.landedFraction(18_500), 0.001f)
+        assertEquals(1f, JourneyTimeline.landedFraction(JourneyTimeline.TOTAL_MS), 0.001f)
     }
 
     @Test

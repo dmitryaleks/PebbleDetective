@@ -60,9 +60,13 @@ fun PebbleNavHost(session: SessionViewModel) {
         composable(Routes.JOURNEY) {
             JourneyScreen(
                 session = session,
+                // Plain pop, not a pop back to RESULT: the journey is also
+                // reachable from a logbook entry, and that stack has no
+                // RESULT on it, so popping to it did nothing at all and the
+                // Done button appeared dead.
                 onFinished = {
                     session.resetJourney()
-                    navController.popBackStack(Routes.RESULT, inclusive = false)
+                    navController.popBackStack()
                 },
             )
         }
