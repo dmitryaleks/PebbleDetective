@@ -24,6 +24,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
@@ -205,6 +206,8 @@ private fun RadarCameraBackdrop() {
     val previewView = remember {
         PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER }
     }
+    // Held so disposal can retract exactly what this screen bound.
+    val bound = remember { mutableStateOf<Pair<ProcessCameraProvider, Preview>?>(null) }
 
     LaunchedEffect(previewView) {
         runCatching {
@@ -229,14 +232,18 @@ private fun RadarCameraBackdrop() {
                 CameraSelector.DEFAULT_FRONT_CAMERA
             }
             provider.bindToLifecycle(owner, lens, preview)
+            bound.value = provider to preview
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            runCatching {
-                ProcessCameraProvider.getInstance(context).get().unbindAll()
-            }
+            // Only this screen's preview. unbindAll() here was a real bug:
+            // Compose disposes the outgoing screen *after* composing the
+            // incoming one, so it tore down the camera that Detection had
+            // just bound, freezing its preview and leaving capture dead.
+            runCatching { bound.value?.let { (provider, preview) -> provider.unbind(preview) } }
+            bound.value = null
         }
     }
 

@@ -32,6 +32,7 @@ class CameraSession(
     private val previewView: PreviewView,
 ) {
     private var imageCapture: ImageCapture? = null
+    private var preview: Preview? = null
     private var provider: ProcessCameraProvider? = null
 
     suspend fun bind(owner: LifecycleOwner) {
@@ -41,6 +42,7 @@ class CameraSession(
         val preview = Preview.Builder().build().apply {
             surfaceProvider = previewView.surfaceProvider
         }
+        this.preview = preview
 
         // Cap the still. A 50MP frame decoded to ARGB_8888 is ~200MB and will
         // simply run the app out of memory; this is ample for a keepsake and
@@ -124,9 +126,17 @@ class CameraSession(
             )
         }
 
+    /**
+     * Releases this session's own use cases.
+     *
+     * Deliberately not unbindAll: another screen may have bound the camera
+     * by the time this runs, and taking everything down would break it.
+     */
     fun unbind() {
-        provider?.unbindAll()
+        val cases = listOfNotNull(preview, imageCapture).toTypedArray()
+        if (cases.isNotEmpty()) runCatching { provider?.unbind(*cases) }
         imageCapture = null
+        preview = null
     }
 }
 
