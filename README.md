@@ -45,7 +45,53 @@ sky — rather than at the camera.
 
 <br clear="right" />
 
-### 1 · Find a pebble
+### 1 · Look around you
+
+<p>
+<img src="docs/screen-sky.png" width="250" alt="The Sun, Mercury and Venus labelled over the live camera" />
+&nbsp;
+<img src="docs/meteor.gif" width="250" alt="A meteor falling out of the sky into the street" />
+</p>
+
+Hold the phone up and the solar system is drawn over whatever the camera can
+see, each world a real NASA photograph hanging in the place it actually
+occupies in the sky. The toolbar splits them into what is **up now** and what
+is **below** your feet; tap one to follow just that body, and an arrow points
+the way until you have swung the phone round to it.
+
+Tap a planet on the screen and a piece of it comes down — that is the second
+picture above, with the phone swinging down to follow it. The fireball is
+pinned to a direction in the world rather than to a place on the screen, so
+it keeps falling where it fell while you turn after it, and the crater it
+leaves in the street stays put.
+
+**And the app remembers.** You just watched a piece of Saturn land, so the
+next stone you scan is from Saturn, whatever colour it happens to be. The
+Detection screen says so before you take the picture, with a **No, check it**
+button beside it — finding out afterwards that the answer had been decided in
+advance would feel like the app cheating. It lasts exactly one pebble.
+
+**This is the first of three stages.** Pick a world here, hand over to
+**Radar** to go and find where its piece came down, and finish in
+**Detection** with the camera on the stone itself:
+
+<p align="center"><b>Planets around</b> → <b>Radar</b> → <b>Detection</b></p>
+
+The button at the bottom of each screen moves you along the chain, and the
+three mode buttons in the top bar — globe, radar, camera — jump straight to
+any stage, so nobody has to walk the whole thing to photograph a stone they
+already have in their hand. Going back retraces the way you came.
+
+**Where the positions come from.** Nowhere. There is no ephemeris file and no
+network call: each planet is six numbers and six rates of change, and solving
+Kepler’s equation on the phone gives its position at any instant. That is
+why it works in a field with no signal, and why it will still be right in
+2050. The orbits are good to a few arcminutes; what actually limits the
+accuracy is the phone’s compass, which is routinely ten degrees out indoors.
+
+<br clear="right" />
+
+### 2 · Find a pebble
 
 <img src="docs/screen-capture.png" width="260" align="right" alt="Camera view with the targeting reticle" />
 
@@ -66,7 +112,7 @@ portrait, and it is the exact image the app analyses.
 
 <br clear="right" />
 
-### 2 · Run a Deep Research
+### 3 · Run a Deep Research
 
 <img src="docs/screen-prompt.png" width="260" align="right" alt="Deep Research prompt over the frozen photograph" />
 
@@ -76,7 +122,7 @@ Saying *Not now* throws the stone back and returns to the camera.
 
 <br clear="right" />
 
-### 3 · Watch the scan
+### 4 · Watch the scan
 
 <img src="docs/research.gif" width="260" align="right" alt="The five second research sequence" />
 
@@ -92,7 +138,7 @@ It can be skipped at any point.
 
 <br clear="right" />
 
-### 4 · Meet the world
+### 5 · Meet the world
 
 <img src="docs/screen-result.png" width="260" align="right" alt="Result screen showing Jupiter" />
 
@@ -106,7 +152,7 @@ planet every time you looked at it would be no fun at all.
 
 <br clear="right" />
 
-### 5 · Fly it home
+### 6 · Fly it home
 
 <img src="docs/journey.gif" width="260" align="right" alt="The pebble's twenty second flight to Earth" />
 
@@ -131,57 +177,14 @@ film again.
 <br clear="right" />
 
 <p>
-<img src="docs/screen-descent.png" width="250" alt="Falling towards Japan" />
+<img src="docs/screen-cruise.png" width="190" alt="Jupiter astern, Earth ahead" />
 &nbsp;
-<img src="docs/screen-landing.png" width="250" alt="Landed in Koto, Tokyo" />
+<img src="docs/screen-descent.png" width="190" alt="Falling towards Japan" />
+&nbsp;
+<img src="docs/screen-landing.png" width="190" alt="Landed in Koto, Tokyo" />
 </p>
 
-### 5b · Find the planets around you
-
-<p>
-<img src="docs/screen-sky.png" width="250" alt="Saturn and Neptune labelled over the live camera" />
-&nbsp;
-<img src="docs/screen-meteor.png" width="250" alt="A meteor landing in the street" />
-</p>
-
-Hold the phone up and the solar system is drawn over whatever the camera can
-see, each world a real NASA photograph hanging in the place it actually
-occupies in the sky. The toolbar splits them into what is **up now** and what
-is **below** your feet; tap one to follow just that body, and an arrow points
-the way until you have swung the phone round to it.
-
-Tap a planet on the screen and a piece of it comes down. The fireball is
-pinned to a direction in the world rather than to a place on the screen, so
-it keeps falling where it fell while you turn to follow it, and the crater it
-leaves in the street stays put.
-
-**And the app remembers.** You just watched a piece of Saturn land, so the
-next stone you scan is from Saturn, whatever colour it happens to be. The
-Detection screen says so before you take the picture, with a **No, check it**
-button beside it — finding out afterwards that the answer had been decided in
-advance would feel like the app cheating. It lasts exactly one pebble.
-
-**This is where the app opens, and the first of three stages.** Pick a world
-here, hand over to **Radar** to go and find where its piece came down, and
-finish in **Detection** with the camera on the stone itself:
-
-<p align="center"><b>Planets around</b> → <b>Radar</b> → <b>Detection</b></p>
-
-The button at the bottom of each screen moves you along the chain, and the
-three mode buttons in the top bar — globe, radar, camera — jump straight to
-any stage, so nobody has to walk the whole thing to photograph a stone they
-already have in their hand. Going back retraces the way you came.
-
-**Where the positions come from.** Nowhere. There is no ephemeris file and no
-network call: each planet is six numbers and six rates of change, and solving
-Kepler’s equation on the phone gives its position at any instant. That is
-why it works in a field with no signal, and why it will still be right in
-2050. The orbits are good to a few arcminutes; what actually limits the
-accuracy is the phone’s compass, which is routinely ten degrees out indoors.
-
-<br clear="right" />
-
-### 6 · Keep the collection
+### 7 · Keep the collection
 
 <p>
 <img src="docs/screen-logbook.png" width="250" alt="The pebble logbook" />
@@ -339,10 +342,18 @@ passwords are in this repository.
 
 ### Regenerating the artwork in this README
 
-```bash
-python tools/make_banner.py      # the hero image, from the bundled NASA photos
-python tools/capture_docs.py     # screenshots and GIFs, from a running device
+```console
+python tools/make_banner.py                  # the hero image
+python tools/fetch_assets.py                 # the bundled photos and sounds
+python tools/capture_docs.py  <serial>       # every screen but the sky
+python tools/capture_sky.py   <serial>       # the sky, and a meteor
 ```
+
+The two capture scripts drive a connected device. They find buttons by their
+accessibility labels rather than by pixel coordinates, because the toolbar has
+grown twice and every time the hard-coded taps quietly started pressing
+whatever had moved into their place. The sky needs the emulator’s virtual
+compass pointed at a planet, which is why it is a script of its own.
 
 ---
 
@@ -383,7 +394,9 @@ A few decisions worth knowing about:
   Android’s built-in world magnetic model supplies the correction offline.
 - **The journey is drawn, not rendered.** A hand-rolled perspective projection
   on a Compose canvas, with the starfield in flat arrays so the draw phase
-  allocates nothing per frame.
+  allocates nothing per frame. The two worlds in it are the real
+  photographs, projected into that scene and lit at the limb; everything
+  around them — the stars, the pebble, its trail, the fire — is drawn.
 - **The landing is a map, drawn the same way.** Coastlines as lists of degrees,
   projected with the longitude squeezed by the cosine of the latitude, at three
   levels of detail that hand over as the scale drops - the islands of Japan,

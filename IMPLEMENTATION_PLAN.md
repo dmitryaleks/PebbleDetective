@@ -525,3 +525,28 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   colour answer of Jupiter), the claim spent after one pebble, a second
   claim named correctly, and the opt-out handing the decision back to the
   colour.
+
+### Post-release — the README caught up with the app
+
+- **Every screenshot regenerated from the current build**, in English, and
+  the walkthrough reordered to run the way the app does: the titles, then
+  Planets around where it lands, then the pebble. The planets section had
+  been numbered 5b because it was written last, which by now said the
+  opposite of what the app did.
+- **The meteor is a GIF**, because a still cannot show a thing that falls,
+  and two new stills cover what the journey GIF passes through too quickly
+  to see: the cruise, where both worlds are photographs, and the descent
+  over Japan.
+- **The capture scripts find buttons by accessibility label.** The toolbar
+  has gained buttons twice and changed its touch target once, and each time
+  the hard-coded taps silently started pressing whatever had moved into
+  their place; one run had been quietly photographing the wrong screens.
+- **GIFs now play at the rate they were captured.** screencap manages only
+  a few frames a second and how few depends on the screen, so a fixed frame
+  time made a slow capture play back comically fast.
+- **Which route is faster depends on the screen, and I measured the wrong
+  one first.** The raw framebuffer beats `screencap -p` on the camera
+  screens, where the encoder has a photograph to chew through, and loses on
+  the drawn ones, which compress to almost nothing: the journey GIF dropped
+  from 38 frames to 22 before that was spotted. Each script now uses the
+  one that suits what it photographs.

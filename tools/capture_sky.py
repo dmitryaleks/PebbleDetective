@@ -13,9 +13,12 @@ from __future__ import annotations
 import io
 import math
 import os
+import struct
 import subprocess
 import sys
 import time
+
+from collections import Counter
 
 from PIL import Image
 
@@ -42,10 +45,19 @@ def adb(*args: str) -> str:
 
 
 def shot() -> Image.Image:
-    raw = subprocess.run(
-        [ADB, "-s", SERIAL, "exec-out", "screencap", "-p"], capture_output=True, timeout=60
+    """One frame, straight off the framebuffer rather than PNG-encoded.
+
+    Asking the device to encode ten megabytes of pixels costs most of a
+    second, and the meteor is captured by grabbing frames as fast as the
+    wire allows.
+    """
+    blob = subprocess.run(
+        [ADB, "-s", SERIAL, "exec-out", "screencap"], capture_output=True, timeout=60
     ).stdout
-    return Image.open(io.BytesIO(raw)).convert("RGB")
+    width, height, _ = struct.unpack("<III", blob[:12])
+    pixels = width * height * 4
+    header = 16 if len(blob) == pixels + 16 else 12
+    return Image.frombytes("RGBA", (width, height), blob[header:header + pixels]).convert("RGB")
 
 
 def save(image: Image.Image, name: str, width: int = 420) -> None:
@@ -101,6 +113,59 @@ def seed_location() -> None:
     os.remove(script)
 
 
+def burst(seconds, name, width=300, frame_ms=220, stride=1):
+    """Frames as fast as screencap allows, assembled into a GIF.
+
+"""
+    frames = []
+    started = time.time()
+    end = started + seconds
+    while time.time() < end:
+        frames.append(shot())
+    # screencap manages only a few frames a second here, and how few
+    # varies, so the playback rate is measured rather than assumed. A
+    # fixed frame time makes a slow capture play back comically fast.
+    captured_ms = int((time.time() - started) * 1000)
+    small = []
+    for frame in frames[::stride]:
+        scaled = frame.copy()
+        scaled.thumbnail((width, width * 4), Image.LANCZOS)
+        small.append(scaled.convert("P", palette=Image.ADAPTIVE, colors=128))
+    path = os.path.join(DOCS, name)
+    small[0].save(path, save_all=True, append_images=small[1:],
+                  duration=max(frame_ms, captured_ms // max(1, len(small))),
+                  loop=0, optimize=True)
+    print("  %s  %d frames  %d kB" % (name, len(small), os.path.getsize(path) // 1024))
+
+
+def find_marker():
+    """Where a planet is on screen, found by its ring rather than guessed.
+
+    The emulator fuses its own rotation vector out of the gravity and
+    field vectors set below and does not track them exactly, so the
+    planet is never quite where the arithmetic says. The ring is drawn in
+    a colour nothing else on the screen uses, which makes it findable.
+    """
+    image = shot()
+    width, height = image.size
+    pixels = image.load()
+    found = []
+    for y in range(620, height - 450, 3):
+        for x in range(0, width, 3):
+            r, g, b = pixels[x, y]
+            if g > 195 and r < 140 and 130 < b < 205:
+                found.append((x, y))
+    if not found:
+        return None
+    # Densest 200px cell wins, so a half-visible planet at the edge does
+    # not drag the average off the one in full view.
+    cells = Counter(((x // 200) * 200, (y // 200) * 200) for x, y in found)
+    (cx, cy), _ = cells.most_common(1)[0]
+    inside = [(x, y) for x, y in found if cx <= x < cx + 200 and cy <= y < cy + 200]
+    return (sum(p[0] for p in inside) // len(inside),
+            sum(p[1] for p in inside) // len(inside))
+
+
 def main() -> int:
     os.makedirs(DOCS, exist_ok=True)
     print("capturing:")
@@ -118,20 +183,22 @@ def main() -> int:
     time.sleep(3)
     save(shot(), "screen-sky.png")
 
-    # Call one down, then swing after it. It lands within a dozen degrees
-    # of the bearing it came from, so following it is a matter of tilting.
-    #
-    # The emulator fuses its own rotation vector out of the two vectors
-    # above and does not track them exactly, so the impact may well come
-    # down near an edge of the frame; nudge the bearing here if the shot
-    # needs recentring. On a real phone you simply look where it went.
-    adb("shell", "input", "tap", "806", "1146")
-    time.sleep(0.9)
-    aim(135.0, 6.0)
-    time.sleep(1.1)
-    aim(135.0, -9.0)
-    time.sleep(1.6)
-    save(shot(), "screen-meteor.png")
+    # Call one down and swing after it. It lands within a dozen degrees of
+    # the bearing it came from, so following it is a matter of tilting -
+    # which is what the two aims below do, standing in for the hand that
+    # would do it on a real phone.
+    marker = find_marker()
+    if marker is None:
+        print("    no planet in view; nudge the bearing above", file=sys.stderr)
+        return 1
+    adb("shell", "input", "tap", str(marker[0]), str(marker[1]))
+
+    # One swing, before the burst and not during it. Each adb call costs
+    # most of a second on Windows, so aiming while capturing took the
+    # frame rate from four a second down to one.
+    aim(135.0, 16.0)
+    # A still cannot show a thing that falls, so this one is a GIF.
+    burst(5.2, "meteor.gif")
 
     print("done")
     return 0
