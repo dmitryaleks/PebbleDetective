@@ -198,54 +198,88 @@ fun DrawScope.drawSchematicPlanet(
 /**
  * A body drawn from a photograph rather than from a palette.
  *
- * Used for Earth, which is the one world in the journey the child has
- * actually stood on, and the one the pebble is falling towards for twelve
- * seconds - a shaded disc does not hold up at nine hundred pixels across.
- *
- * The photograph supplies the continents, the weather and the limb
- * darkening; what is added around it is the thing a flat frame cannot have,
- * an atmosphere that scatters light past the edge of the globe.
+ * The journey is the longest look at a world the app ever gives - Earth
+ * reaches nine hundred pixels across on the approach, and the source planet
+ * six hundred as it leaves - and a shaded disc does not hold up at that
+ * size. The photograph supplies the continents, the bands and the limb
+ * darkening; what is drawn around it is the part a flat frame cannot have.
  */
 fun DrawScope.drawPhotoPlanet(
     image: ImageBitmap?,
     centre: Offset,
     radius: Float,
-    fallback: Planet,
+    planet: Planet,
 ) {
     if (radius <= 0.5f) return
     // Until the decode lands, the schematic one stands in, so arriving at
     // the screen early never shows a hole in space.
     if (image == null) {
-        drawSchematicPlanet(fallback, centre, radius, spin = 0f)
+        drawSchematicPlanet(planet, centre, radius, spin = 0f)
         return
     }
 
-    // Airglow: a thin bright rim right at the limb, and a wider, fainter
-    // halo beyond it. Two layers, because a single gradient reads as a
-    // blurred edge rather than as air.
-    drawCircle(
-        brush = androidx.compose.ui.graphics.Brush.radialGradient(
-            colors = listOf(
-                Color.Transparent,
-                Color(0xFF4FA8FF).copy(alpha = 0.00f),
-                Color(0xFF7FC4FF).copy(alpha = 0.45f),
-                Color.Transparent,
-            ),
-            center = centre,
-            radius = radius * 1.16f,
-        ),
-        radius = radius * 1.16f,
-        center = centre,
-    )
-    drawCircle(
-        brush = androidx.compose.ui.graphics.Brush.radialGradient(
-            colors = listOf(Color.Transparent, Color(0xFF2E6FCC).copy(alpha = 0.22f), Color.Transparent),
-            center = centre,
-            radius = radius * 1.42f,
-        ),
-        radius = radius * 1.42f,
-        center = centre,
-    )
+    when (planet) {
+        // Air, lit from behind at the limb. Two layers, because a single
+        // gradient reads as a blurred edge rather than as an atmosphere.
+        Planet.EARTH -> {
+            // Stops placed by hand so the bright band sits just outside
+            // the limb. Evenly spaced colours put the peak underneath the
+            // planet, where it is invisible, and leave a wash around it.
+            drawCircle(
+                brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                    0.00f to Color.Transparent,
+                    0.80f to Color.Transparent,
+                    0.88f to Color(0xFF8CCBFF).copy(alpha = 0.58f),
+                    1.00f to Color.Transparent,
+                    center = centre,
+                    radius = radius * 1.16f,
+                ),
+                radius = radius * 1.16f,
+                center = centre,
+            )
+            drawCircle(
+                brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color(0xFF2E6FCC).copy(alpha = 0.22f),
+                        Color.Transparent,
+                    ),
+                    center = centre,
+                    radius = radius * 1.42f,
+                ),
+                radius = radius * 1.42f,
+                center = centre,
+            )
+        }
+        // The Sun is the one body that makes its own light, so the glow
+        // goes a long way out and it never gets a shadow.
+        Planet.SUN -> {
+            for (step in 3 downTo 1) {
+                drawCircle(
+                    color = Color(0xFFFFB74D).copy(alpha = 0.13f * step),
+                    radius = radius * (1f + 0.26f * step),
+                    center = centre,
+                )
+            }
+        }
+        // Everything else gets a faint rim in its own colour. Not physics:
+        // a small dark body against a starfield needs an edge or it reads
+        // as a hole punched in the sky.
+        else -> {
+            drawCircle(
+                brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                    0.00f to Color.Transparent,
+                    0.78f to Color.Transparent,
+                    0.86f to lookFor(planet).core.copy(alpha = 0.34f),
+                    1.00f to Color.Transparent,
+                    center = centre,
+                    radius = radius * 1.22f,
+                ),
+                radius = radius * 1.22f,
+                center = centre,
+            )
+        }
+    }
 
     val side = (radius * 2f).toInt().coerceAtLeast(1)
     drawImage(
@@ -256,9 +290,10 @@ fun DrawScope.drawPhotoPlanet(
         dstSize = IntSize(side, side),
     )
 
-    // A little extra shading toward the lower right, clipped to the globe.
-    // The frame is fully lit - DSCOVR looks down the Sun-Earth line - so
-    // without this it sits flat on the starfield like a sticker.
+    // Shading toward the lower right, clipped to the globe. The library
+    // frames are mostly full-disc mosaics with no terminator of their own,
+    // so without this they sit flat on the starfield like stickers.
+    if (planet == Planet.SUN) return
     val disc = androidx.compose.ui.graphics.Path().apply {
         addOval(
             androidx.compose.ui.geometry.Rect(

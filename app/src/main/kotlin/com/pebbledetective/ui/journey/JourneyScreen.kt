@@ -89,6 +89,11 @@ fun JourneyScreen(
             .disc(context, PlanetArt.EARTH_JAPAN_SIDE, EARTH_PX, keySpace = false)
             ?.asImageBitmap()
     }
+    // The world being left is on screen large at the start and tiny by the
+    // end, so it needs less than Earth does.
+    val origin by produceState(initialValue = null as ImageBitmap?, context, source) {
+        value = PlanetArt.disc(context, source, SOURCE_PX)?.asImageBitmap()
+    }
 
     val reducedMotion = animationsDisabled()
 
@@ -115,6 +120,7 @@ fun JourneyScreen(
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFF03040A))) {
         JourneyCanvas(
             source = source,
+            origin = origin,
             earth = earth,
             elapsedMs = elapsed,
             starfield = starfield,
@@ -196,6 +202,7 @@ fun JourneyScreen(
 @Composable
 private fun JourneyCanvas(
     source: Planet,
+    origin: ImageBitmap?,
     earth: ImageBitmap?,
     elapsedMs: Long,
     starfield: Starfield,
@@ -216,11 +223,11 @@ private fun JourneyCanvas(
         // Pacific slides across a photograph of the real one, which reads
         // as a bug rather than as a transition.
         when {
-            reveal <= 0f -> drawSpaceLeg(source, earth, elapsedMs, starfield, centreX, centreY)
+            reveal <= 0f -> drawSpaceLeg(source, origin, earth, elapsedMs, starfield, centreX, centreY)
             reveal < 1f -> drawIntoCanvas { canvas ->
                 fade.alpha = 1f - reveal
                 canvas.saveLayer(Rect(Offset.Zero, size), fade)
-                drawSpaceLeg(source, earth, elapsedMs, starfield, centreX, centreY)
+                drawSpaceLeg(source, origin, earth, elapsedMs, starfield, centreX, centreY)
                 canvas.restore()
             }
         }
@@ -267,6 +274,7 @@ private fun JourneyCanvas(
 /** The part of the flight that happens between the worlds. */
 private fun DrawScope.drawSpaceLeg(
     source: Planet,
+    origin: ImageBitmap?,
     earth: ImageBitmap?,
     elapsedMs: Long,
     starfield: Starfield,
@@ -304,14 +312,14 @@ private fun DrawScope.drawSpaceLeg(
 
     if (Projection.isVisible(sourceZ)) {
         bodies += Body(sourceZ) {
-            drawSchematicPlanet(
-                planet = source,
+            drawPhotoPlanet(
+                image = origin,
                 centre = Offset(
                     Projection.screenX(sourceX, sourceZ, centreX),
                     Projection.screenY(sourceY, sourceZ, centreY),
                 ),
                 radius = Projection.screenRadius(190f, sourceZ),
-                spin = seconds * 0.4f,
+                planet = source,
             )
         }
     }
@@ -324,7 +332,7 @@ private fun DrawScope.drawSpaceLeg(
                     Projection.screenY(earthY, earthZ, centreY),
                 ),
                 radius = Projection.screenRadius(210f, earthZ),
-                fallback = Planet.EARTH,
+                planet = Planet.EARTH,
             )
         }
     }
@@ -360,3 +368,6 @@ private fun DrawScope.drawSpaceLeg(
 
 /** Earth fills most of the screen on the approach, so decode it big. */
 private const val EARTH_PX = 1024
+
+/** The source peaks at about six hundred pixels across as it departs. */
+private const val SOURCE_PX = 768

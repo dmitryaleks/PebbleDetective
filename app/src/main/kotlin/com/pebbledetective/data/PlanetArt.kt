@@ -45,7 +45,14 @@ object PlanetArt {
         keySpace: Boolean = true,
     ): Bitmap? =
         withContext(Dispatchers.Default) {
-            val source = decodeSubsampled(context, assetPath, targetPx) ?: return@withContext null
+            val decoded = decodeSubsampled(context, assetPath, targetPx) ?: return@withContext null
+            // Trim the black margin first. The library frames do not all
+            // fill their own picture - Jupiter sits in a good deal of empty
+            // space - so without this a body is drawn smaller than the
+            // radius asked for, and anything positioned against that radius,
+            // a rim light in particular, floats off the limb.
+            val source = if (keySpace) trimToDisc(decoded) else decoded
+            if (source !== decoded) decoded.recycle()
             val square = square(source, targetPx)
             if (square !== source) source.recycle()
 
@@ -111,6 +118,54 @@ object PlanetArt {
         }.getOrNull()
     }
 
+    /**
+     * Crops away the space around the body.
+     *
+     * Scans for the bounding box of everything brighter than empty sky and
+     * takes the square around it, so the returned bitmap is the body and
+     * nothing else. The threshold is a little above the keying level: a
+     * handful of stray bright pixels in a corner would otherwise keep the
+     * whole frame.
+     */
+    private fun trimToDisc(source: Bitmap): Bitmap {
+        val width = source.width
+        val height = source.height
+        val pixels = IntArray(width * height)
+        source.getPixels(pixels, 0, width, 0, 0, width, height)
+
+        var left = width
+        var top = height
+        var right = -1
+        var bottom = -1
+        for (y in 0 until height) {
+            val row = y * width
+            for (x in 0 until width) {
+                val colour = pixels[row + x]
+                val luma = (((colour shr 16) and 0xFF) * 299 +
+                    ((colour shr 8) and 0xFF) * 587 +
+                    (colour and 0xFF) * 114) / 1000
+                if (luma <= TRIM_LEVEL) continue
+                if (x < left) left = x
+                if (x > right) right = x
+                if (y < top) top = y
+                if (y > bottom) bottom = y
+            }
+        }
+        if (right <= left || bottom <= top) return source
+
+        // A square around the middle of what was found, so a body that is
+        // not quite centred in its frame is not squashed to one side.
+        val centreX = (left + right) / 2
+        val centreY = (top + bottom) / 2
+        val half = maxOf(right - left, bottom - top) / 2 + 1
+        val x0 = (centreX - half).coerceAtLeast(0)
+        val y0 = (centreY - half).coerceAtLeast(0)
+        val x1 = (centreX + half).coerceAtMost(width)
+        val y1 = (centreY + half).coerceAtMost(height)
+        if (x1 - x0 < 2 || y1 - y0 < 2) return source
+        return Bitmap.createBitmap(source, x0, y0, x1 - x0, y1 - y0)
+    }
+
     /** Centre-cropped to a square of [size], so nothing is squashed. */
     private fun square(source: Bitmap, size: Int): Bitmap {
         val side = minOf(source.width, source.height)
@@ -135,6 +190,9 @@ object PlanetArt {
     const val EARTH_JAPAN_SIDE = "planets/earth_east.jpg"
 
     private const val SPACE_LEVEL = 16
+
+    /** Above the keying level, so a stray hot pixel cannot widen the crop. */
+    private const val TRIM_LEVEL = 26
 
     /** Where the circular mask starts softening, as a fraction of the radius. */
     private const val FEATHER = 0.94f

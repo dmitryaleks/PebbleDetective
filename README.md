@@ -114,12 +114,12 @@ Twenty seconds of space flight. The pebble launches, tumbles along a curving
 arc through a warping starfield, its home world shrinking behind it and Earth
 swelling ahead, until the air starts to glow orange around it.
 
-Earth is a photograph rather than a drawing — and specifically a photograph of
-the side with Japan on it, because that is where the pebble is going. The nine
-library full-disk Earths are all the Americas or Africa, so this one comes from
-DSCOVR, which sits a million miles out at the Earth–Sun L1 point and
-photographs the whole sunlit disc every couple of hours; one frame a day is
-centred on the Pacific.
+Both worlds are photographs rather than drawings. Earth is specifically a
+photograph of the side with Japan on it, because that is where the pebble is
+going: the nine library full-disk Earths are all the Americas or Africa, so
+this one comes from DSCOVR, which sits a million miles out at the Earth–Sun L1
+point and photographs the whole sunlit disc every couple of hours — one frame a
+day is centred on the Pacific.
 
 Then it keeps going. The fireball gives way to a map of Japan, the view falls
 and closes in through Kanto and over Tokyo Bay, and the pebble finally comes

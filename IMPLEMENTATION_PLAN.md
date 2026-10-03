@@ -491,7 +491,14 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   moved later and shortened to the half second when Earth has nearly filled
   the frame, and a single wash of fire across the whole screen covers the
   join.
-- **The source planet stays schematic.** The brief settled on photographs
-  for the result screen and a diagram for the journey; this changes that for
-  the destination only, which is the world the child is actually standing on
-  and the one on screen longest.
+- **Then the source planet followed.** Leaving one world as a palette of
+  bands next to a photograph of another did not hold up, so both ends of the
+  flight are photographs now and the brief’s "schematic journey" survives
+  only in the descent map. The schematic planet is still the fallback that
+  stands in while a decode is in flight.
+- **Which exposed that the frames do not fill their own pictures.** Jupiter
+  sits in a good deal of empty space, so a body was being drawn smaller than
+  the radius asked for - invisible until a rim light was positioned against
+  that radius and appeared as a hoop floating off the limb. Discs are now
+  trimmed to their content before scaling, which also made the title
+  sequence sharper, where the same under-filling had gone unnoticed.
