@@ -660,7 +660,7 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     fun playTitleCue() {
         titleCueJob?.cancel()
         titleCueJob = viewModelScope.launch {
-            delay(1_250)
+            delay(1_900)
             container.sound.play(SoundCue.RETICLE_LOCK)
         }
     }

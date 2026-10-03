@@ -108,11 +108,14 @@ def main() -> int:
     # its first frame.
     adb("shell", "am", "force-stop", PKG)
     adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity")
-    time.sleep(4.2)
+    time.sleep(5.6)
     save(shot(), "screen-splash.png")
 
-    # 1. Camera with the reticle.
+    # 1. Camera with the reticle. The app lands on the sky now, so the
+    # camera screen is two taps in rather than where it starts.
     restart()
+    adb("shell", "input", "tap", "853", "207")
+    time.sleep(3)
     time.sleep(2)
     save(shot(), "screen-capture.png")
 

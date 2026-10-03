@@ -437,3 +437,26 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   thing this app has got wrong before: each screen unbinds only the preview
   it bound itself, so the outgoing screen being disposed after the incoming
   one has bound cannot freeze it.
+
+### Post-release — opening on the sky
+
+- **The titles run half again as long**, 2.8 to 4.2 seconds, with every beat
+  stretched rather than the final frame held: a longer hold would have read
+  as the app being stuck rather than as a title sequence.
+- **Planets around is the landing screen**, which moved two responsibilities
+  onto it. It is now the screen that asks for the camera, not just for a
+  location, and it asks for both in one dialog sequence; and its backdrop
+  reads the camera permission as state rather than once, so the view appears
+  when the answer arrives instead of the next time the screen is opened.
+- **Popping back to Detection stopped being safe.** It used to be the root of
+  the graph, so `popBackStack(CAPTURE)` always found it. Coming down the
+  chain from the sky it is not on the stack at all, and a pop that matches
+  nothing silently does nothing - the same shape as the Done button bug. The
+  helper pops when Detection is behind you and pushes when it is not.
+- **The top bar gained a camera button** so the last stage is reachable from
+  the first, which took the row to six buttons; the touch target came down
+  from 56dp to 52dp so that still fits a 360dp screen without clipping.
+- **Verified from a clean install**: camera then location prompts, the titles,
+  the landing on the sky, the chain through to Detection, the toolbar jumping
+  straight there, and back walking the chain in reverse and then out of the
+  app.

@@ -147,6 +147,7 @@ fun RadarScreen(
                 onRadar = { session.startRadar() },
                 radarActive = true,
                 onSky = onSky,
+                onDetection = onSwitchToDetection,
             )
             Text(
                 text = radar.statusText(),

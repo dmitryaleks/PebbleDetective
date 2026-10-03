@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.automirrored.filled.MenuBook
@@ -46,6 +47,7 @@ fun TopControls(
     onSky: (() -> Unit)? = null,
     /** Likewise for the sky. */
     skyActive: Boolean = false,
+    onDetection: (() -> Unit)? = null,
 ) {
     Row(
         // statusBarsPadding is load-bearing: the app draws edge to edge, and
@@ -104,6 +106,14 @@ fun TopControls(
                 )
             }
         }
+        if (onDetection != null) {
+            IconButton(onClick = onDetection, modifier = Modifier.size(TOUCH_TARGET)) {
+                Icon(
+                    imageVector = Icons.Filled.CameraAlt,
+                    contentDescription = stringResource(R.string.cd_detection),
+                )
+            }
+        }
         if (onOpenHistory != null) {
             IconButton(onClick = onOpenHistory, modifier = Modifier.size(TOUCH_TARGET)) {
                 Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = stringResource(R.string.cd_history))
@@ -112,5 +122,10 @@ fun TopControls(
     }
 }
 
-/** Comfortably above the 48dp minimum, because the users are children. */
-private val TOUCH_TARGET = 56.dp
+/**
+ * Above the 48dp minimum, because the users are children, but not by as
+ * much as it was: with all three camera modes reachable from each other
+ * this row now carries six buttons, and 56dp apiece overflowed a 360dp
+ * screen.
+ */
+private val TOUCH_TARGET = 52.dp

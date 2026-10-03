@@ -39,8 +39,9 @@ The app opens on the picture above, assembled a piece at a time: the sky, then
 the solar system arriving left to right, then a pebble falling in on an amber
 trail with the scanner brackets closing on it.
 
-Under three seconds, and a tap anywhere ends it early. A splash screen is a
-toll paid on every single launch.
+Four seconds, and a tap anywhere ends it early. Then the titles hand over to
+**Planets around**, so the app begins where the hunt does — pointing at the
+sky — rather than at the camera.
 
 <br clear="right" />
 
@@ -147,16 +148,16 @@ pinned to a direction in the world rather than to a place on the screen, so
 it keeps falling where it fell while you turn to follow it, and the crater it
 leaves in the street stays put.
 
-**This is the first of three stages.** Pick a world here, hand over to
-**Radar** to go and find where its piece came down, and finish in
-**Detection** with the camera on the stone itself:
+**This is where the app opens, and the first of three stages.** Pick a world
+here, hand over to **Radar** to go and find where its piece came down, and
+finish in **Detection** with the camera on the stone itself:
 
 <p align="center"><b>Planets around</b> → <b>Radar</b> → <b>Detection</b></p>
 
 The button at the bottom of each screen moves you along the chain, and the
-two mode buttons in the top bar jump straight to any stage, so nobody has to
-walk the whole thing to photograph a stone they already have in their hand.
-Going back retraces the way you came.
+three mode buttons in the top bar — globe, radar, camera — jump straight to
+any stage, so nobody has to walk the whole thing to photograph a stone they
+already have in their hand. Going back retraces the way you came.
 
 **Where the positions come from.** Nowhere. There is no ephemeris file and no
 network call: each planet is six numbers and six rates of change, and solving

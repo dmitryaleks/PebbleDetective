@@ -1,6 +1,7 @@
 package com.pebbledetective.ui.nav
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
@@ -29,7 +30,7 @@ fun PebbleNavHost(session: SessionViewModel) {
                 // Popped inclusively, so back from the camera leaves the app
                 // rather than replaying the titles.
                 onFinished = {
-                    navController.navigate(Routes.CAPTURE) {
+                    navController.navigate(Routes.SKY) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -108,9 +109,13 @@ fun PebbleNavHost(session: SessionViewModel) {
         composable(Routes.RADAR) {
             RadarScreen(
                 session = session,
+                // Detection is the end of the chain but no longer its root,
+                // so it may or may not be on the stack already. Popping back
+                // to a destination that is not there silently does nothing,
+                // which is how the Done button was dead for so long.
                 onSwitchToDetection = {
                     session.stopRadar()
-                    navController.popBackStack(Routes.CAPTURE, inclusive = false)
+                    navController.toDetection()
                 },
                 onSky = { navController.navigate(Routes.SKY) { launchSingleTop = true } },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
@@ -119,6 +124,10 @@ fun PebbleNavHost(session: SessionViewModel) {
         composable(Routes.SKY) {
             SkyScreen(
                 session = session,
+                onDetection = {
+                    session.stopSky()
+                    navController.toDetection()
+                },
                 // The hunt runs sky, then radar, then camera. Pushed rather
                 // than swapped, so going back retraces the way you came.
                 onRadar = {
@@ -131,5 +140,19 @@ fun PebbleNavHost(session: SessionViewModel) {
         composable(Routes.CREDITS) {
             CreditsScreen(session, onBack = navController::popBackStack)
         }
+    }
+}
+
+/**
+ * Goes to the camera, reusing the one already behind you if there is one.
+ *
+ * The three camera modes can be entered in any order, so Detection is
+ * sometimes further down the stack and sometimes not on it at all. Popping
+ * alone would do nothing in the second case; navigating alone would stack a
+ * second copy in the first.
+ */
+private fun NavHostController.toDetection() {
+    if (!popBackStack(Routes.CAPTURE, inclusive = false)) {
+        navigate(Routes.CAPTURE) { launchSingleTop = true }
     }
 }

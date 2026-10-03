@@ -154,4 +154,5 @@
     <string name="sky_remembered_place">このまえの こいしの ばしょを つかっているよ</string>
     <string name="sky_follow">おいかけよう</string>
     <string name="sky_to_radar">レーダー モードへ</string>
+    <string name="cd_detection">たんさく モード</string>
 </resources>

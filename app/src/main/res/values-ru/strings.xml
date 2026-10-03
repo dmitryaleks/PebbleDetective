@@ -157,4 +157,5 @@
     <string name="sky_remembered_place">По месту последнего камешка</string>
     <string name="sky_follow">следи за ним</string>
     <string name="sky_to_radar">Перейти к радару</string>
+    <string name="cd_detection">Режим поиска</string>
 </resources>

@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -103,6 +104,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 fun SkyScreen(
     session: SessionViewModel,
     onRadar: () -> Unit,
+    onDetection: () -> Unit,
     onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -127,21 +129,31 @@ fun SkyScreen(
         }
     }
 
+    // This is the first screen of the app, so it asks for both of the
+    // things an augmented sky needs: a view to draw on and somewhere to
+    // stand. One dialog sequence rather than two screens apart.
+    var cameraGranted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        )
+    }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { session.onSkyPermissionResult() }
+    ) { granted ->
+        cameraGranted = granted[Manifest.permission.CAMERA] ?: cameraGranted
+        session.onSkyPermissionResult()
+    }
 
     LaunchedEffect(Unit) {
-        if (!session.hasLocationPermission()) {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                )
-            )
-        } else {
-            session.startSky()
+        val wanted = buildList {
+            if (!cameraGranted) add(Manifest.permission.CAMERA)
+            if (!session.hasLocationPermission()) {
+                add(Manifest.permission.ACCESS_COARSE_LOCATION)
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         }
+        if (wanted.isEmpty()) session.startSky() else permissionLauncher.launch(wanted.toTypedArray())
     }
 
     DisposableEffect(Unit) { onDispose { session.stopSky() } }
@@ -198,7 +210,7 @@ fun SkyScreen(
                 }
             },
     ) {
-        SkyCameraBackdrop()
+        SkyCameraBackdrop(enabled = cameraGranted)
 
         // Readability, not decoration. Green on a sunlit wall is invisible,
         // and the toolbar is the one part of this screen that has to be
@@ -343,6 +355,7 @@ fun SkyScreen(
                 onSky = session::clearSkyFocus,
                 skyActive = true,
                 onRadar = onRadar,
+                onDetection = onDetection,
             )
             PlanetBars(
                 sky = sky,
@@ -566,15 +579,14 @@ private fun SkyStatus(sky: SkyState, names: Map<Planet, String>) {
  * what makes the field of view read off the lens the right one.
  */
 @Composable
-private fun SkyCameraBackdrop() {
+private fun SkyCameraBackdrop(enabled: Boolean) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
 
-    val granted = remember {
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-            android.content.pm.PackageManager.PERMISSION_GRANTED
-    }
-    if (!granted) return
+    // Read as state rather than once: this screen asks for the camera
+    // itself now, and the backdrop has to appear when the answer arrives
+    // rather than the next time the screen is opened.
+    if (!enabled) return
 
     val previewView = remember {
         PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER }

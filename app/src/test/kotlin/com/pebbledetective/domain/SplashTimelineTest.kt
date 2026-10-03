@@ -8,11 +8,13 @@ class SplashTimelineTest {
 
     /**
      * The one property that actually matters for a splash screen: it has to
-     * get out of the way. Everything else about it is taste.
+     * get out of the way. Four seconds is already generous for something
+     * seen on every single launch, so this is the ceiling rather than a
+     * description.
      */
     @Test
-    fun `the titles are over in under three seconds`() {
-        assertTrue(SplashTimeline.TOTAL_MS <= 3_000)
+    fun `the titles do not outstay their welcome`() {
+        assertTrue(SplashTimeline.TOTAL_MS <= 4_500)
         assertTrue(SplashTimeline.isComplete(SplashTimeline.TOTAL_MS))
         assertTrue(!SplashTimeline.isComplete(SplashTimeline.TOTAL_MS - 1))
     }
@@ -35,14 +37,14 @@ class SplashTimelineTest {
     /** Nothing may arrive before there is a sky for it to arrive on. */
     @Test
     fun `the sky leads and the title follows everything else`() {
-        assertTrue(SplashTimeline.sky(400) > SplashTimeline.body(0, 400))
-        assertTrue(SplashTimeline.trail(1_000) > SplashTimeline.reticle(1_000))
-        assertTrue(SplashTimeline.reticle(1_500) > SplashTimeline.title(1_500))
+        assertTrue(SplashTimeline.sky(600) > SplashTimeline.body(0, 600))
+        assertTrue(SplashTimeline.trail(1_500) > SplashTimeline.reticle(1_500))
+        assertTrue(SplashTimeline.reticle(2_250) > SplashTimeline.title(2_250))
     }
 
     @Test
     fun `the bodies arrive one after another and all of them land`() {
-        val midway = (0 until SplashTimeline.BODY_COUNT).map { SplashTimeline.body(it, 700) }
+        val midway = (0 until SplashTimeline.BODY_COUNT).map { SplashTimeline.body(it, 1_050) }
         for (i in 1 until midway.size) {
             assertTrue("body $i overtook body ${i - 1}", midway[i] <= midway[i - 1])
         }
