@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pebbledetective.R
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.capture.CaptureScreen
 import com.pebbledetective.ui.history.HistoryDetailScreen
@@ -15,7 +14,6 @@ import com.pebbledetective.ui.journey.JourneyScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
 import com.pebbledetective.ui.screens.CreditsScreen
-import com.pebbledetective.ui.screens.PlaceholderScreen
 
 @Composable
 fun PebbleNavHost(session: SessionViewModel) {

@@ -44,6 +44,7 @@ import com.pebbledetective.R
 import com.pebbledetective.domain.ResearchPhase
 import com.pebbledetective.domain.ResearchTimeline
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.animationsDisabled
 
 /**
  * The Deep Research sequence: a prompt, then five seconds of theatre.
@@ -79,8 +80,13 @@ fun ResearchScreen(
         }
     }
 
-    LaunchedEffect(startedAt) {
-        val start = startedAt ?: return@LaunchedEffect
+    val reducedMotion = animationsDisabled()
+
+    LaunchedEffect(startedAt, reducedMotion) {
+        if (startedAt == null) return@LaunchedEffect
+        // Someone who turned animations off should not be held through the
+        // whole sequence just because it runs on a wall clock.
+        if (reducedMotion) session.skipResearch()
         // Finite sequence, so withFrameNanos rather than the infinite
         // variant - the latter cooperates with InfiniteAnimationPolicy and
         // makes Compose UI tests hang forever.

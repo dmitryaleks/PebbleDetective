@@ -30,9 +30,12 @@ import com.pebbledetective.data.AppLanguage
 @Composable
 fun Localized(language: AppLanguage, content: @Composable () -> Unit) {
     val context = LocalContext.current
+    // Taken from LocalConfiguration rather than LocalContext.resources: the
+    // latter is not configuration-aware and can hand back a stale value.
+    val base = LocalConfiguration.current
 
-    val configuration = remember(language, context) {
-        Configuration(context.resources.configuration).apply {
+    val configuration = remember(language, base) {
+        Configuration(base).apply {
             setLocales(LocaleList.forLanguageTags(language.tag))
         }
     }

@@ -7,6 +7,7 @@ import com.pebbledetective.data.LocationProvider
 import com.pebbledetective.data.PebbleRepository
 import com.pebbledetective.data.PhotoStore
 import com.pebbledetective.data.SettingsStore
+import java.io.File
 
 /**
  * Manual dependency injection.
@@ -19,6 +20,7 @@ class AppContainer(context: Context) {
     val settings: SettingsStore = SettingsStore(context)
     val sound: SoundPlayer = AndroidSoundPlayer(context, settings)
     val photos: PhotoStore = PhotoStore(context)
-    val pebbles: PebbleRepository = PebbleRepository(context, photos)
+    val pebbles: PebbleRepository =
+        PebbleRepository(File(context.filesDir, "pebbles")) { id -> photos.delete(id) }
     val location: LocationProvider = LocationProvider(context)
 }

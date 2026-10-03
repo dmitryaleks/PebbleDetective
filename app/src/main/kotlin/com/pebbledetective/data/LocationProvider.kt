@@ -7,7 +7,8 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import androidx.core.content.ContextCompat
-import android.os.CancellationSignal
+import androidx.core.location.LocationManagerCompat
+import androidx.core.os.CancellationSignal
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
@@ -44,7 +45,13 @@ class LocationProvider(private val context: Context) {
                     val signal = CancellationSignal()
                     cont.invokeOnCancellation { signal.cancel() }
                     try {
-                        manager.getCurrentLocation(
+                        // LocationManagerCompat, not LocationManager: the
+                        // platform getCurrentLocation is API 30+ and minSdk
+                        // here is 26, so the direct call crashes on Android
+                        // 8 to 10. The compat version backports it.
+                        @Suppress("DEPRECATION")
+                        LocationManagerCompat.getCurrentLocation(
+                            manager,
                             provider,
                             signal,
                             ContextCompat.getMainExecutor(context),

@@ -9,18 +9,9 @@
     <string name="cd_history">Pebble logbook</string>
     <string name="cd_back">Go back</string>
 
-    <!-- Screens (placeholders filled in later phases) -->
-    <string name="screen_capture">Find a pebble</string>
-    <string name="screen_research">Deep Research</string>
-    <string name="screen_result">Where it came from</string>
-    <string name="screen_journey">The journey</string>
-    <string name="screen_history">Pebble logbook</string>
-
     <string name="capture_hint">Point at a pebble and tap it</string>
     <string name="history_empty">No pebbles yet. Go and find one!</string>
 
-    <string name="sound_is_on">Sound on</string>
-    <string name="sound_is_off">Sound off</string>
 
     <!-- Credits -->
     <string name="credits_title">Thanks to</string>
@@ -76,7 +67,6 @@
     <string name="result_journey">Watch it fly home</string>
     <string name="result_new">Find another pebble</string>
     <string name="result_found_at">Found at %1$s</string>
-    <string name="result_colour">Pebble colour</string>
 
     <!-- Journey -->
     <string name="journey_departing">Leaving %1$s</string>

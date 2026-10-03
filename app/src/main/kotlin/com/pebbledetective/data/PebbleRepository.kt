@@ -1,6 +1,5 @@
 package com.pebbledetective.data
 
-import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,10 +46,11 @@ data class PebbleEntry(
  * file and an atomic rename.
  */
 class PebbleRepository(
-    context: Context,
-    private val photos: PhotoStore,
+    directory: File,
+    /** Called when an entry is removed, so its photographs go too. */
+    private val onDelete: suspend (String) -> Unit = {},
 ) {
-    private val file = File(File(context.filesDir, "pebbles").apply { mkdirs() }, "index.jsonl")
+    private val file = File(directory.apply { mkdirs() }, "index.jsonl")
     private val mutex = Mutex()
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
@@ -79,10 +79,8 @@ class PebbleRepository(
 
     suspend fun delete(id: String) = mutex.withLock {
         val remaining = _entries.value.filterNot { it.id == id }
-        withContext(Dispatchers.IO) {
-            rewrite(remaining)
-            photos.delete(id)
-        }
+        withContext(Dispatchers.IO) { rewrite(remaining) }
+        onDelete(id)
         _entries.value = remaining
     }
 

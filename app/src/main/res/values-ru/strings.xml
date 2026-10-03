@@ -8,17 +8,9 @@
     <string name="cd_history">Журнал камешков</string>
     <string name="cd_back">Назад</string>
 
-    <string name="screen_capture">Найди камешек</string>
-    <string name="screen_research">Глубокое исследование</string>
-    <string name="screen_result">Откуда он прилетел</string>
-    <string name="screen_journey">Путешествие</string>
-    <string name="screen_history">Журнал камешков</string>
-
     <string name="capture_hint">Наведи на камешек и коснись его</string>
     <string name="history_empty">Камешков пока нет. Иди и найди!</string>
 
-    <string name="sound_is_on">Звук включён</string>
-    <string name="sound_is_off">Звук выключен</string>
 
     <!-- Credits -->
     <string name="credits_title">Спасибо</string>
@@ -74,7 +66,6 @@
     <string name="result_journey">Посмотреть полёт домой</string>
     <string name="result_new">Найти ещё камешек</string>
     <string name="result_found_at">Найден: %1$s</string>
-    <string name="result_colour">Цвет камешка</string>
 
     <!-- Journey -->
     <string name="journey_departing">Улетаем с %1$s</string>

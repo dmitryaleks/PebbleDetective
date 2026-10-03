@@ -40,6 +40,7 @@ import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.domain.Projection
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.animationsDisabled
 import com.pebbledetective.ui.result.nameRes
 
 /**
@@ -62,10 +63,13 @@ fun JourneyScreen(
     val frame = remember { mutableLongStateOf(0L) }
     val starfield = remember { Starfield() }
 
+    val reducedMotion = animationsDisabled()
+
     LaunchedEffect(Unit) { session.beginJourney() }
 
-    LaunchedEffect(startedAt) {
+    LaunchedEffect(startedAt, reducedMotion) {
         if (startedAt == null) return@LaunchedEffect
+        if (reducedMotion) session.skipJourney()
         while (true) {
             withFrameNanos { }
             val elapsed = session.journeyElapsedMs()

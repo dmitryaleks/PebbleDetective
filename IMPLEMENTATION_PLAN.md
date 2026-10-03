@@ -183,6 +183,10 @@ OpenGL via `GLSurfaceView` is explicitly rejected: a few hundred points and some
 
 ## Phases
 
+**All phases are complete.** Each was built, run on the emulator and pushed
+before the next began. Findings are recorded under *Resolved during
+implementation*.
+
 Each phase ends with something runnable.
 
 ### Phase 0 — Make it an Android project that builds and runs
@@ -229,6 +233,37 @@ Each phase ends with something runnable.
 - Unit tests: `PlanetPickerTest` (every bucket, grey→seeded random, all nine reachable), `DominantColourTest` (synthetic pixel arrays), `PebbleRepositoryTest` (round-trip, atomic write, corrupt-index recovery), `TimelineTest` (research phases tile 0–5 s with no gap; journey within 10–15 s).
 
 ---
+
+### Phase 2-7 — findings worth keeping
+
+- **The in-composition locale override crashed the app.** Passing
+  `createConfigurationContext()` to `LocalContext` detaches it from the
+  Activity, so `rememberLauncherForActivityResult` threw
+  "No ActivityResultRegistryOwner was provided" and took out both the camera
+  permission request and the photo picker. `LocalizedContext` now wraps the
+  real context and overrides only the resource accessors. The `Configuration`
+  itself must come from `LocalConfiguration`, not `LocalContext.resources`,
+  or lint flags it as not configuration-aware.
+- **Location was on the critical path.** `analyse()` awaited a fix before
+  publishing the result, so with no fix available the child watched a spinner
+  for the full ten-second timeout with the planet already decided. Coordinates
+  now attach afterwards.
+- **A lint error caught a real crash.** Swapping `LocationManagerCompat` for
+  the platform `LocationManager.getCurrentLocation` to silence a deprecation
+  warning introduced an API-30 call on a minSdk-26 app — it would have thrown
+  on Android 8 to 10. Reverted; the deprecation warning is the lesser evil.
+- **Three journey rendering bugs** found by looking at frames on device:
+  cloud bands spilling past the limb, a hard pie-wedge terminator, and
+  perspective converging both bodies on screen centre while Earth flew off
+  the edge at the end.
+- **Tests:** 42 JVM unit tests covering the colour-to-planet mapping (including
+  the circular-hue and specular-highlight traps, that Earth is never a source,
+  and that a seed always yields the same planet), both timelines, the
+  projection, the stability tracker, and the JSONL logbook including a torn
+  trailing line. `PebbleRepository` takes a `File` rather than a `Context` so
+  it tests without Robolectric.
+- **Lint is clean** and the merged manifest holds exactly `CAMERA` and
+  `ACCESS_COARSE_LOCATION`.
 
 ## Verification
 
