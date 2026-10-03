@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Radar mode only. It hides a pebble within thirty metres, which coarse
+         location cannot resolve. Requested when radar is first opened, never
+         at startup, and the rest of the app works without it. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- The "Deep Research" is simulated: this app does no networking, and
          nothing a child photographs ever leaves the device. These removals are

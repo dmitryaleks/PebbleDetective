@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +39,9 @@ fun TopControls(
     onToggleSound: () -> Unit,
     onOpenHistory: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    onRadar: (() -> Unit)? = null,
+    /** Tints the radar button while radar mode is the screen you are on. */
+    radarActive: Boolean = false,
 ) {
     Row(
         // statusBarsPadding is load-bearing: the app draws edge to edge, and
@@ -64,6 +69,21 @@ fun TopControls(
                     if (soundEnabled) R.string.cd_sound_on else R.string.cd_sound_off
                 ),
             )
+        }
+        if (onRadar != null) {
+            IconButton(onClick = onRadar, modifier = Modifier.size(TOUCH_TARGET)) {
+                Icon(
+                    imageVector = Icons.Filled.Radar,
+                    contentDescription = stringResource(
+                        if (radarActive) R.string.cd_radar_again else R.string.cd_radar
+                    ),
+                    tint = if (radarActive) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        LocalContentColor.current
+                    },
+                )
+            }
         }
         if (onOpenHistory != null) {
             IconButton(onClick = onOpenHistory, modifier = Modifier.size(TOUCH_TARGET)) {

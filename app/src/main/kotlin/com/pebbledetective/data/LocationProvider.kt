@@ -4,12 +4,18 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Bundle
+import android.os.Looper
 import android.os.Build
 import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.CancellationSignal
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
@@ -36,6 +42,72 @@ class LocationProvider(private val context: Context) {
     fun hasPermission(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
+
+    /**
+     * Whether precise location is available.
+     *
+     * The logbook is happy with coarse - it only records roughly where a
+     * stone was found. Radar mode is not: it hides a pebble within thirty
+     * metres, and coarse location is accurate to about a city block, which
+     * would make the game meaningless. Android also lets someone grant
+     * "approximate only" when precise was asked for, so this is checked
+     * rather than assumed.
+     */
+    fun hasPreciseLocation(): Boolean =
+        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+
+    /**
+     * A stream of fixes, for the radar's moving centre.
+     *
+     * Emits the last known fix straight away so the radar has something to
+     * draw before the first update arrives, then updates as the player walks.
+     */
+    fun locationUpdates(minIntervalMs: Long = 1_000L): Flow<Location> = callbackFlow {
+        val manager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+        if (!hasPermission() || manager == null) {
+            close()
+            return@callbackFlow
+        }
+
+        lastKnown(manager)?.let { trySend(it) }
+
+        val provider = enabledProvider(manager)
+        if (provider == null) {
+            close()
+            return@callbackFlow
+        }
+
+        // The SAM form only works from API 30; the other callbacks got
+        // defaults then, and minSdk here is 26.
+        val listener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                trySend(location)
+            }
+
+            @Deprecated("Required below API 30")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
+
+            override fun onProviderEnabled(provider: String) = Unit
+
+            override fun onProviderDisabled(provider: String) = Unit
+        }
+
+        try {
+            manager.requestLocationUpdates(
+                provider,
+                minIntervalMs,
+                0f,
+                listener,
+                Looper.getMainLooper(),
+            )
+        } catch (e: SecurityException) {
+            close(e)
+            return@callbackFlow
+        }
+
+        awaitClose { runCatching { manager.removeUpdates(listener) } }
+    }
 
     /** A single fix, or null. Never throws, never blocks anything that matters. */
     // androidx's CancellationSignal is deprecated in favour of the platform

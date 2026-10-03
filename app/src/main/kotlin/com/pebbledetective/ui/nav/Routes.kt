@@ -7,6 +7,7 @@ object Routes {
     const val RESULT = "result"
     const val JOURNEY = "journey"
     const val HISTORY = "history"
+    const val RADAR = "radar"
     const val CREDITS = "credits"
     const val HISTORY_DETAIL = "history/{id}"
 

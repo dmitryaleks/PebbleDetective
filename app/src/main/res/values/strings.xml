@@ -96,4 +96,14 @@
     <string name="gallery_next">Next pebble</string>
     <string name="gallery_position">%1$d of %2$d</string>
     <string name="gallery_jump_to">Pebble %1$d of %2$d</string>
+
+    <!-- Radar mode -->
+    <string name="cd_radar">Radar mode</string>
+    <string name="cd_radar_again">Hide a new pebble</string>
+    <string name="radar_to_detection">Switch to Detection</string>
+    <string name="radar_new_target">Hide a new pebble</string>
+    <string name="radar_searching">Locking on...</string>
+    <string name="radar_distance">%1$d m away</string>
+    <string name="radar_found">Found it! Look around you</string>
+    <string name="radar_needs_precise">Radar needs precise location</string>
 </resources>

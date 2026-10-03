@@ -11,6 +11,7 @@ import com.pebbledetective.ui.capture.CaptureScreen
 import com.pebbledetective.ui.history.HistoryDetailScreen
 import com.pebbledetective.ui.history.HistoryScreen
 import com.pebbledetective.ui.journey.JourneyScreen
+import com.pebbledetective.ui.radar.RadarScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
 import com.pebbledetective.ui.screens.CreditsScreen
@@ -28,6 +29,7 @@ fun PebbleNavHost(session: SessionViewModel) {
                     navController.navigate(Routes.RESEARCH)
                 },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
+                onRadar = { navController.navigate(Routes.RADAR) },
             )
         }
         composable(Routes.RESEARCH) {
@@ -81,6 +83,16 @@ fun PebbleNavHost(session: SessionViewModel) {
                 entryId = backStackEntry.arguments?.getString("id").orEmpty(),
                 onBack = navController::popBackStack,
                 onReplay = { navController.navigate(Routes.JOURNEY) },
+            )
+        }
+        composable(Routes.RADAR) {
+            RadarScreen(
+                session = session,
+                onSwitchToDetection = {
+                    session.stopRadar()
+                    navController.popBackStack(Routes.CAPTURE, inclusive = false)
+                },
+                onOpenHistory = { navController.navigate(Routes.HISTORY) },
             )
         }
         composable(Routes.CREDITS) {

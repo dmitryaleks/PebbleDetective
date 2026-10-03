@@ -13,6 +13,8 @@ import com.pebbledetective.core.AppContainer
 import com.pebbledetective.data.AppLanguage
 import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PebbleStatus
+import com.pebbledetective.domain.Geo
+import com.pebbledetective.domain.GeoPoint
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.ResearchTimeline
@@ -24,6 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.TimeZone
@@ -57,6 +60,11 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
 
     private val _result = MutableStateFlow<PebbleEntry?>(null)
     val result: StateFlow<PebbleEntry?> = _result.asStateFlow()
+
+    private val _radar = MutableStateFlow(RadarState())
+    val radar: StateFlow<RadarState> = _radar.asStateFlow()
+
+    private var radarJob: Job? = null
 
     private val _journeyStartedAt = MutableStateFlow<Long?>(null)
     val journeyStartedAt: StateFlow<Long?> = _journeyStartedAt.asStateFlow()
@@ -248,6 +256,65 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         if (_result.value?.id == id) _result.value = container.pebbles.find(id)
     }
 
+    // ---- radar ----------------------------------------------------------
+
+    fun hasPreciseLocation(): Boolean = container.location.hasPreciseLocation()
+
+    /** Called after the radar permission dialog closes, whatever the answer. */
+    fun onRadarPermissionResult() {
+        if (container.location.hasPreciseLocation()) {
+            startRadar()
+        } else {
+            _radar.value = RadarState(preciseLocation = false)
+        }
+    }
+
+    /**
+     * Hides a fresh pebble and starts tracking.
+     *
+     * Pressing Radar again lands here, which is what re-rolls the target -
+     * the brief asks for a new hiding place each time rather than resuming
+     * the old hunt.
+     */
+    fun startRadar() {
+        radarJob?.cancel()
+        if (!container.location.hasPreciseLocation()) {
+            _radar.value = RadarState(preciseLocation = false)
+            return
+        }
+        _radar.value = RadarState(preciseLocation = true)
+        container.sound.play(SoundCue.SATELLITE_PING)
+
+        radarJob = viewModelScope.launch {
+            container.location.locationUpdates().collectLatest { location ->
+                val here = GeoPoint(location.latitude, location.longitude)
+                val state = _radar.value
+
+                // The first fix fixes the hiding place; later ones only move
+                // the player. Re-rolling on every update would make the
+                // pebble run away as you walked toward it.
+                val target = state.target ?: Geo.randomTargetNear(here, Random.Default)
+
+                val distance = Geo.distanceMetres(here, target)
+                val found = Geo.isFound(distance)
+                if (found && !state.found) container.sound.play(SoundCue.ARRIVAL_CHIME)
+
+                _radar.value = state.copy(
+                    target = target,
+                    here = here,
+                    distanceMetres = distance,
+                    bearingDegrees = Geo.bearingDegrees(here, target),
+                    found = found,
+                )
+            }
+        }
+    }
+
+    fun stopRadar() {
+        radarJob?.cancel()
+        radarJob = null
+    }
+
     // ---- logbook --------------------------------------------------------
 
     /** The logbook list only ever decodes thumbnails, never full frames. */
@@ -315,6 +382,7 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     }
 
     override fun onCleared() {
+        radarJob?.cancel()
         container.sound.release()
     }
 
@@ -346,4 +414,19 @@ private fun com.pebbledetective.domain.Hsv.toArgb(): Int {
     }
     fun ch(v: Float) = (((v + m) * 255f).toInt()).coerceIn(0, 255)
     return (0xFF shl 24) or (ch(r) shl 16) or (ch(g) shl 8) or ch(b)
+}
+
+/** What the radar screen needs to draw itself. */
+data class RadarState(
+    val preciseLocation: Boolean = true,
+    /** Where the pebble is hidden, once the first fix has arrived. */
+    val target: GeoPoint? = null,
+    val here: GeoPoint? = null,
+    val distanceMetres: Double? = null,
+    /** Bearing to the target from true position, degrees clockwise from north. */
+    val bearingDegrees: Double? = null,
+    val found: Boolean = false,
+) {
+    /** The outer ring. Targets are hidden within 30m, so this always contains one. */
+    val rangeMetres: Double get() = 30.0
 }

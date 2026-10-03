@@ -97,4 +97,14 @@
     <string name="gallery_next">Следующий камешек</string>
     <string name="gallery_position">%1$d из %2$d</string>
     <string name="gallery_jump_to">Камешек %1$d из %2$d</string>
+
+    <!-- Radar mode -->
+    <string name="cd_radar">Режим радара</string>
+    <string name="cd_radar_again">Спрятать новый камешек</string>
+    <string name="radar_to_detection">Перейти к поиску</string>
+    <string name="radar_new_target">Спрятать новый камешек</string>
+    <string name="radar_searching">Настраиваюсь...</string>
+    <string name="radar_distance">%1$d м до цели</string>
+    <string name="radar_found">Нашли! Смотри вокруг</string>
+    <string name="radar_needs_precise">Радару нужна точная геолокация</string>
 </resources>

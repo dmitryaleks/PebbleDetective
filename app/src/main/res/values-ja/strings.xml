@@ -94,4 +94,14 @@
     <string name="gallery_next">つぎの こいし</string>
     <string name="gallery_position">%2$d この うち %1$d こめ</string>
     <string name="gallery_jump_to">%2$d この うち %1$d こめの こいし</string>
+
+    <!-- Radar mode -->
+    <string name="cd_radar">レーダー モード</string>
+    <string name="cd_radar_again">あたらしい こいしを かくす</string>
+    <string name="radar_to_detection">たんさく モードへ</string>
+    <string name="radar_new_target">あたらしい こいしを かくす</string>
+    <string name="radar_searching">そくい ちゅう…</string>
+    <string name="radar_distance">あと %1$d メートル</string>
+    <string name="radar_found">みつけた！まわりを みてね</string>
+    <string name="radar_needs_precise">レーダーには せいみつな いちじょうほうが ひつよう</string>
 </resources>

@@ -130,6 +130,32 @@ coordinates are where a child was standing.
 
 ---
 
+## Radar mode
+
+<img src="docs/screen-radar.png" width="260" align="right" alt="The radar scope over the camera" />
+
+Tap the radar button in the top bar and the app **hides a virtual pebble
+somewhere within thirty metres** and sends the child out to find it.
+
+The scope is drawn over the live camera: range rings, a rotating sweep, a
+pulsing blip and an arrow pointing the way. Your own position is the centre
+and moves as you walk, and the whole display turns with the phone — the arrow
+keeps pointing at the same patch of ground however you hold it, because the
+target is a real coordinate rather than a spot on the screen.
+
+Tapping radar again hides a new pebble from scratch. You can switch back to
+Detection at any point, whether or not you reached it.
+
+**Radar asks for precise location**, and it is the only part of the app that
+does. The logbook is content with coarse accuracy; a thirty-metre hunt is not,
+since coarse location is accurate to roughly a city block. The permission is
+requested the first time radar is opened, never at startup, and everything
+else works without it.
+
+<br clear="right" />
+
+---
+
 ## Three languages, at any moment
 
 **English, Russian and Japanese**, switched with the globe button on *every*
@@ -159,6 +185,7 @@ The merged manifest holds exactly two permissions:
 |---|---|---|
 | `CAMERA` | to see the pebble | yes — and if refused, the Android photo picker is offered instead, which needs no permission at all |
 | `ACCESS_COARSE_LOCATION` | to remember where a stone was found | **no** — refuse it and everything still works, just without a place |
+| `ACCESS_FINE_LOCATION` | radar mode only, which hides a pebble within 30 m | **no** — asked when radar is first opened; the rest of the app never needs it |
 
 This is enforced, not merely intended. `camera-view` pulls in a video dependency
 that drags `ACCESS_NETWORK_STATE` along with it, so that module is excluded and
