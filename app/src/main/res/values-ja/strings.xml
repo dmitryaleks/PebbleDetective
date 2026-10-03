@@ -19,4 +19,11 @@
 
     <string name="sound_is_on">おと オン</string>
     <string name="sound_is_off">おと オフ</string>
+
+    <!-- Credits -->
+    <string name="credits_title">ありがとう</string>
+    <string name="credits_photos">わくせいの しゃしん: NASA Image and Video Library（パブリックドメイン）</string>
+    <string name="credits_sounds">こうかおん: 「60 CC0 Sci-Fi SFX」rubberduck さく（CC0 1.0）</string>
+    <string name="credits_nasa_note">NASA は このアプリを すいせんしていません。</string>
+    <string name="cd_credits">クレジット</string>
 </resources>

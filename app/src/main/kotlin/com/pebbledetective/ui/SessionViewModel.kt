@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.pebbledetective.core.AppContainer
+import com.pebbledetective.audio.SoundCue
+import com.pebbledetective.audio.SoundPlayer
 import com.pebbledetective.data.AppLanguage
 import kotlinx.coroutines.flow.StateFlow
 
@@ -19,12 +21,22 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     val language: StateFlow<AppLanguage> = container.settings.language
     val soundEnabled: StateFlow<Boolean> = container.settings.soundEnabled
 
-    fun cycleLanguage() = container.settings.cycleLanguage()
+    val sound: SoundPlayer get() = container.sound
+
+    fun cycleLanguage() {
+        container.settings.cycleLanguage()
+        container.sound.play(SoundCue.UI_TAP)
+    }
 
     fun toggleSound() {
         val enabled = !container.settings.soundEnabled.value
         container.settings.setSoundEnabled(enabled)
-        if (!enabled) container.sound.stopAll()
+        // Confirm the new state audibly when switching on; go quiet otherwise.
+        if (enabled) container.sound.play(SoundCue.SIGNAL_ACQUIRED) else container.sound.stopAll()
+    }
+
+    override fun onCleared() {
+        container.sound.release()
     }
 
     companion object {

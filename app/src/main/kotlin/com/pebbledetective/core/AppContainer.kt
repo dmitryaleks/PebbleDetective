@@ -1,7 +1,7 @@
 package com.pebbledetective.core
 
 import android.content.Context
-import com.pebbledetective.audio.NoopSoundPlayer
+import com.pebbledetective.audio.AndroidSoundPlayer
 import com.pebbledetective.audio.SoundPlayer
 import com.pebbledetective.data.SettingsStore
 
@@ -14,7 +14,5 @@ import com.pebbledetective.data.SettingsStore
  */
 class AppContainer(context: Context) {
     val settings: SettingsStore = SettingsStore(context)
-
-    // Replaced by the real SoundPool-backed player once the audio files land.
-    val sound: SoundPlayer = NoopSoundPlayer
+    val sound: SoundPlayer = AndroidSoundPlayer(context, settings)
 }

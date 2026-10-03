@@ -19,4 +19,11 @@
 
     <string name="sound_is_on">Звук включён</string>
     <string name="sound_is_off">Звук выключен</string>
+
+    <!-- Credits -->
+    <string name="credits_title">Спасибо</string>
+    <string name="credits_photos">Фотографии планет: NASA Image and Video Library (общественное достояние).</string>
+    <string name="credits_sounds">Звуковые эффекты: «60 CC0 Sci-Fi SFX», автор rubberduck (CC0 1.0).</string>
+    <string name="credits_nasa_note">NASA не поддерживает это приложение.</string>
+    <string name="cd_credits">Благодарности</string>
 </resources>

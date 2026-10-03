@@ -37,6 +37,7 @@ fun PlaceholderScreen(
     @StringRes bodyRes: Int? = null,
     onOpenHistory: (() -> Unit)? = null,
     onBack: (() -> Unit)? = null,
+    onOpenCredits: (() -> Unit)? = null,
 ) {
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
@@ -77,6 +78,11 @@ fun PlaceholderScreen(
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(top = 24.dp),
             )
+            if (onOpenCredits != null) {
+                TextButton(onClick = onOpenCredits, modifier = Modifier.padding(top = 8.dp)) {
+                    Text(stringResource(R.string.cd_credits))
+                }
+            }
             if (onBack != null) {
                 TextButton(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)

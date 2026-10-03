@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pebbledetective.R
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.screens.CreditsScreen
 import com.pebbledetective.ui.screens.PlaceholderScreen
 
 @Composable
@@ -37,7 +38,11 @@ fun PebbleNavHost(session: SessionViewModel) {
                 bodyRes = R.string.history_empty,
                 onOpenHistory = null,
                 onBack = navController::popBackStack,
+                onOpenCredits = { navController.navigate(Routes.CREDITS) },
             )
+        }
+        composable(Routes.CREDITS) {
+            CreditsScreen(session, onBack = navController::popBackStack)
         }
     }
 }
