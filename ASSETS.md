@@ -20,6 +20,7 @@ Source: [NASA Image and Video Library](https://images.nasa.gov/). NASA media are
 | Saturn | `app/src/main/assets/planets/saturn.jpg` | [PIA11141](https://images.nasa.gov/details/PIA11141) | Saturn Cassini | 1280x619, 28KB |
 | Uranus | `app/src/main/assets/planets/uranus.jpg` | [PIA18182](https://images.nasa.gov/details/PIA18182) | Uranus Voyager 2 | 1280x1280, 47KB |
 | Neptune | `app/src/main/assets/planets/neptune.jpg` | [PIA01492](https://images.nasa.gov/details/PIA01492) | Neptune Voyager 2 | 1280x1278, 92KB |
+| Earth (Eastern Hemisphere) | `app/src/main/assets/planets/earth_east.jpg` | [epic_1b_20260928024318](https://epic.gsfc.nasa.gov/) | DSCOVR EPIC full disc centred near 135 east, cropped and lifted | 1024x1024, 217KB |
 
 ## Sound cues
 

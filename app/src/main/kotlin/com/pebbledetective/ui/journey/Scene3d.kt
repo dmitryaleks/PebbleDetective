@@ -4,6 +4,7 @@ import android.graphics.Paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -12,6 +13,8 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.domain.Projection
 import kotlin.math.abs
@@ -185,6 +188,93 @@ fun DrawScope.drawSchematicPlanet(
                 colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.62f)),
                 center = Offset(centre.x - radius * 0.45f, centre.y - radius * 0.45f),
                 radius = radius * 1.85f,
+            ),
+            radius = radius,
+            center = centre,
+        )
+    }
+}
+
+/**
+ * A body drawn from a photograph rather than from a palette.
+ *
+ * Used for Earth, which is the one world in the journey the child has
+ * actually stood on, and the one the pebble is falling towards for twelve
+ * seconds - a shaded disc does not hold up at nine hundred pixels across.
+ *
+ * The photograph supplies the continents, the weather and the limb
+ * darkening; what is added around it is the thing a flat frame cannot have,
+ * an atmosphere that scatters light past the edge of the globe.
+ */
+fun DrawScope.drawPhotoPlanet(
+    image: ImageBitmap?,
+    centre: Offset,
+    radius: Float,
+    fallback: Planet,
+) {
+    if (radius <= 0.5f) return
+    // Until the decode lands, the schematic one stands in, so arriving at
+    // the screen early never shows a hole in space.
+    if (image == null) {
+        drawSchematicPlanet(fallback, centre, radius, spin = 0f)
+        return
+    }
+
+    // Airglow: a thin bright rim right at the limb, and a wider, fainter
+    // halo beyond it. Two layers, because a single gradient reads as a
+    // blurred edge rather than as air.
+    drawCircle(
+        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+            colors = listOf(
+                Color.Transparent,
+                Color(0xFF4FA8FF).copy(alpha = 0.00f),
+                Color(0xFF7FC4FF).copy(alpha = 0.45f),
+                Color.Transparent,
+            ),
+            center = centre,
+            radius = radius * 1.16f,
+        ),
+        radius = radius * 1.16f,
+        center = centre,
+    )
+    drawCircle(
+        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+            colors = listOf(Color.Transparent, Color(0xFF2E6FCC).copy(alpha = 0.22f), Color.Transparent),
+            center = centre,
+            radius = radius * 1.42f,
+        ),
+        radius = radius * 1.42f,
+        center = centre,
+    )
+
+    val side = (radius * 2f).toInt().coerceAtLeast(1)
+    drawImage(
+        image = image,
+        srcOffset = IntOffset.Zero,
+        srcSize = IntSize(image.width, image.height),
+        dstOffset = IntOffset((centre.x - radius).toInt(), (centre.y - radius).toInt()),
+        dstSize = IntSize(side, side),
+    )
+
+    // A little extra shading toward the lower right, clipped to the globe.
+    // The frame is fully lit - DSCOVR looks down the Sun-Earth line - so
+    // without this it sits flat on the starfield like a sticker.
+    val disc = androidx.compose.ui.graphics.Path().apply {
+        addOval(
+            androidx.compose.ui.geometry.Rect(
+                left = centre.x - radius,
+                top = centre.y - radius,
+                right = centre.x + radius,
+                bottom = centre.y + radius,
+            )
+        )
+    }
+    clipPath(disc) {
+        drawCircle(
+            brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                colors = listOf(Color.Transparent, Color(0xFF02060F).copy(alpha = 0.38f)),
+                center = Offset(centre.x - radius * 0.38f, centre.y - radius * 0.42f),
+                radius = radius * 1.75f,
             ),
             radius = radius,
             center = centre,

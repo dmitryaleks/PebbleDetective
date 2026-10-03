@@ -5,6 +5,7 @@ Two sources, both chosen because they need no account and carry no
 attribution obligation:
 
   * planet photos - NASA Image and Video Library (public domain)
+  * the Earth the journey flies to - NASA DSCOVR/EPIC (public domain)
   * sound cues    - OpenGameArt "60 CC0 Sci-Fi SFX" (CC0)
 
 Planet IDs are pinned, not searched. A live search by body name
@@ -13,6 +14,9 @@ Space Center photo for Mars - so the asset set is fixed and
 reproducible instead.
 
 Usage:  python tools/fetch_assets.py [--skip-audio] [--skip-planets]
+
+The Earth step needs Pillow; the rest deliberately does not, so a plain
+Python can still refresh the planets and the sound.
 """
 from __future__ import annotations
 
@@ -143,6 +147,58 @@ def fetch_planets():
     return rows
 
 
+# The journey ends in Tokyo, so the Earth it flies towards has to be the
+# side with Japan on it. The library full-disk Earths are all the Americas
+# or Africa; DSCOVR sits at the Earth-Sun L1 point and photographs the whole
+# sunlit disc every couple of hours, so one frame per day is centred on the
+# Pacific. This is the frame nearest 140 east.
+EPIC_IMAGE = "epic_1b_20260928024318"
+EPIC_URL = ("https://epic.gsfc.nasa.gov/archive/natural/2026/09/28/png/"
+            + EPIC_IMAGE + ".png")
+EPIC_PAGE = "https://epic.gsfc.nasa.gov/"
+
+
+def fetch_earth_east():
+    """The Japan-side Earth, cropped to its disc and lifted a little.
+
+    EPIC natural-colour frames are faithful rather than flattering: the
+    disc sits in a wide black frame and the whole thing is dim next to the
+    Blue Marble composites. Cropping to the limb and a modest lift in
+    brightness, contrast and saturation is all that is done to it.
+    """
+    from PIL import Image, ImageEnhance  # only this step needs Pillow
+
+    print("  earth_east (DSCOVR/EPIC)")
+    blob = get(EPIC_URL, binary=True)
+    image = Image.open(io.BytesIO(blob)).convert("RGB")
+
+    # The disc never fills the frame, so find it rather than assume it.
+    box = image.convert("L").point(lambda v: 255 if v > 18 else 0).getbbox()
+    cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+    half = max(box[2] - box[0], box[3] - box[1]) * 1.03 / 2
+    disc = image.crop((int(cx - half), int(cy - half), int(cx + half), int(cy + half)))
+    disc = disc.resize((1024, 1024), Image.LANCZOS)
+    disc = ImageEnhance.Brightness(disc).enhance(1.12)
+    disc = ImageEnhance.Contrast(disc).enhance(1.20)
+    disc = ImageEnhance.Color(disc).enhance(1.22)
+
+    os.makedirs(PLANET_DIR, exist_ok=True)
+    path = os.path.join(PLANET_DIR, "earth_east.jpg")
+    disc.save(path, "JPEG", quality=90, optimize=True)
+    kb = os.path.getsize(path) // 1024
+    print("    %s  1024x1024  %dKB" % (EPIC_IMAGE, kb))
+    return {
+        "body": "earth (eastern hemisphere)",
+        "file": "app/src/main/assets/planets/earth_east.jpg",
+        "nasa_id": EPIC_IMAGE,
+        "source": EPIC_URL,
+        "page": EPIC_PAGE,
+        "kb": kb,
+        "dim": "1024x1024",
+        "caption": "DSCOVR EPIC full disc centred near 135 east, cropped and lifted",
+    }
+
+
 def fetch_audio():
     os.makedirs(AUDIO_DIR, exist_ok=True)
     print("  downloading CC0 pack")
@@ -213,6 +269,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-audio", action="store_true")
     ap.add_argument("--skip-planets", action="store_true")
+    ap.add_argument("--skip-earth", action="store_true")
     args = ap.parse_args()
 
     planets = []
@@ -220,6 +277,9 @@ def main():
     if not args.skip_planets:
         print("planets:")
         planets = fetch_planets()
+    if not args.skip_earth:
+        print("earth, Japan side:")
+        planets.append(fetch_earth_east())
     if not args.skip_audio:
         print("audio:")
         audio = fetch_audio()

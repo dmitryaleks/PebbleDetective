@@ -97,7 +97,10 @@ fun ResultScreen(
             PlanetPortrait(planet)
 
             Text(
-                text = stringResource(planet.nameRes),
+                // The caption above reads "this pebble came from", so this
+                // is the end of a sentence rather than a label, and Russian
+                // wants the genitive here too: прилетел с Юпитера.
+                text = stringResource(planet.fromNameRes),
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,

@@ -460,3 +460,38 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   the landing on the sky, the chain through to Detection, the toolbar jumping
   straight there, and back walking the chain in reverse and then out of the
   app.
+
+### Post-release — Russian cases, and a real Earth
+
+- **Russian inflects and the app did not.** "Улетаем с %s" with the plain name
+  gives "с Марс", which is wrong; it wants the genitive, "с Марса", and the
+  ending varies by word - Венеры, Юпитера, Солнца. No format string can
+  derive that, so each body has a second name resource and the languages
+  that do not inflect repeat the first. The result screen had the same bug
+  and is the more visible one: its caption reads "Этот камешек прилетел с"
+  with the planet underneath, which is one sentence however it is laid out.
+- **Earth is now a photograph, of the right hemisphere.** The bundled
+  full-disk Earths - and every one in the NASA library - show the Americas or
+  Africa, and the journey lands in Tokyo. DSCOVR sits at L1 and images the
+  whole sunlit disc every couple of hours, so one frame per day is centred
+  on the Pacific; the frame nearest 135 east is bundled, cropped to its limb
+  and lifted a little, since EPIC natural colour is faithful rather than
+  flattering.
+- **It needed a different alpha.** The other bodies are keyed off luminance,
+  which melts a lit limb into the starfield. Doing that to this frame put
+  stars through the Pacific: the darkest tenth of the disc is dark enough to
+  come out half transparent. A frame already cropped to its disc wants a
+  plain circular mask instead.
+- **A photograph exposed a transition that was getting away with it.** The
+  space leg and the schematic map used to be drawn over each other at full
+  strength during the handover. With a small drawn Earth that read as a
+  dissolve; with a photographic one at nine hundred pixels it read as a bug,
+  a schematic Honshu the size of the Pacific sliding across a picture of the
+  real one. The two now cross-dissolve inside a saved layer, the swap was
+  moved later and shortened to the half second when Earth has nearly filled
+  the frame, and a single wash of fire across the whole screen covers the
+  join.
+- **The source planet stays schematic.** The brief settled on photographs
+  for the result screen and a diagram for the journey; this changes that for
+  the destination only, which is the world the child is actually standing on
+  and the one on screen longest.

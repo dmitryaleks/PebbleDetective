@@ -63,6 +63,18 @@
     <string name="planet_uranus_fact">It rolls around the Sun lying on its side, like a barrel.</string>
     <string name="planet_neptune_name">Neptune</string>
     <string name="planet_neptune_fact">The windiest world. Its winds blow faster than a jet plane!</string>
+
+    <!-- The form that follows "Leaving". English does not inflect, so
+         these match the plain names; Russian does. -->
+    <string name="planet_sun_from">The Sun</string>
+    <string name="planet_mercury_from">Mercury</string>
+    <string name="planet_venus_from">Venus</string>
+    <string name="planet_earth_from">Earth</string>
+    <string name="planet_mars_from">Mars</string>
+    <string name="planet_jupiter_from">Jupiter</string>
+    <string name="planet_saturn_from">Saturn</string>
+    <string name="planet_uranus_from">Uranus</string>
+    <string name="planet_neptune_from">Neptune</string>
     <string name="result_title">This pebble came from</string>
     <string name="result_journey">Watch it fly home</string>
     <string name="result_new">Find another pebble</string>

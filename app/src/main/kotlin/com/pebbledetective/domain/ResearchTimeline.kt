@@ -147,9 +147,10 @@ object JourneyTimeline {
      * How far the schematic map of Japan has faded in under the fireball,
      * 0 while still in space and 1 once the descent view has taken over.
      *
-     * The swap happens inside the entry phase on purpose: the heat glow is
-     * at its brightest then, so it covers the cut between the starfield and
-     * the map rather than the two being seen to replace each other.
+     * The swap happens late in the entry phase on purpose, and quickly. The
+     * heat glow is at its brightest then, and Earth has grown to most of
+     * the screen, so there is the least possible difference in scale
+     * between the photograph being left and the map being arrived at.
      */
     fun mapReveal(elapsedMs: Long): Float {
         if (elapsedMs <= MAP_REVEAL_START) return 0f
@@ -157,7 +158,7 @@ object JourneyTimeline {
         return ((elapsedMs - MAP_REVEAL_START) / span).coerceIn(0f, 1f)
     }
 
-    private const val MAP_REVEAL_START = 10_300L
+    private const val MAP_REVEAL_START = 10_900L
 
     /**
      * How far into the landing itself, 0 the moment before touchdown and 1

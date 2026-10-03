@@ -62,6 +62,17 @@
     <string name="planet_uranus_fact">よこに ねたまま たいようの まわりを ころがるよ。</string>
     <string name="planet_neptune_name">かいおうせい</string>
     <string name="planet_neptune_fact">いちばん かぜが つよい せかい。ジェットきより はやいよ！</string>
+
+    <!-- Japanese marks the role with a particle, so the name is unchanged. -->
+    <string name="planet_sun_from">たいよう</string>
+    <string name="planet_mercury_from">すいせい</string>
+    <string name="planet_venus_from">きんせい</string>
+    <string name="planet_earth_from">ちきゅう</string>
+    <string name="planet_mars_from">かせい</string>
+    <string name="planet_jupiter_from">もくせい</string>
+    <string name="planet_saturn_from">どせい</string>
+    <string name="planet_uranus_from">てんのうせい</string>
+    <string name="planet_neptune_from">かいおうせい</string>
     <string name="result_title">この こいしの ふるさとは</string>
     <string name="result_journey">かえる たびを みる</string>
     <string name="result_new">つぎの こいしを さがす</string>

@@ -27,8 +27,25 @@ object PlanetArt {
      * the stars the way it does on the banner.
      */
     suspend fun disc(context: Context, planet: Planet, targetPx: Int): Bitmap? =
+        disc(context, planet.assetPath, targetPx)
+
+    /**
+     * The same, for a bundled frame that is not one of the nine.
+     *
+     * @param keySpace whether to take the alpha from luminance. True suits a
+     *   body photographed against black, where keying lets the lit limb melt
+     *   into the starfield. False suits a frame already cropped to its disc:
+     *   keying a dark ocean would make it half transparent and put stars
+     *   through the Pacific, which is exactly what it did the first time.
+     */
+    suspend fun disc(
+        context: Context,
+        assetPath: String,
+        targetPx: Int,
+        keySpace: Boolean = true,
+    ): Bitmap? =
         withContext(Dispatchers.Default) {
-            val source = decodeSubsampled(context, planet, targetPx) ?: return@withContext null
+            val source = decodeSubsampled(context, assetPath, targetPx) ?: return@withContext null
             val square = square(source, targetPx)
             if (square !== source) source.recycle()
 
@@ -46,8 +63,11 @@ object PlanetArt {
                     val luma = (r * 299 + g * 587 + b * 114) / 1000
                     // Below about 16 is space; ramp quickly so the body
                     // itself never goes translucent.
-                    var alpha =
-                        if (luma < SPACE_LEVEL) 0 else minOf(255, (luma - SPACE_LEVEL) * 7)
+                    var alpha = when {
+                        !keySpace -> 255
+                        luma < SPACE_LEVEL -> 0
+                        else -> minOf(255, (luma - SPACE_LEVEL) * 7)
+                    }
 
                     // And a circular mask on top. Keying alone is not enough
                     // for the Sun, whose frame is lit corner to corner: it
@@ -70,10 +90,10 @@ object PlanetArt {
             keyed
         }
 
-    private fun decodeSubsampled(context: Context, planet: Planet, targetPx: Int): Bitmap? {
+    private fun decodeSubsampled(context: Context, assetPath: String, targetPx: Int): Bitmap? {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         runCatching {
-            context.assets.open(planet.assetPath).use { BitmapFactory.decodeStream(it, null, bounds) }
+            context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, bounds) }
         }.getOrNull()
 
         var sample = 1
@@ -85,7 +105,7 @@ object PlanetArt {
             inPreferredConfig = Bitmap.Config.ARGB_8888
         }
         return runCatching {
-            context.assets.open(planet.assetPath).use {
+            context.assets.open(assetPath).use {
                 BitmapFactory.decodeStream(it, null, options)
             }
         }.getOrNull()
@@ -106,6 +126,13 @@ object PlanetArt {
         if (cropped !== source && cropped !== scaled) cropped.recycle()
         return scaled
     }
+
+    /**
+     * The Earth the journey flies to: a DSCOVR frame of the sunlit disc
+     * centred near 135 east, so Japan is facing the viewer as the pebble
+     * comes in. The nine library photographs are all the wrong hemisphere.
+     */
+    const val EARTH_JAPAN_SIDE = "planets/earth_east.jpg"
 
     private const val SPACE_LEVEL = 16
 

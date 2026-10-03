@@ -20,14 +20,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -37,13 +44,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
+import com.pebbledetective.data.PlanetArt
 import com.pebbledetective.domain.JourneyPhase
 import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.domain.Projection
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.animationsDisabled
-import com.pebbledetective.ui.result.nameRes
+import com.pebbledetective.ui.result.fromNameRes
 
 /**
  * The pebble's flight home: twenty seconds of schematic space travel.
@@ -72,6 +80,16 @@ fun JourneyScreen(
     val frame = remember { mutableLongStateOf(0L) }
     val starfield = remember { Starfield() }
 
+    // Earth grows to most of the screen on the approach, so it is decoded
+    // at full size and off the main thread. The schematic one stands in
+    // until it lands.
+    val context = LocalContext.current
+    val earth by produceState(initialValue = null as ImageBitmap?, context) {
+        value = PlanetArt
+            .disc(context, PlanetArt.EARTH_JAPAN_SIDE, EARTH_PX, keySpace = false)
+            ?.asImageBitmap()
+    }
+
     val reducedMotion = animationsDisabled()
 
     LaunchedEffect(Unit) { session.beginJourney() }
@@ -97,6 +115,7 @@ fun JourneyScreen(
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFF03040A))) {
         JourneyCanvas(
             source = source,
+            earth = earth,
             elapsedMs = elapsed,
             starfield = starfield,
             modifier = Modifier.fillMaxSize(),
@@ -113,7 +132,7 @@ fun JourneyScreen(
             Text(
                 text = when (phase) {
                     JourneyPhase.DEPARTURE, JourneyPhase.LAUNCH ->
-                        stringResource(R.string.journey_departing, stringResource(source.nameRes))
+                        stringResource(R.string.journey_departing, stringResource(source.fromNameRes))
                     JourneyPhase.CRUISE -> stringResource(R.string.journey_cruising)
                     JourneyPhase.ENTRY -> stringResource(R.string.journey_entering)
                     JourneyPhase.APPROACH -> stringResource(R.string.journey_approach)
@@ -177,17 +196,33 @@ fun JourneyScreen(
 @Composable
 private fun JourneyCanvas(
     source: Planet,
+    earth: ImageBitmap?,
     elapsedMs: Long,
     starfield: Starfield,
     modifier: Modifier = Modifier,
 ) {
+    // Held rather than allocated: it is only used during the one-second
+    // dissolve, but a Paint built inside the draw lambda is a new object
+    // on every frame of it.
+    val fade = remember { Paint() }
+
     Canvas(modifier = modifier) {
         val centreX = size.width / 2f
         val centreY = size.height / 2f
         val reveal = JourneyTimeline.mapReveal(elapsedMs)
 
-        if (reveal < 1f) {
-            drawSpaceLeg(source, elapsedMs, starfield, centreX, centreY)
+        // The two scenes cross-dissolve rather than stack. Drawn at full
+        // strength over each other, a schematic Honshu the size of the
+        // Pacific slides across a photograph of the real one, which reads
+        // as a bug rather than as a transition.
+        when {
+            reveal <= 0f -> drawSpaceLeg(source, earth, elapsedMs, starfield, centreX, centreY)
+            reveal < 1f -> drawIntoCanvas { canvas ->
+                fade.alpha = 1f - reveal
+                canvas.saveLayer(Rect(Offset.Zero, size), fade)
+                drawSpaceLeg(source, earth, elapsedMs, starfield, centreX, centreY)
+                canvas.restore()
+            }
         }
         if (reveal > 0f) {
             drawDescent(
@@ -195,6 +230,17 @@ private fun JourneyCanvas(
                 landedFraction = JourneyTimeline.landedFraction(elapsedMs),
                 alpha = reveal,
             )
+        }
+
+        // A wash of fire across the whole frame at the moment of the cut,
+        // brightest exactly halfway through the dissolve and gone at both
+        // ends. One flash rather than a flicker: a strobe is a seizure risk
+        // and this already does the job, which is to hide the join between
+        // a photograph of Earth and a diagram of Japan.
+        val cover = 4f * reveal * (1f - reveal)
+        if (cover > 0.01f) {
+            drawRect(color = Color(0xFFFF8A2A).copy(alpha = 0.58f * cover))
+            drawRect(color = Color(0xFFFFD79A).copy(alpha = 0.22f * cover))
         }
 
         // Atmospheric entry glow over the top of whichever scene is showing,
@@ -221,6 +267,7 @@ private fun JourneyCanvas(
 /** The part of the flight that happens between the worlds. */
 private fun DrawScope.drawSpaceLeg(
     source: Planet,
+    earth: ImageBitmap?,
     elapsedMs: Long,
     starfield: Starfield,
     centreX: Float,
@@ -270,14 +317,14 @@ private fun DrawScope.drawSpaceLeg(
     }
     if (Projection.isVisible(earthZ)) {
         bodies += Body(earthZ) {
-            drawSchematicPlanet(
-                planet = Planet.EARTH,
+            drawPhotoPlanet(
+                image = earth,
                 centre = Offset(
                     Projection.screenX(earthX, earthZ, centreX),
                     Projection.screenY(earthY, earthZ, centreY),
                 ),
                 radius = Projection.screenRadius(210f, earthZ),
-                spin = seconds * 0.3f,
+                fallback = Planet.EARTH,
             )
         }
     }
@@ -310,3 +357,6 @@ private fun DrawScope.drawSpaceLeg(
 
     bodies.sortedByDescending { it.z }.forEach { it.draw() }
 }
+
+/** Earth fills most of the screen on the approach, so decode it big. */
+private const val EARTH_PX = 1024

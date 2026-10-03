@@ -110,9 +110,16 @@ planet every time you looked at it would be no fun at all.
 
 <img src="docs/journey.gif" width="260" align="right" alt="The pebble's twenty second flight to Earth" />
 
-Twenty seconds of schematic space flight. The pebble launches, tumbles along a
-curving arc through a warping starfield, its home world shrinking behind it and
-Earth swelling ahead, until the air starts to glow orange around it.
+Twenty seconds of space flight. The pebble launches, tumbles along a curving
+arc through a warping starfield, its home world shrinking behind it and Earth
+swelling ahead, until the air starts to glow orange around it.
+
+Earth is a photograph rather than a drawing — and specifically a photograph of
+the side with Japan on it, because that is where the pebble is going. The nine
+library full-disk Earths are all the Americas or Africa, so this one comes from
+DSCOVR, which sits a million miles out at the Earth–Sun L1 point and
+photographs the whole sunlit disc every couple of hours; one frame a day is
+centred on the Pacific.
 
 Then it keeps going. The fireball gives way to a map of Japan, the view falls
 and closes in through Kanto and over Tokyo Bay, and the pebble finally comes
@@ -239,6 +246,11 @@ The language is applied inside the composition rather than by restarting the
 activity, so switching it never interrupts the camera and never restarts an
 animation in progress. The sequence you were watching carries on from the frame
 it was on.
+
+Russian needs more than a lookup table. A pebble does not come **с Марс** but
+**с Марса**, and the ending differs by word — Венеры, Юпитера, Солнца. There is
+no rule a format string can apply, so every body carries a second name in the
+genitive, and the languages that do not inflect simply repeat the first one.
 
 ---
 

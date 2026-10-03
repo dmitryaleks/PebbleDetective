@@ -62,6 +62,17 @@
     <string name="planet_uranus_fact">Он катится вокруг Солнца на боку, как бочка.</string>
     <string name="planet_neptune_name">Нептун</string>
     <string name="planet_neptune_fact">Самый ветреный мир. Ветер там быстрее самолёта!</string>
+
+    <!-- Родительный падеж: "Улетаем с Марса", не "с Марс". -->
+    <string name="planet_sun_from">Солнца</string>
+    <string name="planet_mercury_from">Меркурия</string>
+    <string name="planet_venus_from">Венеры</string>
+    <string name="planet_earth_from">Земли</string>
+    <string name="planet_mars_from">Марса</string>
+    <string name="planet_jupiter_from">Юпитера</string>
+    <string name="planet_saturn_from">Сатурна</string>
+    <string name="planet_uranus_from">Урана</string>
+    <string name="planet_neptune_from">Нептуна</string>
     <string name="result_title">Этот камешек прилетел с</string>
     <string name="result_journey">Посмотреть полёт домой</string>
     <string name="result_new">Найти ещё камешек</string>

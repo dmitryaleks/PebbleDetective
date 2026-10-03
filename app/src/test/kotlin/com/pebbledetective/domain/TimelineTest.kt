@@ -139,12 +139,13 @@ class JourneyTimelineTest {
     @Test
     fun `the map fades in under the brightest part of the entry glow`() {
         assertEquals(0f, JourneyTimeline.mapReveal(9_000), 0.001f)
+        assertEquals(0f, JourneyTimeline.mapReveal(10_900), 0.001f)
         assertEquals(1f, JourneyTimeline.mapReveal(11_500), 0.001f)
-        val midway = JourneyTimeline.mapReveal(10_900)
+        val midway = JourneyTimeline.mapReveal(11_200)
         assertTrue("reveal was $midway", midway in 0.2f..0.8f)
         assertTrue(
             "the glow must still be strong while the map appears",
-            JourneyTimeline.entryHeat(10_900) > 0.6f,
+            JourneyTimeline.entryHeat(11_200) > 0.6f,
         )
     }
 
