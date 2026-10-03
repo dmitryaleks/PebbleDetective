@@ -77,4 +77,12 @@
     <string name="result_new">Find another pebble</string>
     <string name="result_found_at">Found at %1$s</string>
     <string name="result_colour">Pebble colour</string>
+
+    <!-- Journey -->
+    <string name="journey_departing">Leaving %1$s</string>
+    <string name="journey_cruising">Crossing space</string>
+    <string name="journey_entering">Entering the atmosphere</string>
+    <string name="journey_arrived">Landed on Earth!</string>
+    <string name="journey_distance">%1$d%% of the way to go</string>
+    <string name="journey_done">Done</string>
 </resources>

@@ -75,4 +75,12 @@
     <string name="result_new">Найти ещё камешек</string>
     <string name="result_found_at">Найден: %1$s</string>
     <string name="result_colour">Цвет камешка</string>
+
+    <!-- Journey -->
+    <string name="journey_departing">Улетаем с %1$s</string>
+    <string name="journey_cruising">Летим через космос</string>
+    <string name="journey_entering">Входим в атмосферу</string>
+    <string name="journey_arrived">Приземлились на Земле!</string>
+    <string name="journey_distance">Осталось %1$d%%</string>
+    <string name="journey_done">Готово</string>
 </resources>

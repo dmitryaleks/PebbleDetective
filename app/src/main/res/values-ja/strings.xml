@@ -75,4 +75,12 @@
     <string name="result_new">つぎの こいしを さがす</string>
     <string name="result_found_at">みつけた ばしょ: %1$s</string>
     <string name="result_colour">こいしの いろ</string>
+
+    <!-- Journey -->
+    <string name="journey_departing">%1$s を しゅっぱつ</string>
+    <string name="journey_cruising">うちゅうを おうだんちゅう</string>
+    <string name="journey_entering">たいきけんに とつにゅう</string>
+    <string name="journey_arrived">ちきゅうに とうちゃく！</string>
+    <string name="journey_distance">のこり %1$d%%</string>
+    <string name="journey_done">おわり</string>
 </resources>

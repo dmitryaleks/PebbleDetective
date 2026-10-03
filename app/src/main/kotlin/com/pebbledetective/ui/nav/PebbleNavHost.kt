@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.pebbledetective.R
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.capture.CaptureScreen
+import com.pebbledetective.ui.journey.JourneyScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
 import com.pebbledetective.ui.screens.CreditsScreen
@@ -53,7 +54,13 @@ fun PebbleNavHost(session: SessionViewModel) {
             )
         }
         composable(Routes.JOURNEY) {
-            PlaceholderScreen(session, R.string.screen_journey, null, null, navController::popBackStack)
+            JourneyScreen(
+                session = session,
+                onFinished = {
+                    session.resetJourney()
+                    navController.popBackStack(Routes.RESULT, inclusive = false)
+                },
+            )
         }
         composable(Routes.HISTORY) {
             PlaceholderScreen(

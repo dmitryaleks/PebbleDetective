@@ -14,6 +14,7 @@ import com.pebbledetective.data.AppLanguage
 import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PebbleStatus
 import com.pebbledetective.domain.Planet
+import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.ResearchTimeline
 import com.pebbledetective.domain.dominantColour
 import com.pebbledetective.domain.pickPlanet
@@ -57,7 +58,11 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     private val _result = MutableStateFlow<PebbleEntry?>(null)
     val result: StateFlow<PebbleEntry?> = _result.asStateFlow()
 
+    private val _journeyStartedAt = MutableStateFlow<Long?>(null)
+    val journeyStartedAt: StateFlow<Long?> = _journeyStartedAt.asStateFlow()
+
     private var analysisJob: Job? = null
+    private var journeyCueJob: Job? = null
     private var cueJob: Job? = null
 
     init {
@@ -89,6 +94,8 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     fun discardCapture() {
         analysisJob?.cancel()
         cueJob?.cancel()
+        journeyCueJob?.cancel()
+        _journeyStartedAt.value = null
         container.sound.stopAll()
         _captured.value = null
         _researchStartedAt.value = null
@@ -214,6 +221,51 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         container.pebbles.update(located)
         // Only update the visible result if it is still this pebble.
         if (_result.value?.id == located.id) _result.value = located
+    }
+
+    // ---- journey --------------------------------------------------------
+
+    fun journeyElapsedMs(): Long =
+        _journeyStartedAt.value?.let { SystemClock.elapsedRealtime() - it } ?: 0L
+
+    fun beginJourney() {
+        if (_journeyStartedAt.value != null) return
+        _journeyStartedAt.value = SystemClock.elapsedRealtime()
+        journeyCueJob?.cancel()
+        journeyCueJob = viewModelScope.launch {
+            // Cues follow their own clock rather than the frame loop, so a
+            // dropped frame cannot nudge the soundtrack out of step.
+            delay(1_400)
+            container.sound.play(SoundCue.LAUNCH_WHOOSH)
+            container.sound.loop(SoundCue.SPACE_DRONE)
+            delay(8_100)
+            container.sound.stop(SoundCue.SPACE_DRONE)
+            container.sound.play(SoundCue.ENTRY_RUMBLE)
+            delay(1_500)
+            container.sound.play(SoundCue.ARRIVAL_CHIME)
+        }
+    }
+
+    /** By the third pebble an unskippable twelve-second film is hostile. */
+    fun skipJourney() {
+        val started = _journeyStartedAt.value ?: return
+        val target = SystemClock.elapsedRealtime() - JourneyTimeline.TOTAL_MS
+        if (target < started) return
+        journeyCueJob?.cancel()
+        container.sound.stopAll()
+        container.sound.play(SoundCue.ARRIVAL_CHIME)
+        _journeyStartedAt.value = target
+    }
+
+    fun finishJourney() {
+        journeyCueJob?.cancel()
+        container.sound.stop(SoundCue.SPACE_DRONE)
+    }
+
+    fun resetJourney() {
+        journeyCueJob?.cancel()
+        container.sound.stopAll()
+        _journeyStartedAt.value = null
     }
 
     override fun onCleared() {
