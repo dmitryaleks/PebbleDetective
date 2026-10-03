@@ -102,6 +102,15 @@ def main() -> int:
     os.makedirs(DOCS, exist_ok=True)
     print("capturing:")
 
+    # 0. The title sequence, caught just before it hands over. The wait has
+    # to cover the system splash as well as the sequence itself, which on
+    # the emulator costs the best part of two seconds before Compose draws
+    # its first frame.
+    adb("shell", "am", "force-stop", PKG)
+    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity")
+    time.sleep(4.2)
+    save(shot(), "screen-splash.png")
+
     # 1. Camera with the reticle.
     restart()
     time.sleep(2)

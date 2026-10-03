@@ -75,6 +75,7 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
 
     private var analysisJob: Job? = null
     private var journeyCueJob: Job? = null
+    private var titleCueJob: Job? = null
     private var cueJob: Job? = null
 
     /**
@@ -456,6 +457,23 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         resetJourney()
     }
 
+    // ---- title sequence -------------------------------------------------
+
+    /**
+     * The lock-on that goes with the reticle closing on the splash screen.
+     *
+     * Scheduled on its own delay rather than off the frame loop, like every
+     * other cue in the app: frames may drop, the soundtrack should not.
+     * Silent unless sound has been turned on, which it is not by default.
+     */
+    fun playTitleCue() {
+        titleCueJob?.cancel()
+        titleCueJob = viewModelScope.launch {
+            delay(1_250)
+            container.sound.play(SoundCue.RETICLE_LOCK)
+        }
+    }
+
     // ---- journey --------------------------------------------------------
 
     fun journeyElapsedMs(): Long =
@@ -511,6 +529,7 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     }
 
     override fun onCleared() {
+        titleCueJob?.cancel()
         radarJob?.cancel()
         radarSoundJob?.cancel()
         detectionSoundJob?.cancel()

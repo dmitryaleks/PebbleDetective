@@ -350,3 +350,26 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
 - **Verified on device** along both paths: Done from the post-research journey
   returns to the result screen, and Done from a logbook replay returns to that
   logbook entry. Skip still lands on the same final frame.
+
+### Post-release — the title sequence
+
+- **The splash is Compose, not the platform splash screen API.** That API
+  gives you one centred icon on a flat colour, which cannot carry the solar
+  system. The system splash still shows first on Android 12 and up and
+  cannot be removed, so what the player actually sees is the launcher icon
+  for a moment and then the sequence; `windowBackground` was already the
+  same near-black, so there is no flash between them.
+- **The planet photographs needed a circular mask as well as the luminance
+  key.** Keying alone is what the share card and the banner script do, and
+  it is enough for every body except the Sun, whose NASA frame is lit corner
+  to corner: it came through as a bright square sitting on the starfield.
+- **The discs are decoded subsampled.** Nine full-size frames on the way
+  into the app is tens of megabytes and a visible stall. They decode at
+  256px on a background dispatcher and are published one at a time, so the
+  sky and the wordmark never wait for them.
+- **The title column is deliberately narrower than the screen.** The
+  pebble’s trail comes down the left-hand side, and a full-width subtitle
+  ran straight across it.
+- **Verified on device** in all three languages, that a tap skips without
+  the tap reaching the camera screen underneath, and that back from the
+  camera leaves the app rather than replaying the titles.

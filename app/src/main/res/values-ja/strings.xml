@@ -118,4 +118,11 @@
     <string name="share_failed">カードを つくれませんでした</string>
     <string name="save_done">しゃしんを ほぞんしました</string>
     <string name="save_failed">ほぞんできませんでした</string>
+
+    <!-- Title sequence -->
+    <string name="splash_title_top">こいし</string>
+    <string name="splash_title_bottom">たんてい</string>
+    <string name="splash_tagline">どの いしにも ふるさとが ある</string>
+    <string name="splash_subtitle">こいしを さがして、スキャンして、どの ほしから きたか しらべよう。</string>
+    <string name="splash_hint">タップで スキップ</string>
 </resources>

@@ -120,4 +120,11 @@
     <string name="share_failed">Could not build the summary</string>
     <string name="save_done">Photo saved</string>
     <string name="save_failed">Could not save the photo</string>
+
+    <!-- Title sequence -->
+    <string name="splash_title_top">PEBBLE</string>
+    <string name="splash_title_bottom">DETECTIVE</string>
+    <string name="splash_tagline">EVERY STONE CAME FROM SOMEWHERE</string>
+    <string name="splash_subtitle">Find a pebble. Scan it. Discover which world it fell from.</string>
+    <string name="splash_hint">tap to skip</string>
 </resources>

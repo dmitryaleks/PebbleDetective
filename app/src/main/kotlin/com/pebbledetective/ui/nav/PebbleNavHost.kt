@@ -15,12 +15,26 @@ import com.pebbledetective.ui.radar.RadarScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
 import com.pebbledetective.ui.screens.CreditsScreen
+import com.pebbledetective.ui.splash.SplashScreen
 
 @Composable
 fun PebbleNavHost(session: SessionViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Routes.CAPTURE) {
+    NavHost(navController = navController, startDestination = Routes.SPLASH) {
+        composable(Routes.SPLASH) {
+            SplashScreen(
+                session = session,
+                // Popped inclusively, so back from the camera leaves the app
+                // rather than replaying the titles.
+                onFinished = {
+                    navController.navigate(Routes.CAPTURE) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         composable(Routes.CAPTURE) {
             CaptureScreen(
                 session = session,

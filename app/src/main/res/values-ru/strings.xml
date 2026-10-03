@@ -121,4 +121,11 @@
     <string name="share_failed">Не удалось собрать карточку</string>
     <string name="save_done">Фото сохранено</string>
     <string name="save_failed">Не удалось сохранить фото</string>
+
+    <!-- Title sequence -->
+    <string name="splash_title_top">СЫЩИК</string>
+    <string name="splash_title_bottom">КАМЕШКОВ</string>
+    <string name="splash_tagline">У КАЖДОГО КАМНЯ ЕСТЬ РОДИНА</string>
+    <string name="splash_subtitle">Найди камешек. Просканируй. Узнай, с какой он планеты.</string>
+    <string name="splash_hint">нажми, чтобы пропустить</string>
 </resources>

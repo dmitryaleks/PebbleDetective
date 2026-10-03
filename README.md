@@ -31,6 +31,19 @@ real photograph from NASA and a fact about that world.
 
 ## How it plays
 
+### 0 · Open it
+
+<img src="docs/screen-splash.png" width="260" align="right" alt="The title sequence" />
+
+The app opens on the picture above, assembled a piece at a time: the sky, then
+the solar system arriving left to right, then a pebble falling in on an amber
+trail with the scanner brackets closing on it.
+
+Under three seconds, and a tap anywhere ends it early. A splash screen is a
+toll paid on every single launch.
+
+<br clear="right" />
+
 ### 1 · Find a pebble
 
 <img src="docs/screen-capture.png" width="260" align="right" alt="Camera view with the targeting reticle" />
