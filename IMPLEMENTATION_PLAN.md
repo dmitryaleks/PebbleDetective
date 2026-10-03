@@ -11,7 +11,7 @@ The whole experience is **offline by design**: the "Deep Research" is theatre, s
 ### Decisions you confirmed
 | Question | Decision |
 |---|---|
-| Camera | **Rear camera only** (`PROJECT.md` says "frontal"; rear is the usable one for a pebble and you chose it — no flip control) |
+| Camera | **Rear camera only** — the usable one for a pebble on the ground; no flip control. `PROJECT.md` originally said "frontal" and has since been corrected to match. |
 | Languages | **English, Russian, Japanese** |
 | Planet art | **Real NASA photos on the result screen**, procedural schematic drawing in the 3D journey |
 | Sound | **Bundled royalty-free audio files** |

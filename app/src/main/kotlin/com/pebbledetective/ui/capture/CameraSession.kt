@@ -24,9 +24,8 @@ import kotlin.coroutines.resumeWithException
 /**
  * Binds the rear camera for preview plus stills, and takes the shot.
  *
- * `PROJECT.md` says "frontal camera", but the subject is a pebble on the
- * ground; the rear camera is the one that can actually see it, and that is
- * what was chosen. There is no flip control.
+ * Rear lens only. The subject is a pebble on the ground, so the rear camera
+ * is the one that can actually see it; there is no flip control.
  */
 class CameraSession(
     private val context: Context,
