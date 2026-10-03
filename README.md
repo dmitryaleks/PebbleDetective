@@ -141,8 +141,8 @@ coordinates are where a child was standing.
 Tap the radar button in the top bar and the app **hides a virtual pebble
 somewhere within thirty metres** and sends the child out to find it.
 
-The scope is drawn over the live camera: range rings, a rotating sweep, a
-pulsing blip and an arrow pointing the way. Your own position is the centre
+The scope is drawn over the live rear camera: range rings, a rotating sweep,
+a pulsing blip and an arrow pointing the way. Your own position is the centre
 and moves as you walk, and the whole display turns with the phone — the arrow
 keeps pointing at the same patch of ground however you hold it, because the
 target is a real coordinate rather than a spot on the screen.

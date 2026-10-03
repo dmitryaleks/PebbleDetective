@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -22,9 +21,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -52,7 +49,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
@@ -228,7 +224,16 @@ private fun PagerControls(
     }
 }
 
-/** One pebble: the photograph, its planet, and when and where it was found. */
+/**
+ * One pebble: the photograph, its planet, and when and where it was found.
+ *
+ * Laid out to *fit*, not to scroll. It used to be a scrolling column with a
+ * full-width square photograph, which on a tall phone pushed the location
+ * link and every button clean off the bottom - and the vertical scroll lost
+ * its gesture to the pager, so they could not even be scrolled to. The
+ * photograph now takes whatever room is left after the things that must
+ * always be reachable.
+ */
 @Composable
 private fun PebblePage(
     session: SessionViewModel,
@@ -244,7 +249,7 @@ private fun PebblePage(
     val planet = Planet.fromId(entry.planetId)
     val formatter = remember(language, entry.timeZoneId) {
         DateTimeFormatter
-            .ofLocalizedDateTime(FormatStyle.FULL)
+            .ofLocalizedDateTime(FormatStyle.MEDIUM)
             .withLocale(language.locale)
             .withZone(ZoneId.of(entry.timeZoneId))
     }
@@ -252,20 +257,17 @@ private fun PebblePage(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        // Takes the leftover space, so nothing below it can be pushed away.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
+                .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color.Black)
-                .semantics {
-                    contentDescription = entry.planetId ?: ""
-                },
+                .background(Color.Black),
             contentAlignment = Alignment.Center,
         ) {
             photo?.let {
@@ -278,39 +280,42 @@ private fun PebblePage(
             }
         }
 
-        if (planet != null) {
-            val planetImage by rememberPlanetImage(planet)
-            planetImage?.let {
-                Image(
-                    bitmap = it,
-                    contentDescription = stringResource(planet.nameRes),
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth(0.4f).aspectRatio(1f),
+        // Planet and date side by side: two short lines instead of four tall ones.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            if (planet != null) {
+                val planetImage by rememberPlanetImage(planet)
+                planetImage?.let {
+                    Image(
+                        bitmap = it,
+                        contentDescription = stringResource(planet.nameRes),
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(54.dp),
+                    )
+                }
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = planet?.let { stringResource(it.nameRes) }
+                        ?: stringResource(R.string.history_unknown_planet),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = formatter.format(Instant.ofEpochMilli(entry.capturedAtEpochMs)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 )
             }
-            Text(
-                text = stringResource(planet.nameRes),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        } else {
-            Text(
-                text = stringResource(R.string.history_unknown_planet),
-                style = MaterialTheme.typography.titleMedium,
-            )
         }
-
-        Text(
-            text = formatter.format(Instant.ofEpochMilli(entry.capturedAtEpochMs)),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
-        )
 
         val lat = entry.latitude
         val lon = entry.longitude
         if (lat != null && lon != null) {
-            MapLink(latitude = lat, longitude = lon)
+            MapLink(latitude = lat, longitude = lon, modifier = Modifier.fillMaxWidth())
         } else {
             Text(
                 text = stringResource(R.string.history_no_place),
@@ -325,12 +330,18 @@ private fun PebblePage(
             }
         }
 
-        TextButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.history_delete))
-        }
-        TextButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            Text(stringResource(R.string.cd_back), modifier = Modifier.padding(start = 8.dp))
+        // Side by side, so the buttons cost one row rather than two.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            TextButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                Text(stringResource(R.string.cd_back), modifier = Modifier.padding(start = 6.dp))
+            }
+            TextButton(onClick = onDelete) {
+                Text(stringResource(R.string.history_delete))
+            }
         }
     }
 }

@@ -56,9 +56,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * moves as they walk; the display rotates with the phone, so the arrow keeps
  * pointing at the same patch of ground however the phone is turned.
  *
- * The camera here is the front one, as asked. It is a backdrop for the
- * overlay rather than something to aim, which is why it does not follow the
- * rear-only rule the capture screen does.
+ * The backdrop is the rear camera: you are walking toward something, so the
+ * useful view is where you are going rather than your own face.
  */
 @Composable
 fun RadarScreen(
@@ -187,7 +186,7 @@ private fun com.pebbledetective.ui.RadarState.statusText(): String = when {
 }
 
 /**
- * The live camera behind the scope.
+ * The live rear camera behind the scope.
  *
  * Failing to bind is not fatal - the radar is perfectly usable against the
  * black background, so a device with no front camera still plays.
@@ -224,10 +223,10 @@ private fun RadarCameraBackdrop() {
                 surfaceProvider = previewView.surfaceProvider
             }
             provider.unbindAll()
-            val lens = if (provider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
-                CameraSelector.DEFAULT_FRONT_CAMERA
-            } else {
+            val lens = if (provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) {
                 CameraSelector.DEFAULT_BACK_CAMERA
+            } else {
+                CameraSelector.DEFAULT_FRONT_CAMERA
             }
             provider.bindToLifecycle(owner, lens, preview)
         }
