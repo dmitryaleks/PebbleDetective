@@ -34,4 +34,20 @@
     <string name="camera_allow">カメラを ゆるす</string>
     <string name="camera_open_settings">せってい を ひらく</string>
     <string name="camera_use_photo">もっている しゃしんを つかう</string>
+
+    <!-- Deep Research -->
+    <string name="research_prompt_title">ディープ リサーチ する？</string>
+    <string name="research_prompt_body">この こいしが どこから きたか しらべられるよ。</string>
+    <string name="research_yes">うん、しらべて！</string>
+    <string name="research_no">いまは やめとく</string>
+    <string name="research_connecting">えいせいに せつぞくちゅう…</string>
+    <string name="research_signal">しんごう キャッチ！</string>
+    <string name="research_analysing">こいしを かいせきちゅう</string>
+    <string name="research_match">みつかった！</string>
+    <string name="research_line_scan">ひょうめん スキャン かんりょう</string>
+    <string name="research_line_spectrum">いろの スペクトルを よみとり</string>
+    <string name="research_line_mineral">こうぶつ データと しょうごう</string>
+    <string name="research_line_crystal">けっしょう こうぞう いっち</string>
+    <string name="research_line_origin">ふるさとを さがしています…</string>
+    <string name="action_skip">スキップ</string>
 </resources>

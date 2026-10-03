@@ -36,4 +36,20 @@
     <string name="camera_allow">Allow camera</string>
     <string name="camera_open_settings">Open settings</string>
     <string name="camera_use_photo">Use a photo I already have</string>
+
+    <!-- Deep Research -->
+    <string name="research_prompt_title">Run a Deep Research?</string>
+    <string name="research_prompt_body">I can find out where this pebble came from.</string>
+    <string name="research_yes">Yes, investigate!</string>
+    <string name="research_no">Not now</string>
+    <string name="research_connecting">Connecting to satellite...</string>
+    <string name="research_signal">Signal acquired</string>
+    <string name="research_analysing">Analysing pebble</string>
+    <string name="research_match">Match found!</string>
+    <string name="research_line_scan">Surface scan complete</string>
+    <string name="research_line_spectrum">Reading colour spectrum</string>
+    <string name="research_line_mineral">Comparing mineral records</string>
+    <string name="research_line_crystal">Crystal structure matched</string>
+    <string name="research_line_origin">Tracing origin...</string>
+    <string name="action_skip">Skip</string>
 </resources>

@@ -34,4 +34,20 @@
     <string name="camera_allow">Разрешить камеру</string>
     <string name="camera_open_settings">Открыть настройки</string>
     <string name="camera_use_photo">Взять готовое фото</string>
+
+    <!-- Deep Research -->
+    <string name="research_prompt_title">Начать глубокое исследование?</string>
+    <string name="research_prompt_body">Я могу узнать, откуда прилетел этот камешек.</string>
+    <string name="research_yes">Да, исследуем!</string>
+    <string name="research_no">Не сейчас</string>
+    <string name="research_connecting">Связь со спутником...</string>
+    <string name="research_signal">Сигнал получен</string>
+    <string name="research_analysing">Изучаю камешек</string>
+    <string name="research_match">Совпадение найдено!</string>
+    <string name="research_line_scan">Поверхность просканирована</string>
+    <string name="research_line_spectrum">Читаю цветовой спектр</string>
+    <string name="research_line_mineral">Сверяю с базой минералов</string>
+    <string name="research_line_crystal">Кристаллы совпали</string>
+    <string name="research_line_origin">Ищу родину...</string>
+    <string name="action_skip">Пропустить</string>
 </resources>
