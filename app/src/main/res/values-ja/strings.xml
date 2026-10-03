@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">こいし たんてい</string>
+
+    <string name="cd_language">げんごを かえる</string>
+    <string name="cd_sound_on">おとを けす</string>
+    <string name="cd_sound_off">おとを だす</string>
+    <string name="cd_history">こいし ノート</string>
+    <string name="cd_back">もどる</string>
+
+    <string name="screen_capture">こいしを さがそう</string>
+    <string name="screen_research">ディープ リサーチ</string>
+    <string name="screen_result">どこから きたの？</string>
+    <string name="screen_journey">たびの ようす</string>
+    <string name="screen_history">こいし ノート</string>
+
+    <string name="capture_hint">こいしに むけて タップしてね</string>
+    <string name="history_empty">まだ こいしが ないよ。さがしに いこう！</string>
+
+    <string name="sound_is_on">おと オン</string>
+    <string name="sound_is_off">おと オフ</string>
+</resources>

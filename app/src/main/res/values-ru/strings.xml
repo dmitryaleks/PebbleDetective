@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сыщик Камешков</string>
+
+    <string name="cd_language">Сменить язык</string>
+    <string name="cd_sound_on">Выключить звук</string>
+    <string name="cd_sound_off">Включить звук</string>
+    <string name="cd_history">Журнал камешков</string>
+    <string name="cd_back">Назад</string>
+
+    <string name="screen_capture">Найди камешек</string>
+    <string name="screen_research">Глубокое исследование</string>
+    <string name="screen_result">Откуда он прилетел</string>
+    <string name="screen_journey">Путешествие</string>
+    <string name="screen_history">Журнал камешков</string>
+
+    <string name="capture_hint">Наведи на камешек и коснись его</string>
+    <string name="history_empty">Камешков пока нет. Иди и найди!</string>
+
+    <string name="sound_is_on">Звук включён</string>
+    <string name="sound_is_off">Звук выключен</string>
+</resources>

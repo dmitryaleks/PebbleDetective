@@ -1,0 +1,17 @@
+# Keep line endings sane across Windows / macOS / Linux and CI.
+* text=auto eol=lf
+
+# Gradle wrapper must stay LF or it will not run on Linux or macOS.
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows-only scripts keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binaries must never be line-ending converted.
+*.jar binary
+*.png binary
+*.jpg binary
+*.ogg binary
+*.wav binary

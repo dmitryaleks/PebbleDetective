@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pebble Detective</string>
+
+    <!-- Top controls -->
+    <string name="cd_language">Change language</string>
+    <string name="cd_sound_on">Turn sound off</string>
+    <string name="cd_sound_off">Turn sound on</string>
+    <string name="cd_history">Pebble logbook</string>
+    <string name="cd_back">Go back</string>
+
+    <!-- Screens (placeholders filled in later phases) -->
+    <string name="screen_capture">Find a pebble</string>
+    <string name="screen_research">Deep Research</string>
+    <string name="screen_result">Where it came from</string>
+    <string name="screen_journey">The journey</string>
+    <string name="screen_history">Pebble logbook</string>
+
+    <string name="capture_hint">Point at a pebble and tap it</string>
+    <string name="history_empty">No pebbles yet. Go and find one!</string>
+
+    <string name="sound_is_on">Sound on</string>
+    <string name="sound_is_off">Sound off</string>
+</resources>
