@@ -37,6 +37,18 @@ object ResearchTimeline {
     fun isComplete(elapsedMs: Long): Boolean = elapsedMs >= TOTAL_MS
 
     /**
+     * The start time that jumps the sequence to its end, or null when there
+     * is nothing left to skip.
+     *
+     * Skipping works by moving the *start* backwards so the elapsed time
+     * lands on [TOTAL_MS]. The returned value is therefore earlier than
+     * [startedAt], which is easy to mistake for a rewind and guard against
+     * by accident - doing so disables the skip button entirely.
+     */
+    fun skippedStart(startedAt: Long, nowMs: Long): Long? =
+        if (isComplete(nowMs - startedAt)) null else nowMs - TOTAL_MS
+
+    /**
      * How many analysis lines should have streamed in by now, so the readout
      * fills steadily instead of appearing all at once.
      */
@@ -83,6 +95,18 @@ object JourneyTimeline {
         (elapsedMs.toFloat() / TOTAL_MS).coerceIn(0f, 1f)
 
     fun isComplete(elapsedMs: Long): Boolean = elapsedMs >= TOTAL_MS
+
+    /**
+     * The start time that jumps the sequence to its end, or null when there
+     * is nothing left to skip.
+     *
+     * Skipping works by moving the *start* backwards so the elapsed time
+     * lands on [TOTAL_MS]. The returned value is therefore earlier than
+     * [startedAt], which is easy to mistake for a rewind and guard against
+     * by accident - doing so disables the skip button entirely.
+     */
+    fun skippedStart(startedAt: Long, nowMs: Long): Long? =
+        if (isComplete(nowMs - startedAt)) null else nowMs - TOTAL_MS
 
     /**
      * How far along its arc the pebble is, 0 at the source planet and 1 at

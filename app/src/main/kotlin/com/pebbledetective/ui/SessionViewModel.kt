@@ -131,8 +131,8 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     /** Jump to the end. A sequence a child cannot skip becomes hostile fast. */
     fun skipResearch() {
         val started = _researchStartedAt.value ?: return
-        val target = SystemClock.elapsedRealtime() - ResearchTimeline.TOTAL_MS
-        if (target < started) return
+        val target = ResearchTimeline.skippedStart(started, SystemClock.elapsedRealtime())
+            ?: return
         cueJob?.cancel()
         container.sound.stopAll()
         _researchStartedAt.value = target
@@ -270,8 +270,8 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     /** By the third pebble an unskippable twelve-second film is hostile. */
     fun skipJourney() {
         val started = _journeyStartedAt.value ?: return
-        val target = SystemClock.elapsedRealtime() - JourneyTimeline.TOTAL_MS
-        if (target < started) return
+        val target = JourneyTimeline.skippedStart(started, SystemClock.elapsedRealtime())
+            ?: return
         journeyCueJob?.cancel()
         container.sound.stopAll()
         container.sound.play(SoundCue.ARRIVAL_CHIME)
