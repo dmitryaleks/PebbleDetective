@@ -147,6 +147,17 @@ pinned to a direction in the world rather than to a place on the screen, so
 it keeps falling where it fell while you turn to follow it, and the crater it
 leaves in the street stays put.
 
+**This is the first of three stages.** Pick a world here, hand over to
+**Radar** to go and find where its piece came down, and finish in
+**Detection** with the camera on the stone itself:
+
+<p align="center"><b>Planets around</b> → <b>Radar</b> → <b>Detection</b></p>
+
+The button at the bottom of each screen moves you along the chain, and the
+two mode buttons in the top bar jump straight to any stage, so nobody has to
+walk the whole thing to photograph a stone they already have in their hand.
+Going back retraces the way you came.
+
 **Where the positions come from.** Nowhere. There is no ephemeris file and no
 network call: each planet is six numbers and six rates of change, and solving
 Kepler’s equation on the phone gives its position at any instant. That is
@@ -198,8 +209,9 @@ and moves as you walk, and the whole display turns with the phone — the arrow
 keeps pointing at the same patch of ground however you hold it, because the
 target is a real coordinate rather than a spot on the screen.
 
-Tapping radar again hides a new pebble from scratch. You can switch back to
-Detection at any point, whether or not you reached it.
+Tapping radar again hides a new pebble from scratch. You can switch on to
+Detection at any point, whether or not you reached the target, and the globe
+in the top bar goes back up to **Planets around**.
 
 With sound on it plays like a detector: a room tone under the scope, a ping
 each time the sweep comes round, and a proximity beep that **quickens as you

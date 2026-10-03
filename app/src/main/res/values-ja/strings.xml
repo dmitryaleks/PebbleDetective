@@ -153,4 +153,5 @@
     </string-array>
     <string name="sky_remembered_place">このまえの こいしの ばしょを つかっているよ</string>
     <string name="sky_follow">おいかけよう</string>
+    <string name="sky_to_radar">レーダー モードへ</string>
 </resources>

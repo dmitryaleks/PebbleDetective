@@ -64,6 +64,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 fun RadarScreen(
     session: SessionViewModel,
     onSwitchToDetection: () -> Unit,
+    onSky: () -> Unit,
     onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -145,6 +146,7 @@ fun RadarScreen(
                 onOpenHistory = onOpenHistory,
                 onRadar = { session.startRadar() },
                 radarActive = true,
+                onSky = onSky,
             )
             Text(
                 text = radar.statusText(),

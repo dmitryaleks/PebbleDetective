@@ -421,3 +421,19 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   guide arrow, and a meteor called down from Saturn and followed to the
   ground. The merged manifest still holds exactly CAMERA and the two
   location permissions: a planetarium that needs no network at all.
+
+### Post-release — the three camera modes become one hunt
+
+- **Planets around now hands over to Radar, not to Detection.** The three
+  camera modes are a sequence - pick a world, go and find where its piece
+  landed, photograph the stone - and the bottom button on each screen moves
+  along it. Every mode also carries both mode buttons in the top bar, so a
+  child who already has a stone in their hand can start at the end.
+- **Pushed rather than swapped.** Going from the sky to the radar leaves the
+  sky on the back stack, so back retraces the route; only Detection collapses
+  it, because it is where the flow begins and ends. Verified that back out of
+  Detection leaves the app rather than walking the chain in reverse.
+- **The camera survives the handover** in both directions, which is the
+  thing this app has got wrong before: each screen unbinds only the preview
+  it bound itself, so the outgoing screen being disposed after the incoming
+  one has bound cannot freeze it.

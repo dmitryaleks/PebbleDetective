@@ -112,15 +112,18 @@ fun PebbleNavHost(session: SessionViewModel) {
                     session.stopRadar()
                     navController.popBackStack(Routes.CAPTURE, inclusive = false)
                 },
+                onSky = { navController.navigate(Routes.SKY) { launchSingleTop = true } },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
             )
         }
         composable(Routes.SKY) {
             SkyScreen(
                 session = session,
-                onSwitchToDetection = {
+                // The hunt runs sky, then radar, then camera. Pushed rather
+                // than swapped, so going back retraces the way you came.
+                onRadar = {
                     session.stopSky()
-                    navController.popBackStack(Routes.CAPTURE, inclusive = false)
+                    navController.navigate(Routes.RADAR) { launchSingleTop = true }
                 },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
             )

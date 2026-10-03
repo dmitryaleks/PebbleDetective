@@ -155,4 +155,5 @@
     </string-array>
     <string name="sky_remembered_place">Using where your last pebble was found</string>
     <string name="sky_follow">follow it down</string>
+    <string name="sky_to_radar">Switch to Radar</string>
 </resources>

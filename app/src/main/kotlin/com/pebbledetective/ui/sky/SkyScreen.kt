@@ -102,7 +102,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 @Composable
 fun SkyScreen(
     session: SessionViewModel,
-    onSwitchToDetection: () -> Unit,
+    onRadar: () -> Unit,
     onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -339,9 +339,10 @@ fun SkyScreen(
                 onCycleLanguage = session::cycleLanguage,
                 onToggleSound = session::toggleSound,
                 onOpenHistory = onOpenHistory,
-                // Already here, so the button lets every planet back in.
+                // Already here, so this button lets every planet back in.
                 onSky = session::clearSkyFocus,
                 skyActive = true,
+                onRadar = onRadar,
             )
             PlanetBars(
                 sky = sky,
@@ -368,8 +369,11 @@ fun SkyScreen(
                 color = if (sky.meteor != null) SignalAmber else ScannerGreen.copy(alpha = 0.75f),
                 textAlign = TextAlign.Center,
             )
-            Button(onClick = onSwitchToDetection, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.radar_to_detection))
+            // The next stage of the hunt, not the last one: find a world,
+            // then let the radar put a piece of it somewhere nearby, then
+            // go and photograph what you turn up.
+            Button(onClick = onRadar, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.sky_to_radar))
             }
         }
     }
