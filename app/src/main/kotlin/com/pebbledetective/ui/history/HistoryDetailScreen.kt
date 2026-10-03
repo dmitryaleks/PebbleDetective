@@ -43,6 +43,7 @@ import com.pebbledetective.R
 import com.pebbledetective.data.locale
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.MapLink
 import com.pebbledetective.ui.common.TopControls
 import com.pebbledetective.ui.result.nameRes
 import com.pebbledetective.ui.result.rememberPlanetImage
@@ -146,18 +147,17 @@ fun HistoryDetailScreen(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
             )
-            Text(
-                text = if (current.latitude != null && current.longitude != null) {
-                    stringResource(
-                        R.string.result_found_at,
-                        "%.4f, %.4f".format(current.latitude, current.longitude),
-                    )
-                } else {
-                    stringResource(R.string.history_no_place)
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            )
+            val lat = current.latitude
+            val lon = current.longitude
+            if (lat != null && lon != null) {
+                MapLink(latitude = lat, longitude = lon)
+            } else {
+                Text(
+                    text = stringResource(R.string.history_no_place),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                )
+            }
 
             if (planet != null) {
                 Button(

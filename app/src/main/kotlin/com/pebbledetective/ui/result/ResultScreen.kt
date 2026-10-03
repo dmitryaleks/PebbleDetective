@@ -40,6 +40,7 @@ import com.pebbledetective.R
 import com.pebbledetective.data.locale
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.MapLink
 import com.pebbledetective.ui.common.TopControls
 import java.time.Instant
 import java.time.ZoneId
@@ -123,15 +124,10 @@ fun ResultScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 )
-                if (entry.latitude != null && entry.longitude != null) {
-                    Text(
-                        text = stringResource(
-                            R.string.result_found_at,
-                            "%.3f, %.3f".format(entry.latitude, entry.longitude),
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    )
+                val lat = entry.latitude
+                val lon = entry.longitude
+                if (lat != null && lon != null) {
+                    MapLink(latitude = lat, longitude = lon)
                 }
             }
 

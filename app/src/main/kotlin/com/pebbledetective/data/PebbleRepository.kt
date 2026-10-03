@@ -77,6 +77,21 @@ class PebbleRepository(
         _entries.value = updated.sortedByDescending { it.capturedAtEpochMs }
     }
 
+    /**
+     * Read-modify-write for one entry, all inside the lock.
+     *
+     * The location fix lands seconds after the planet is decided, so a
+     * caller holding a copy of the entry from before would write the planet
+     * straight back out of existence. Transforming whatever is current
+     * removes that race rather than relying on the timing working out.
+     */
+    suspend fun updateWhere(id: String, transform: (PebbleEntry) -> PebbleEntry) = mutex.withLock {
+        val current = _entries.value.firstOrNull { it.id == id } ?: return@withLock
+        val updated = _entries.value.map { if (it.id == id) transform(current) else it }
+        withContext(Dispatchers.IO) { rewrite(updated) }
+        _entries.value = updated.sortedByDescending { it.capturedAtEpochMs }
+    }
+
     suspend fun delete(id: String) = mutex.withLock {
         val remaining = _entries.value.filterNot { it.id == id }
         withContext(Dispatchers.IO) { rewrite(remaining) }

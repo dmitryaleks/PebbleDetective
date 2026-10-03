@@ -86,4 +86,8 @@
         <item quantity="one">%1$d pebble collected</item>
         <item quantity="other">%1$d pebbles collected</item>
     </plurals>
+
+    <!-- Map link -->
+    <string name="map_open">Open in Maps</string>
+    <string name="map_pin_label">Pebble found here</string>
 </resources>

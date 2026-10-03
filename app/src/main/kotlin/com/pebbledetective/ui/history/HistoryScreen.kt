@@ -45,6 +45,7 @@ import com.pebbledetective.data.locale
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
+import com.pebbledetective.ui.common.formatCoordinates
 import com.pebbledetective.ui.result.nameRes
 import java.time.Instant
 import java.time.ZoneId
@@ -195,7 +196,7 @@ private fun HistoryRow(
             )
             Text(
                 text = if (entry.latitude != null && entry.longitude != null) {
-                    "%.3f, %.3f".format(entry.latitude, entry.longitude)
+                    formatCoordinates(entry.latitude, entry.longitude)
                 } else {
                     stringResource(R.string.history_no_place)
                 },

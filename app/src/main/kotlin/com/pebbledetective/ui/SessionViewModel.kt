@@ -65,6 +65,13 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     private var journeyCueJob: Job? = null
     private var cueJob: Job? = null
 
+    /**
+     * Outstanding location lookups. Kept apart from analysisJob so moving on
+     * to the next pebble cannot cancel them; they are abandoned only when the
+     * view model itself goes away.
+     */
+    private val locationJobs = mutableListOf<Job>()
+
     init {
         viewModelScope.launch { container.pebbles.load() }
     }
@@ -180,6 +187,12 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         )
         container.pebbles.append(entry)
 
+        // Kick the location request off now, in parallel with the colour
+        // analysis, and on a job of its own. See attachLocation for why it
+        // must not live inside analysisJob.
+        locationJobs.removeAll { it.isCompleted }
+        locationJobs += viewModelScope.launch { attachLocation(id) }
+
         val colour = withContext(Dispatchers.Default) {
             val bitmap = capture.bitmap
             val pixels = IntArray(bitmap.width * bitmap.height)
@@ -198,29 +211,41 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         // store the answer rather than ever recomputing it.
         val planet: Planet = pickPlanet(colour, Random(id.hashCode().toLong()))
 
-        val researched = entry.copy(
-            status = PebbleStatus.RESEARCHED,
-            planetId = planet.id,
-            dominantColourArgb = colour.toArgb(),
-        )
-        container.pebbles.update(researched)
-        _result.value = researched
-
-        // Location is deliberately *not* on the critical path. Waiting for a
-        // fix before revealing the planet left the child watching a spinner
-        // for the full timeout whenever no fix was available. The planet is
-        // what they are waiting for; where they were standing is incidental
-        // and can arrive late.
-        attachLocation(researched)
+        // Transform whatever is current rather than the snapshot taken
+        // before the analysis began. A cached location fix returns instantly,
+        // so by now the location job may already have written coordinates -
+        // and writing the old copy back would erase them.
+        container.pebbles.updateWhere(id) { current ->
+            current.copy(
+                status = PebbleStatus.RESEARCHED,
+                planetId = planet.id,
+                dominantColourArgb = colour.toArgb(),
+            )
+        }
+        _result.value = container.pebbles.find(id)
     }
 
-    /** Adds coordinates to an already-published result, if a fix turns up. */
-    private suspend fun attachLocation(entry: PebbleEntry) {
+    /**
+     * Adds coordinates to a pebble once a fix turns up.
+     *
+     * Runs on its own job, deliberately *not* inside analysisJob. It used to
+     * be the last statement of analyse(), which meant discardCapture() -
+     * which "Find another pebble" calls - cancelled it mid-wait. Anyone
+     * moving briskly from one stone to the next therefore lost the location
+     * on almost every pebble; only the ones they happened to linger over
+     * recorded a place.
+     *
+     * The entry is re-read and transformed under the repository lock, so a
+     * fix arriving after the planet was decided cannot write the planet back
+     * out again.
+     */
+    private suspend fun attachLocation(id: String) {
         val location = container.location.currentLocation() ?: return
-        val located = entry.copy(latitude = location.latitude, longitude = location.longitude)
-        container.pebbles.update(located)
-        // Only update the visible result if it is still this pebble.
-        if (_result.value?.id == located.id) _result.value = located
+        container.pebbles.updateWhere(id) { current ->
+            current.copy(latitude = location.latitude, longitude = location.longitude)
+        }
+        // Refresh the visible result only if it is still this pebble.
+        if (_result.value?.id == id) _result.value = container.pebbles.find(id)
     }
 
     // ---- logbook --------------------------------------------------------

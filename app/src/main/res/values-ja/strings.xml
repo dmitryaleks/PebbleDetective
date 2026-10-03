@@ -84,4 +84,8 @@
     <plurals name="history_count">
         <item quantity="other">あつめた こいし: %1$d こ</item>
     </plurals>
+
+    <!-- Map link -->
+    <string name="map_open">ちずで ひらく</string>
+    <string name="map_pin_label">ここで こいしを みつけた</string>
 </resources>

@@ -87,4 +87,8 @@
         <item quantity="many">Собрано %1$d камешков</item>
         <item quantity="other">Собрано %1$d камешка</item>
     </plurals>
+
+    <!-- Map link -->
+    <string name="map_open">Открыть на карте</string>
+    <string name="map_pin_label">Здесь найден камешек</string>
 </resources>

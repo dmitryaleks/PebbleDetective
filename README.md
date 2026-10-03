@@ -104,15 +104,23 @@ film again.
 ### 6 · Keep the collection
 
 <p>
-<img src="docs/screen-logbook.png" width="260" alt="The pebble logbook" />
-&nbsp;&nbsp;
-<img src="docs/screen-logbook-ja.png" width="260" alt="The same logbook in Japanese" />
+<img src="docs/screen-logbook.png" width="250" alt="The pebble logbook" />
+&nbsp;
+<img src="docs/screen-logbook-ja.png" width="250" alt="The same logbook in Japanese" />
+&nbsp;
+<img src="docs/screen-detail.png" width="250" alt="One pebble, with a tappable map link" />
 </p>
 
 Every stone is kept: its photograph, the world it came from, when it was found
 and — if location was allowed — where. Tap one to see it full size and watch its
 journey again. Each can be deleted, and the logbook shows how much space the
 collection is using.
+
+**The coordinates are tappable** and open the spot in a map. This is the one
+place the app reaches outside itself: it still holds no network permission and
+makes no requests of its own, it simply hands the coordinates to whatever maps
+app is installed, and that app does the talking. Worth knowing, because those
+coordinates are where a child was standing.
 
 ---
 
@@ -188,7 +196,7 @@ echo "sdk.dir=/path/to/Android/Sdk" > local.properties
 
 ./gradlew :app:assembleDebug          # build
 ./gradlew :app:installDebug           # install over USB
-./gradlew :app:testDebugUnitTest      # 50 unit tests
+./gradlew :app:testDebugUnitTest      # 56 unit tests
 ```
 
 For a signed release build, create `keystore.properties` beside `local.properties`:
