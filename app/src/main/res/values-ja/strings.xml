@@ -26,4 +26,12 @@
     <string name="credits_sounds">こうかおん: 「60 CC0 Sci-Fi SFX」rubberduck さく（CC0 1.0）</string>
     <string name="credits_nasa_note">NASA は このアプリを すいせんしていません。</string>
     <string name="cd_credits">クレジット</string>
+
+    <!-- Capture -->
+    <string name="capture_hold_still">うごかないで…</string>
+    <string name="camera_needed_title">カメラが ひつよう</string>
+    <string name="camera_needed_body">こいし たんていは カメラで こいしを みます。しゃしんは この スマホから でません。</string>
+    <string name="camera_allow">カメラを ゆるす</string>
+    <string name="camera_open_settings">せってい を ひらく</string>
+    <string name="camera_use_photo">もっている しゃしんを つかう</string>
 </resources>

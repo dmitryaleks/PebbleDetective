@@ -28,4 +28,12 @@
     <string name="credits_sounds">Sound effects: "60 CC0 Sci-Fi SFX" by rubberduck (CC0 1.0).</string>
     <string name="credits_nasa_note">NASA does not endorse this app.</string>
     <string name="cd_credits">Credits</string>
+
+    <!-- Capture -->
+    <string name="capture_hold_still">Hold still...</string>
+    <string name="camera_needed_title">I need the camera</string>
+    <string name="camera_needed_body">Pebble Detective looks at pebbles through the camera. Nothing you photograph ever leaves this phone.</string>
+    <string name="camera_allow">Allow camera</string>
+    <string name="camera_open_settings">Open settings</string>
+    <string name="camera_use_photo">Use a photo I already have</string>
 </resources>

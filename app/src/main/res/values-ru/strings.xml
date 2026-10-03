@@ -26,4 +26,12 @@
     <string name="credits_sounds">Звуковые эффекты: «60 CC0 Sci-Fi SFX», автор rubberduck (CC0 1.0).</string>
     <string name="credits_nasa_note">NASA не поддерживает это приложение.</string>
     <string name="cd_credits">Благодарности</string>
+
+    <!-- Capture -->
+    <string name="capture_hold_still">Не шевелись...</string>
+    <string name="camera_needed_title">Нужна камера</string>
+    <string name="camera_needed_body">Сыщик Камешков смотрит на камешки через камеру. Снимки никогда не покидают этот телефон.</string>
+    <string name="camera_allow">Разрешить камеру</string>
+    <string name="camera_open_settings">Открыть настройки</string>
+    <string name="camera_use_photo">Взять готовое фото</string>
 </resources>
