@@ -50,4 +50,29 @@
     <string name="research_line_crystal">けっしょう こうぞう いっち</string>
     <string name="research_line_origin">ふるさとを さがしています…</string>
     <string name="action_skip">スキップ</string>
+
+    <!-- Planets and result -->
+    <string name="planet_sun_name">たいよう</string>
+    <string name="planet_sun_fact">もえる ガスの おおきな たま。ちきゅうが 100まんこ はいるよ！</string>
+    <string name="planet_mercury_name">すいせい</string>
+    <string name="planet_mercury_fact">いちばん ちいさな わくせい。たいようの まわりを いちばん はやく まわるよ。</string>
+    <string name="planet_venus_name">きんせい</string>
+    <string name="planet_venus_fact">いちばん あつい わくせい。さんの あめが ふるんだ！</string>
+    <string name="planet_earth_name">ちきゅう</string>
+    <string name="planet_earth_fact">わたしたちの いえ。こいしも ひとも いる ゆいいつの ばしょ。</string>
+    <string name="planet_mars_name">かせい</string>
+    <string name="planet_mars_fact">あかい わくせい。さびで まっかなんだ！</string>
+    <string name="planet_jupiter_name">もくせい</string>
+    <string name="planet_jupiter_fact">いちばん おおきな わくせい。おじいちゃんより ふるい あらしが あるよ。</string>
+    <string name="planet_saturn_name">どせい</string>
+    <string name="planet_saturn_fact">こおりと いわの おおきな わを つけているよ。</string>
+    <string name="planet_uranus_name">てんのうせい</string>
+    <string name="planet_uranus_fact">よこに ねたまま たいようの まわりを ころがるよ。</string>
+    <string name="planet_neptune_name">かいおうせい</string>
+    <string name="planet_neptune_fact">いちばん かぜが つよい せかい。ジェットきより はやいよ！</string>
+    <string name="result_title">この こいしの ふるさとは</string>
+    <string name="result_journey">かえる たびを みる</string>
+    <string name="result_new">つぎの こいしを さがす</string>
+    <string name="result_found_at">みつけた ばしょ: %1$s</string>
+    <string name="result_colour">こいしの いろ</string>
 </resources>

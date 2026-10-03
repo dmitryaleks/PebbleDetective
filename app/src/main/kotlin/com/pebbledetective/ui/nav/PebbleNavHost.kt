@@ -8,6 +8,7 @@ import com.pebbledetective.R
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.capture.CaptureScreen
 import com.pebbledetective.ui.research.ResearchScreen
+import com.pebbledetective.ui.result.ResultScreen
 import com.pebbledetective.ui.screens.CreditsScreen
 import com.pebbledetective.ui.screens.PlaceholderScreen
 
@@ -41,7 +42,15 @@ fun PebbleNavHost(session: SessionViewModel) {
             )
         }
         composable(Routes.RESULT) {
-            PlaceholderScreen(session, R.string.screen_result, null, null, navController::popBackStack)
+            ResultScreen(
+                session = session,
+                onJourney = { navController.navigate(Routes.JOURNEY) },
+                onNewPebble = {
+                    session.discardCapture()
+                    navController.popBackStack(Routes.CAPTURE, inclusive = false)
+                },
+                onOpenHistory = { navController.navigate(Routes.HISTORY) },
+            )
         }
         composable(Routes.JOURNEY) {
             PlaceholderScreen(session, R.string.screen_journey, null, null, navController::popBackStack)

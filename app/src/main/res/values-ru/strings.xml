@@ -50,4 +50,29 @@
     <string name="research_line_crystal">Кристаллы совпали</string>
     <string name="research_line_origin">Ищу родину...</string>
     <string name="action_skip">Пропустить</string>
+
+    <!-- Planets and result -->
+    <string name="planet_sun_name">Солнце</string>
+    <string name="planet_sun_fact">Огромный шар горящего газа. Внутри поместился бы миллион Земель!</string>
+    <string name="planet_mercury_name">Меркурий</string>
+    <string name="planet_mercury_fact">Самая маленькая планета и самый быстрый бегун вокруг Солнца.</string>
+    <string name="planet_venus_name">Венера</string>
+    <string name="planet_venus_fact">Самая горячая планета. Там идут кислотные дожди!</string>
+    <string name="planet_earth_name">Земля</string>
+    <string name="planet_earth_fact">Наш дом и единственное место, где есть и камешки, и люди.</string>
+    <string name="planet_mars_name">Марс</string>
+    <string name="planet_mars_fact">Красная планета. Она красная, потому что покрыта ржавчиной!</string>
+    <string name="planet_jupiter_name">Юпитер</string>
+    <string name="planet_jupiter_fact">Самая большая планета. Там бушует буря старше твоих бабушки и дедушки.</string>
+    <string name="planet_saturn_name">Сатурн</string>
+    <string name="planet_saturn_fact">Он носит огромные кольца изо льда и камня.</string>
+    <string name="planet_uranus_name">Уран</string>
+    <string name="planet_uranus_fact">Он катится вокруг Солнца на боку, как бочка.</string>
+    <string name="planet_neptune_name">Нептун</string>
+    <string name="planet_neptune_fact">Самый ветреный мир. Ветер там быстрее самолёта!</string>
+    <string name="result_title">Этот камешек прилетел с</string>
+    <string name="result_journey">Посмотреть полёт домой</string>
+    <string name="result_new">Найти ещё камешек</string>
+    <string name="result_found_at">Найден: %1$s</string>
+    <string name="result_colour">Цвет камешка</string>
 </resources>

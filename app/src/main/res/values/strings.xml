@@ -52,4 +52,29 @@
     <string name="research_line_crystal">Crystal structure matched</string>
     <string name="research_line_origin">Tracing origin...</string>
     <string name="action_skip">Skip</string>
+
+    <!-- Planets and result -->
+    <string name="planet_sun_name">The Sun</string>
+    <string name="planet_sun_fact">A giant ball of burning gas. A million Earths would fit inside it!</string>
+    <string name="planet_mercury_name">Mercury</string>
+    <string name="planet_mercury_fact">The smallest planet, and the quickest racer around the Sun.</string>
+    <string name="planet_venus_name">Venus</string>
+    <string name="planet_venus_fact">The hottest planet of all. The clouds there rain acid!</string>
+    <string name="planet_earth_name">Earth</string>
+    <string name="planet_earth_fact">Our home, and the only place we know with pebbles AND people.</string>
+    <string name="planet_mars_name">Mars</string>
+    <string name="planet_mars_fact">The red planet. It is red because it is covered in rust!</string>
+    <string name="planet_jupiter_name">Jupiter</string>
+    <string name="planet_jupiter_fact">The biggest planet, with a storm older than your grandparents.</string>
+    <string name="planet_saturn_name">Saturn</string>
+    <string name="planet_saturn_fact">It wears huge rings made of ice and rock.</string>
+    <string name="planet_uranus_name">Uranus</string>
+    <string name="planet_uranus_fact">It rolls around the Sun lying on its side, like a barrel.</string>
+    <string name="planet_neptune_name">Neptune</string>
+    <string name="planet_neptune_fact">The windiest world. Its winds blow faster than a jet plane!</string>
+    <string name="result_title">This pebble came from</string>
+    <string name="result_journey">Watch it fly home</string>
+    <string name="result_new">Find another pebble</string>
+    <string name="result_found_at">Found at %1$s</string>
+    <string name="result_colour">Pebble colour</string>
 </resources>

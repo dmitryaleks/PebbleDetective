@@ -190,17 +190,30 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         // Seed from the id so a grey pebble's random planet is stable, and
         // store the answer rather than ever recomputing it.
         val planet: Planet = pickPlanet(colour, Random(id.hashCode().toLong()))
-        val location = container.location.currentLocation()
 
         val researched = entry.copy(
             status = PebbleStatus.RESEARCHED,
             planetId = planet.id,
             dominantColourArgb = colour.toArgb(),
-            latitude = location?.latitude,
-            longitude = location?.longitude,
         )
         container.pebbles.update(researched)
         _result.value = researched
+
+        // Location is deliberately *not* on the critical path. Waiting for a
+        // fix before revealing the planet left the child watching a spinner
+        // for the full timeout whenever no fix was available. The planet is
+        // what they are waiting for; where they were standing is incidental
+        // and can arrive late.
+        attachLocation(researched)
+    }
+
+    /** Adds coordinates to an already-published result, if a fix turns up. */
+    private suspend fun attachLocation(entry: PebbleEntry) {
+        val location = container.location.currentLocation() ?: return
+        val located = entry.copy(latitude = location.latitude, longitude = location.longitude)
+        container.pebbles.update(located)
+        // Only update the visible result if it is still this pebble.
+        if (_result.value?.id == located.id) _result.value = located
     }
 
     override fun onCleared() {
