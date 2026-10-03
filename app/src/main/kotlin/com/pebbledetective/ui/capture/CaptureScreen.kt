@@ -45,6 +45,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
 import com.pebbledetective.audio.SoundCue
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.draw.clip
+import com.pebbledetective.domain.Planet
+import com.pebbledetective.ui.result.fromNameRes
+import com.pebbledetective.ui.theme.SignalAmber
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
 
@@ -68,6 +75,7 @@ fun CaptureScreen(
     val context = LocalContext.current
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
+    val claimedOrigin by session.claimedOrigin.collectAsStateWithLifecycle()
 
     var granted by remember {
         mutableStateOf(
@@ -116,6 +124,45 @@ fun CaptureScreen(
                 onOpenHistory = onOpenHistory,
                 onRadar = onRadar,
                 onSky = onSky,
+            )
+            claimedOrigin?.let { planet ->
+                ClaimedOriginBanner(planet = planet, onDismiss = session::forgetClaimedOrigin)
+            }
+        }
+    }
+}
+
+/**
+ * Says that the next stone is already spoken for, and lets that be undone.
+ *
+ * Shown only after a meteor has been called down in the sky mode, and only
+ * until a pebble is researched. It has to be visible before the capture,
+ * not after: finding out that the answer was decided in advance only once
+ * the answer appears would feel like the app cheating.
+ */
+@Composable
+private fun ClaimedOriginBanner(planet: Planet, onDismiss: () -> Unit) {
+    // "a piece of Jupiter" wants the same inflected form as "leaving
+    // Jupiter" does: осколок Юпитера, not осколок Юпитер.
+    val name = stringResource(planet.fromNameRes)
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(Color(0xFF0B1022).copy(alpha = 0.86f))
+            .padding(start = 14.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.capture_origin_claimed, name),
+            style = MaterialTheme.typography.bodySmall,
+            color = SignalAmber,
+            modifier = Modifier.weight(1f),
+        )
+        TextButton(onClick = onDismiss) {
+            Text(
+                text = stringResource(R.string.capture_origin_forget),
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }

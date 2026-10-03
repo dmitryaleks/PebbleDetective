@@ -155,6 +155,12 @@ pinned to a direction in the world rather than to a place on the screen, so
 it keeps falling where it fell while you turn to follow it, and the crater it
 leaves in the street stays put.
 
+**And the app remembers.** You just watched a piece of Saturn land, so the
+next stone you scan is from Saturn, whatever colour it happens to be. The
+Detection screen says so before you take the picture, with a **No, check it**
+button beside it — finding out afterwards that the answer had been decided in
+advance would feel like the app cheating. It lasts exactly one pebble.
+
 **This is where the app opens, and the first of three stages.** Pick a world
 here, hand over to **Radar** to go and find where its piece came down, and
 finish in **Detection** with the camera on the stone itself:

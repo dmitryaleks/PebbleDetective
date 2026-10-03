@@ -71,6 +71,17 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     private val _sky = MutableStateFlow(SkyState())
     val sky: StateFlow<SkyState> = _sky.asStateFlow()
 
+    /**
+     * The world the next pebble will be said to have come from, set by
+     * calling a meteor down on yourself in the sky mode.
+     *
+     * Held in memory only, and for one pebble. It is a thing you just did,
+     * not a setting: surviving a process death or a second capture would
+     * make it a mode the child has to remember they are in.
+     */
+    private val _claimedOrigin = MutableStateFlow<Planet?>(null)
+    val claimedOrigin: StateFlow<Planet?> = _claimedOrigin.asStateFlow()
+
     private var radarJob: Job? = null
     private var radarSoundJob: Job? = null
     private var skyJob: Job? = null
@@ -229,9 +240,16 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
             )
         }
 
+        // A meteor watched down from a particular world outranks the
+        // colour of the stone: the child has just been told where this one
+        // came from, and having the app disagree makes the sky mode a lie.
+        // Spent on one pebble, then forgotten.
+        val claimed = _claimedOrigin.value
+        _claimedOrigin.value = null
+
         // Seed from the id so a grey pebble's random planet is stable, and
         // store the answer rather than ever recomputing it.
-        val planet: Planet = pickPlanet(colour, Random(id.hashCode().toLong()))
+        val planet: Planet = claimed ?: pickPlanet(colour, Random(id.hashCode().toLong()))
 
         // Transform whatever is current rather than the snapshot taken
         // before the analysis began. A cached location fix returns instantly,
@@ -514,6 +532,10 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     fun launchMeteor(planet: Planet) {
         val sighting = _sky.value.sightings.firstOrNull { it.planet == planet } ?: return
         meteorJob?.cancel()
+        // You watched a piece of this one land nearby, so the next stone
+        // you pick up is from there. The detection screen says so and lets
+        // you say otherwise.
+        _claimedOrigin.value = planet
         _sky.value = _sky.value.copy(
             meteor = MeteorShot(
                 planet = planet,
@@ -541,6 +563,12 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
             delay(MeteorTimeline.TOTAL_MS - MeteorTimeline.CUE_SETTLED_MS)
             _sky.value = _sky.value.copy(meteor = null)
         }
+    }
+
+    /** Go back to deciding by colour. Offered on the detection screen. */
+    fun forgetClaimedOrigin() {
+        container.sound.play(SoundCue.UI_TAP)
+        _claimedOrigin.value = null
     }
 
     fun meteorElapsedMs(): Long =

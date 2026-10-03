@@ -502,3 +502,26 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   that radius and appeared as a hoop floating off the limb. Discs are now
   trimmed to their content before scaling, which also made the title
   sequence sharper, where the same under-filling had gone unnoticed.
+
+### Post-release — the sky decides the next stone
+
+- **A meteor called down from a planet claims the next pebble.** The child
+  has just been told, with a fireball and a bang, where a piece of Saturn
+  landed; having the colour analysis then say Jupiter makes the sky mode a
+  lie. The claim outranks the colour for exactly one pebble and is then
+  forgotten.
+- **The dominant colour is still measured and still recorded.** Only the
+  planet is overridden, so the logbook entry stays honest about what the
+  stone actually looked like.
+- **The hint has to come before the capture, not after.** A banner on the
+  Detection screen names the world and carries an opt-out, because finding
+  out that the answer had been decided in advance only once the answer
+  appears would read as the app cheating. Opting out puts the colour back
+  in charge.
+- **Held in memory, not in saved state.** It is a thing you just did rather
+  than a setting; surviving a process death or a second capture would make
+  it a mode a child has to remember they are in.
+- **Verified on device**, all four paths: the claim applied (Saturn over the
+  colour answer of Jupiter), the claim spent after one pebble, a second
+  claim named correctly, and the opt-out handing the decision back to the
+  colour.

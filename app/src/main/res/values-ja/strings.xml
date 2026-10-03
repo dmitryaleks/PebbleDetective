@@ -166,4 +166,6 @@
     <string name="sky_follow">おいかけよう</string>
     <string name="sky_to_radar">レーダー モードへ</string>
     <string name="cd_detection">たんさく モード</string>
+    <string name="capture_origin_claimed">%1$sの かけらが ふってきたよ。つぎの こいしは そこから。</string>
+    <string name="capture_origin_forget">しらべる</string>
 </resources>
