@@ -96,14 +96,15 @@ fun RadarScreen(
         onDispose { session.stopRadar() }
     }
 
-    // One clock for the sweep and the pulse, as elsewhere in the app.
+    // Elapsed since the hunt began, so the drawn sweep and the ping that
+    // goes with it share one clock.
     val frame = remember { mutableLongStateOf(0L) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(radar.startedAtElapsedMs) {
         while (true) {
-            withFrameNanos { frame.longValue = it }
+            withFrameNanos { }
+            frame.longValue = android.os.SystemClock.elapsedRealtime() - radar.startedAtElapsedMs
         }
     }
-    val seconds = frame.longValue / 1_000_000_000f
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         RadarCameraBackdrop()
@@ -130,7 +131,7 @@ fun RadarScreen(
                 } ?: 0.0,
                 rangeMetres = radar.rangeMetres,
                 found = radar.found,
-                elapsedSeconds = seconds,
+                elapsedMs = frame.longValue,
             ),
             modifier = Modifier.fillMaxSize(),
         )

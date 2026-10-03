@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,6 +87,13 @@ fun CaptureScreen(
         if (!granted) permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
+    // The scanner idles for as long as the camera is up, and stops however
+    // the screen is left.
+    DisposableEffect(granted) {
+        if (granted) session.startDetectionAmbience()
+        onDispose { session.stopDetectionAmbience() }
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         if (granted) {
             CameraPane(session = session, onCaptured = onCaptured)
@@ -141,6 +149,8 @@ private fun CameraPane(session: SessionViewModel, onCaptured: (Bitmap, Offset) -
         val armed = armedAt ?: return@LaunchedEffect
         if (capturing || !steadiness.steady) return@LaunchedEffect
         capturing = true
+        // Hand over from the idle scanner to the capture cues.
+        session.stopDetectionAmbience()
         session.sound.play(SoundCue.RETICLE_LOCK)
         val tapped = target
         runCatching { camera.capture() }

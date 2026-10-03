@@ -43,6 +43,10 @@ child holds still, so they can see what the app is waiting for. If their hands
 will not stop moving, the threshold relaxes and after a few seconds it takes the
 picture anyway. A gate a child cannot satisfy is worse than no gate at all.
 
+With sound on, the scanner idles while you hunt — a low bed with servo ticks
+and sample chirps at irregular intervals, so it reads as a machine thinking
+rather than a metronome. It hands over to the capture cues the moment you tap.
+
 The moment the shutter fires, the frame freezes. That still is the pebble's
 portrait, and it is the exact image the app analyses.
 
@@ -145,6 +149,12 @@ target is a real coordinate rather than a spot on the screen.
 
 Tapping radar again hides a new pebble from scratch. You can switch back to
 Detection at any point, whether or not you reached it.
+
+With sound on it plays like a detector: a room tone under the scope, a ping
+each time the sweep comes round, and a proximity beep that **quickens as you
+close in** — lazy at thirty metres, an urgent chatter at arm's length. The
+ping and the drawn sweep share one clock, so the beep lands with the beam
+crossing the top rather than drifting against it.
 
 **Radar asks for precise location**, and it is the only part of the app that
 does. The logbook is content with coarse accuracy; a thirty-metre hunt is not,

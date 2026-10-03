@@ -16,6 +16,7 @@ import com.pebbledetective.data.PebbleStatus
 import com.pebbledetective.domain.Geo
 import com.pebbledetective.domain.GeoPoint
 import com.pebbledetective.domain.Planet
+import com.pebbledetective.domain.RadarTimeline
 import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.ResearchTimeline
 import com.pebbledetective.domain.dominantColour
@@ -65,6 +66,8 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     val radar: StateFlow<RadarState> = _radar.asStateFlow()
 
     private var radarJob: Job? = null
+    private var radarSoundJob: Job? = null
+    private var detectionSoundJob: Job? = null
 
     private val _journeyStartedAt = MutableStateFlow<Long?>(null)
     val journeyStartedAt: StateFlow<Long?> = _journeyStartedAt.asStateFlow()
@@ -282,8 +285,9 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
             _radar.value = RadarState(preciseLocation = false)
             return
         }
-        _radar.value = RadarState(preciseLocation = true)
+        _radar.value = RadarState(preciseLocation = true, startedAtElapsedMs = SystemClock.elapsedRealtime())
         container.sound.play(SoundCue.SATELLITE_PING)
+        startRadarSounds()
 
         radarJob = viewModelScope.launch {
             container.location.locationUpdates().collectLatest { location ->
@@ -313,6 +317,95 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     fun stopRadar() {
         radarJob?.cancel()
         radarJob = null
+        radarSoundJob?.cancel()
+        radarSoundJob = null
+        container.sound.stop(SoundCue.RADAR_AMBIENT)
+    }
+
+    /**
+     * The radar's soundtrack: a room tone, a ping as the sweep comes round,
+     * and a proximity beep that quickens as the pebble gets closer.
+     *
+     * The ping shares its period with the drawn sweep via RadarTimeline, and
+     * both clocks start together, so the beep lands with the sweep crossing
+     * the top of the scope rather than drifting against it.
+     */
+    private fun startRadarSounds() {
+        radarSoundJob?.cancel()
+        radarSoundJob = viewModelScope.launch {
+            launch { holdAmbience(SoundCue.RADAR_AMBIENT) }
+
+            launch {
+                while (true) {
+                    delay(RadarTimeline.SWEEP_PERIOD_MS)
+                    container.sound.play(SoundCue.RADAR_PING)
+                }
+            }
+
+            launch {
+                while (true) {
+                    val distance = _radar.value.distanceMetres
+                    if (distance == null) {
+                        delay(400)
+                        continue
+                    }
+                    // Silent once found; the chime already said so, and an
+                    // unending chatter while standing on the target is nasty.
+                    if (!_radar.value.found) container.sound.play(SoundCue.RADAR_CLOSE)
+                    delay(RadarTimeline.proximityIntervalMs(distance, _radar.value.rangeMetres))
+                }
+            }
+        }
+    }
+
+    // ---- detection ambience ---------------------------------------------
+
+    /**
+     * The scanner idling on the camera screen, before anything is tapped.
+     *
+     * Started and stopped by the capture screen itself rather than tied to a
+     * session state, because it belongs to being on that screen.
+     */
+    fun startDetectionAmbience() {
+        detectionSoundJob?.cancel()
+        detectionSoundJob = viewModelScope.launch {
+            launch { holdAmbience(SoundCue.SCANNER_AMBIENT) }
+            launch {
+                // Irregular on purpose: a metronome reads as a fault tone
+                // rather than a machine thinking.
+                var servoNext = true
+                while (true) {
+                    delay(Random.nextLong(1_400, 3_600))
+                    container.sound.play(
+                        if (servoNext) SoundCue.SERVO else SoundCue.SCANNER_BLIP
+                    )
+                    servoNext = !servoNext
+                }
+            }
+        }
+    }
+
+    fun stopDetectionAmbience() {
+        detectionSoundJob?.cancel()
+        detectionSoundJob = null
+        container.sound.stop(SoundCue.SCANNER_AMBIENT)
+    }
+
+    /**
+     * Keeps a looping bed playing for as long as this coroutine lives, and
+     * follows the sound toggle.
+     *
+     * Without watching the setting, turning sound on midway through a screen
+     * would leave it silent until the screen was re-entered.
+     */
+    private suspend fun holdAmbience(cue: SoundCue) {
+        try {
+            container.settings.soundEnabled.collectLatest { enabled ->
+                if (enabled) container.sound.loop(cue) else container.sound.stop(cue)
+            }
+        } finally {
+            container.sound.stop(cue)
+        }
     }
 
     // ---- logbook --------------------------------------------------------
@@ -383,6 +476,8 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
 
     override fun onCleared() {
         radarJob?.cancel()
+        radarSoundJob?.cancel()
+        detectionSoundJob?.cancel()
         container.sound.release()
     }
 
@@ -419,6 +514,8 @@ private fun com.pebbledetective.domain.Hsv.toArgb(): Int {
 /** What the radar screen needs to draw itself. */
 data class RadarState(
     val preciseLocation: Boolean = true,
+    /** When the hunt began, for the sweep and the ping to share a clock. */
+    val startedAtElapsedMs: Long = 0L,
     /** Where the pebble is hidden, once the first fix has arrived. */
     val target: GeoPoint? = null,
     val here: GeoPoint? = null,

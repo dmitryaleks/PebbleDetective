@@ -143,4 +143,10 @@ private val SoundCue.resId: Int
         SoundCue.SPACE_DRONE -> R.raw.cue_space_drone
         SoundCue.ENTRY_RUMBLE -> R.raw.cue_entry_rumble
         SoundCue.ARRIVAL_CHIME -> R.raw.cue_arrival_chime
+        SoundCue.SCANNER_AMBIENT -> R.raw.cue_scanner_ambient
+        SoundCue.SCANNER_BLIP -> R.raw.cue_scanner_blip
+        SoundCue.SERVO -> R.raw.cue_servo
+        SoundCue.RADAR_AMBIENT -> R.raw.cue_radar_ambient
+        SoundCue.RADAR_PING -> R.raw.cue_radar_ping
+        SoundCue.RADAR_CLOSE -> R.raw.cue_radar_close
     }

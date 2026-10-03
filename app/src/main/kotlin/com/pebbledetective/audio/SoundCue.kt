@@ -19,4 +19,14 @@ enum class SoundCue {
     SPACE_DRONE,
     ENTRY_RUMBLE,
     ARRIVAL_CHIME,
+
+    /** Detection mode idles with a robotic scanner running. */
+    SCANNER_AMBIENT,
+    SCANNER_BLIP,
+    SERVO,
+
+    /** Radar mode: a room tone, a ping per sweep, and a proximity beep. */
+    RADAR_AMBIENT,
+    RADAR_PING,
+    RADAR_CLOSE,
 }

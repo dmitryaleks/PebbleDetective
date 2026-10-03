@@ -62,6 +62,16 @@ CUES = {
     "cue_space_drone": ("sfx_11d.ogg", "8.7s bed - looped during the cruise"),
     "cue_entry_rumble": ("sfx_18a.ogg", "3.4s rumble - atmospheric entry"),
     "cue_arrival_chime": ("sfx_16a.ogg", "2.6s chime - landed on Earth"),
+
+    # Detection mode: a robotic scanner idling before anything is tapped.
+    "cue_scanner_ambient": ("sfx_11b.ogg", "6.5s bed - looped while the camera hunts"),
+    "cue_scanner_blip": ("sfx_12a.ogg", "0.41s chirp - periodic scanner sample"),
+    "cue_servo": ("sfx_14a.ogg", "0.43s servo - the reticle motor hunting"),
+
+    # Radar mode.
+    "cue_radar_ambient": ("sfx_11a.ogg", "6.9s bed - looped under the scope"),
+    "cue_radar_ping": ("sfx_20b.ogg", "0.20s ping - once per sweep revolution"),
+    "cue_radar_close": ("sfx_09b.ogg", "0.12s tick - proximity beep, faster when nearer"),
 }
 
 SFX_ZIP_URL = "https://opengameart.org/sites/default/files/60-sci-fi-sfx_0.zip"

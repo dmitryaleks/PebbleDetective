@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
+import com.pebbledetective.domain.RadarTimeline
 import com.pebbledetective.ui.theme.ScannerGreen
 import com.pebbledetective.ui.theme.SignalAmber
 import kotlin.math.cos
@@ -34,8 +35,8 @@ data class RadarScene(
     /** The outer ring, in metres. */
     val rangeMetres: Double,
     val found: Boolean,
-    /** Seconds since the radar opened, driving the sweep and the pulse. */
-    val elapsedSeconds: Float,
+    /** Milliseconds since the radar opened, driving the sweep and the pulse. */
+    val elapsedMs: Long,
 )
 
 /**
@@ -60,7 +61,7 @@ fun RadarScope(
         drawGlow(centre, radius)
         drawRings(centre, radius, scene.rangeMetres, measurer, ringStyle)
         drawCrosshair(centre, radius)
-        drawSweep(centre, radius, scene.elapsedSeconds)
+        drawSweep(centre, radius, scene.elapsedMs)
         drawCardinals(centre, radius, measurer, ringStyle)
 
         val distance = scene.distanceMetres
@@ -74,7 +75,7 @@ fun RadarScope(
                 centre.y + (sin(angle) * radius * fraction).toFloat(),
             )
             drawArrow(centre, blip, scene.found)
-            drawBlip(blip, scene.elapsedSeconds, scene.found, radius)
+            drawBlip(blip, scene.elapsedMs, scene.found, radius)
             // A target beyond the outer ring still needs pointing at.
             if (distance > scene.rangeMetres) drawOffScaleTick(centre, radius, angle)
         }
@@ -126,8 +127,8 @@ private fun DrawScope.drawCrosshair(centre: Offset, radius: Float) {
 }
 
 /** The classic sweep: a bright leading edge with a fading wedge behind it. */
-private fun DrawScope.drawSweep(centre: Offset, radius: Float, seconds: Float) {
-    val angle = (seconds / SWEEP_PERIOD_S) * 360f
+private fun DrawScope.drawSweep(centre: Offset, radius: Float, elapsedMs: Long) {
+    val angle = RadarTimeline.sweepDegrees(elapsedMs)
 
     rotate(degrees = angle, pivot = centre) {
         for (i in 0 until TAIL_STEPS) {
@@ -217,9 +218,9 @@ private fun DrawScope.drawArrow(from: Offset, to: Offset, found: Boolean) {
 }
 
 /** The pebble, pulsing so it is obvious among the rings. */
-private fun DrawScope.drawBlip(at: Offset, seconds: Float, found: Boolean, radius: Float) {
+private fun DrawScope.drawBlip(at: Offset, elapsedMs: Long, found: Boolean, radius: Float) {
     val colour = if (found) SignalAmber else ScannerGreen
-    val phase = (seconds % PULSE_PERIOD_S) / PULSE_PERIOD_S
+    val phase = RadarTimeline.pulsePhase(elapsedMs)
 
     // An expanding ring that fades as it grows.
     drawCircle(
@@ -257,8 +258,5 @@ private fun DrawScope.drawPlayer(centre: Offset) {
 }
 
 private const val RINGS = 3
-/** One revolution every 2.4s - deliberately slow enough not to strobe. */
-private const val SWEEP_PERIOD_S = 2.4f
-private const val PULSE_PERIOD_S = 1.4f
 private const val TAIL_DEGREES = 70f
 private const val TAIL_STEPS = 5

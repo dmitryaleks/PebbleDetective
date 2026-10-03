@@ -40,6 +40,12 @@ Source: [60 CC0 Sci-Fi SFX](https://opengameart.org/content/60-cc0-sci-fi-sfx) b
 | `cue_space_drone` | `app/src/main/res/raw/cue_space_drone.ogg` | `sfx_11d.ogg` | 8.7s bed - looped during the cruise |
 | `cue_entry_rumble` | `app/src/main/res/raw/cue_entry_rumble.ogg` | `sfx_18a.ogg` | 3.4s rumble - atmospheric entry |
 | `cue_arrival_chime` | `app/src/main/res/raw/cue_arrival_chime.ogg` | `sfx_16a.ogg` | 2.6s chime - landed on Earth |
+| `cue_scanner_ambient` | `app/src/main/res/raw/cue_scanner_ambient.ogg` | `sfx_11b.ogg` | 6.5s bed - looped while the camera hunts |
+| `cue_scanner_blip` | `app/src/main/res/raw/cue_scanner_blip.ogg` | `sfx_12a.ogg` | 0.41s chirp - periodic scanner sample |
+| `cue_servo` | `app/src/main/res/raw/cue_servo.ogg` | `sfx_14a.ogg` | 0.43s servo - the reticle motor hunting |
+| `cue_radar_ambient` | `app/src/main/res/raw/cue_radar_ambient.ogg` | `sfx_11a.ogg` | 6.9s bed - looped under the scope |
+| `cue_radar_ping` | `app/src/main/res/raw/cue_radar_ping.ogg` | `sfx_20b.ogg` | 0.20s ping - once per sweep revolution |
+| `cue_radar_close` | `app/src/main/res/raw/cue_radar_close.ogg` | `sfx_09b.ogg` | 0.12s tick - proximity beep, faster when nearer |
 
-Total audio: 1439KB
+Total audio: 2139KB
 
