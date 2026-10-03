@@ -26,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -50,14 +52,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
 import com.pebbledetective.data.AppLanguage
 import com.pebbledetective.data.PebbleEntry
+import com.pebbledetective.data.ShareCardText
 import com.pebbledetective.data.locale
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.MapLink
+import com.pebbledetective.ui.common.formatCoordinates
+import com.pebbledetective.ui.common.shareImage
 import com.pebbledetective.ui.common.TopControls
 import com.pebbledetective.ui.result.nameRes
 import com.pebbledetective.ui.result.rememberPlanetImage
@@ -106,6 +116,39 @@ fun HistoryDetailScreen(
 
     var confirmDelete by remember { mutableStateOf<PebbleEntry?>(null) }
 
+    val context = LocalContext.current
+    val snackbar = remember { SnackbarHostState() }
+    val savedText = stringResource(R.string.save_done)
+    val saveFailedText = stringResource(R.string.save_failed)
+    val shareFailedText = stringResource(R.string.share_failed)
+    val shareSheetTitle = stringResource(R.string.share_sheet_title)
+    val cardTitle = stringResource(R.string.share_card_title)
+    val cardFooter = stringResource(R.string.share_card_footer)
+    val unknownPlanet = stringResource(R.string.history_unknown_planet)
+
+    // Which pebble the save dialog is for; the picker answers later.
+    var pendingSaveId by remember { mutableStateOf<String?>(null) }
+
+    // Android own save dialog. No storage permission is involved: the person
+    // chooses where the file goes, and the app gets a handle to that one
+    // file and nothing else.
+    val saveLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("image/jpeg")
+    ) { uri ->
+        val id = pendingSaveId
+        pendingSaveId = null
+        if (uri != null && id != null) {
+            scope.launch {
+                val saved = runCatching {
+                    val bytes = session.rawPhotoBytes(id) ?: return@runCatching false
+                    context.contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
+                    true
+                }.getOrDefault(false)
+                snackbar.showSnackbar(if (saved) savedText else saveFailedText)
+            }
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize().navigationBarsPadding()) {
         TopControls(
             language = language,
@@ -132,6 +175,11 @@ fun HistoryDetailScreen(
         ) { page ->
             // The list can shrink mid-swipe when a pebble is deleted.
             val entry = entries.getOrNull(page) ?: return@HorizontalPager
+            // Resolved here, in composition, rather than through
+            // LocalContext inside the share callback.
+            val planetName = Planet.fromId(entry.planetId)
+                ?.let { stringResource(it.nameRes) }
+                ?: unknownPlanet
             PebblePage(
                 session = session,
                 entry = entry,
@@ -142,8 +190,41 @@ fun HistoryDetailScreen(
                 },
                 onDelete = { confirmDelete = entry },
                 onBack = onBack,
+                onShare = {
+                    scope.launch {
+                        val formatter = DateTimeFormatter
+                            .ofLocalizedDateTime(FormatStyle.MEDIUM)
+                            .withLocale(language.locale)
+                            .withZone(ZoneId.of(entry.timeZoneId))
+                        val uri = session.shareCard(
+                            entry = entry,
+                            text = ShareCardText(
+                                title = cardTitle,
+                                planetName = planetName,
+                                dateTime = formatter.format(
+                                    Instant.ofEpochMilli(entry.capturedAtEpochMs)
+                                ),
+                                coordinates = entry.latitude?.let { lat ->
+                                    entry.longitude?.let { lon -> formatCoordinates(lat, lon) }
+                                },
+                                footer = cardFooter,
+                            ),
+                        )
+                        if (uri == null) {
+                            snackbar.showSnackbar(shareFailedText)
+                        } else {
+                            context.shareImage(uri, shareSheetTitle)
+                        }
+                    }
+                },
+                onSave = {
+                    pendingSaveId = entry.id
+                    saveLauncher.launch(suggestedFileName(entry))
+                },
             )
         }
+
+        SnackbarHost(hostState = snackbar)
 
         // Thirty swipes to reach the far end of a collection is no way to
         // browse one, so the strip jumps straight there.
@@ -242,6 +323,8 @@ private fun PebblePage(
     onReplay: () -> Unit,
     onDelete: () -> Unit,
     onBack: () -> Unit,
+    onShare: () -> Unit,
+    onSave: () -> Unit,
 ) {
     var photo by remember(entry.id) { mutableStateOf<Bitmap?>(null) }
     LaunchedEffect(entry.id) { photo = session.photo(entry.id) }
@@ -330,14 +413,30 @@ private fun PebblePage(
             }
         }
 
-        // Side by side, so the buttons cost one row rather than two.
+        // All four actions on one row, so none of them can push the others
+        // off the bottom the way the old scrolling layout did.
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             TextButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 Text(stringResource(R.string.cd_back), modifier = Modifier.padding(start = 6.dp))
+            }
+            IconButton(onClick = onShare, modifier = Modifier.size(52.dp)) {
+                Icon(
+                    Icons.Filled.Share,
+                    contentDescription = stringResource(R.string.cd_share),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+            IconButton(onClick = onSave, modifier = Modifier.size(52.dp)) {
+                Icon(
+                    Icons.Filled.Download,
+                    contentDescription = stringResource(R.string.cd_save),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
             }
             TextButton(onClick = onDelete) {
                 Text(stringResource(R.string.history_delete))
@@ -434,4 +533,20 @@ private fun ThumbnailChip(
             )
         }
     }
+}
+
+/**
+ * A filename someone can make sense of months later.
+ *
+ * Deliberately not localised and deliberately not epoch milliseconds: a
+ * fixed, sortable pattern keeps saved files tidy in a folder and safe on
+ * any filesystem.
+ */
+private fun suggestedFileName(entry: PebbleEntry): String {
+    val stamp = DateTimeFormatter
+        .ofPattern("yyyy-MM-dd-HHmm")
+        .withZone(ZoneId.of(entry.timeZoneId))
+        .format(Instant.ofEpochMilli(entry.capturedAtEpochMs))
+    val planet = entry.planetId ?: "pebble"
+    return "pebble-$stamp-$planet.jpg"
 }

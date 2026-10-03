@@ -6,6 +6,7 @@ import com.pebbledetective.audio.SoundPlayer
 import com.pebbledetective.data.LocationProvider
 import com.pebbledetective.data.PebbleRepository
 import com.pebbledetective.data.PhotoStore
+import com.pebbledetective.data.ShareCardRenderer
 import com.pebbledetective.data.SettingsStore
 import java.io.File
 
@@ -16,11 +17,12 @@ import java.io.File
  * Deliberately not Hilt: the app is small and this keeps annotation
  * processing out of the build entirely.
  */
-class AppContainer(context: Context) {
+class AppContainer(val context: Context) {
     val settings: SettingsStore = SettingsStore(context)
     val sound: SoundPlayer = AndroidSoundPlayer(context, settings)
     val photos: PhotoStore = PhotoStore(context)
     val pebbles: PebbleRepository =
         PebbleRepository(File(context.filesDir, "pebbles")) { id -> photos.delete(id) }
     val location: LocationProvider = LocationProvider(context)
+    val shareCards: ShareCardRenderer = ShareCardRenderer(context)
 }

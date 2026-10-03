@@ -107,4 +107,14 @@
     <string name="radar_distance">%1$d м до цели</string>
     <string name="radar_found">Нашли! Смотри вокруг</string>
     <string name="radar_needs_precise">Радару нужна точная геолокация</string>
+
+    <!-- Share and save -->
+    <string name="cd_share">Поделиться камешком</string>
+    <string name="cd_save">Сохранить фото</string>
+    <string name="share_sheet_title">Поделиться камешком</string>
+    <string name="share_card_title">Сыщик Камешков</string>
+    <string name="share_card_footer">Найдено с Сыщиком Камешков</string>
+    <string name="share_failed">Не удалось собрать карточку</string>
+    <string name="save_done">Фото сохранено</string>
+    <string name="save_failed">Не удалось сохранить фото</string>
 </resources>

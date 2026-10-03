@@ -104,4 +104,14 @@
     <string name="radar_distance">あと %1$d メートル</string>
     <string name="radar_found">みつけた！まわりを みてね</string>
     <string name="radar_needs_precise">レーダーには せいみつな いちじょうほうが ひつよう</string>
+
+    <!-- Share and save -->
+    <string name="cd_share">この こいしを シェア</string>
+    <string name="cd_save">しゃしんを ほぞん</string>
+    <string name="share_sheet_title">この こいしを シェア</string>
+    <string name="share_card_title">こいし たんてい</string>
+    <string name="share_card_footer">こいし たんていで みつけたよ</string>
+    <string name="share_failed">カードを つくれませんでした</string>
+    <string name="save_done">しゃしんを ほぞんしました</string>
+    <string name="save_failed">ほぞんできませんでした</string>
 </resources>

@@ -106,4 +106,14 @@
     <string name="radar_distance">%1$d m away</string>
     <string name="radar_found">Found it! Look around you</string>
     <string name="radar_needs_precise">Radar needs precise location</string>
+
+    <!-- Share and save -->
+    <string name="cd_share">Share this pebble</string>
+    <string name="cd_save">Save the photo</string>
+    <string name="share_sheet_title">Share this pebble</string>
+    <string name="share_card_title">Pebble Detective</string>
+    <string name="share_card_footer">Found with Pebble Detective</string>
+    <string name="share_failed">Could not build the summary</string>
+    <string name="save_done">Photo saved</string>
+    <string name="save_failed">Could not save the photo</string>
 </resources>

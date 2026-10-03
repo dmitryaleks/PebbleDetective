@@ -43,6 +43,19 @@
             </intent-filter>
         </activity>
 
+        <!-- Hands a single share card to whichever app the share sheet
+             picks. Scoped to the cache directory the cards are written to,
+             so nothing else in the app's storage is exposed. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"

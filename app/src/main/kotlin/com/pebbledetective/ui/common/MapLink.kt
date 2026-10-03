@@ -102,3 +102,22 @@ fun Context.openInMaps(latitude: Double, longitude: Double) {
 }
 
 private fun String.toUri(): Uri = Uri.parse(this)
+
+/**
+ * Hands an image to the Android share sheet.
+ *
+ * The URI comes from the app FileProvider and the read grant travels with
+ * the intent, so the receiving app can open that one file and nothing else.
+ */
+fun Context.shareImage(uri: Uri, chooserTitle: String) {
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    runCatching {
+        startActivity(
+            Intent.createChooser(send, chooserTitle).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+    }
+}

@@ -13,6 +13,7 @@ import com.pebbledetective.core.AppContainer
 import com.pebbledetective.data.AppLanguage
 import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PebbleStatus
+import com.pebbledetective.data.ShareCardText
 import com.pebbledetective.domain.Geo
 import com.pebbledetective.domain.GeoPoint
 import com.pebbledetective.domain.Planet
@@ -422,6 +423,32 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     }
 
     suspend fun storageBytes(): Long = container.photos.bytesUsed()
+
+    /**
+     * Renders a shareable summary card and returns a URI for the share sheet.
+     *
+     * The planet photograph is read from assets here rather than taken from
+     * the screen, so the card is the same whatever the device was showing.
+     */
+    suspend fun shareCard(entry: PebbleEntry, text: ShareCardText): android.net.Uri? {
+        val photo = container.photos.loadPhoto(entry.id) ?: return null
+        val planet = Planet.fromId(entry.planetId)?.let { loadPlanetAsset(it) }
+        return container.shareCards.render(entry.id, photo, planet, text)
+    }
+
+    private suspend fun loadPlanetAsset(planet: Planet): android.graphics.Bitmap? =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                container.context.assets.open(planet.assetPath).use {
+                    android.graphics.BitmapFactory.decodeStream(it)
+                }
+            }.getOrNull()
+        }
+
+    /** The original camera JPEG, for saving out of the app. */
+    suspend fun rawPhotoBytes(id: String): ByteArray? = withContext(Dispatchers.IO) {
+        container.photos.photoFile(id).takeIf { it.exists() }?.readBytes()
+    }
 
     /** Re-runs the flight for an entry opened from the logbook. */
     fun replay(entry: PebbleEntry) {
