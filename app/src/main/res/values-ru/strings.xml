@@ -177,4 +177,16 @@
     <string name="journey_system">Солнечная система в тот день</string>
     <string name="journey_closing">Ищем: %1$s</string>
     <string name="journey_au_away">До него %1$s расстояний до Солнца</string>
+    <string name="cd_planetarium">Планетарий</string>
+    <string name="cd_orrery">Модель Солнечной системы. Сведи пальцы, чтобы приблизить, проведи, чтобы повернуть, нажми на планету, чтобы следить за ней.</string>
+    <string name="cd_orrery_scrubber">Передвинь, чтобы сменить дату</string>
+    <string name="orrery_open">Открыть планетарий</string>
+    <string name="orrery_today">Сегодня</string>
+    <string name="orrery_show_all">Показать всю систему</string>
+    <string name="orrery_speed_caption">Дней в секунду</string>
+    <string name="orrery_pause">Остановить время</string>
+    <string name="orrery_backwards">Время назад</string>
+    <string name="orrery_names">Названия</string>
+    <string name="orrery_hint">Сведи пальцы · проведи, чтобы повернуть · нажми на планету</string>
+    <string name="orrery_focus_hint">Найти в Солнечной системе: %1$s</string>
 </resources>

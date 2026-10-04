@@ -177,4 +177,16 @@
     <string name="journey_system">The solar system that day</string>
     <string name="journey_closing">Finding %1$s</string>
     <string name="journey_au_away">%1$s times the distance to the Sun away</string>
+    <string name="cd_planetarium">Planetarium</string>
+    <string name="cd_orrery">A model of the solar system. Pinch to zoom, drag to turn it, tap a world to follow it.</string>
+    <string name="cd_orrery_scrubber">Slide to change the date</string>
+    <string name="orrery_open">Open the planetarium</string>
+    <string name="orrery_today">Today</string>
+    <string name="orrery_show_all">Show the whole system</string>
+    <string name="orrery_speed_caption">Days each second</string>
+    <string name="orrery_pause">Stop time</string>
+    <string name="orrery_backwards">Run time backwards</string>
+    <string name="orrery_names">Names</string>
+    <string name="orrery_hint">Pinch to zoom · drag to turn · tap a world to follow it</string>
+    <string name="orrery_focus_hint">See %1$s in the solar system</string>
 </resources>

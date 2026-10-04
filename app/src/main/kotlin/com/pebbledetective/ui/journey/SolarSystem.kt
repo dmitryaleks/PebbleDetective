@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.pebbledetective.domain.Astronomy
 import com.pebbledetective.domain.Planet
 import kotlin.math.cos
+import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -33,6 +34,66 @@ object SolarSystem {
 
     /** Where one body sits on screen, and how big to draw it. */
     data class Placement(val at: Offset, val radiusPx: Float, val depth: Float)
+
+    /**
+     * Where a body goes on screen, how big its disc is, and how far away.
+     *
+     * This is the whole of the orrery's geometry, including the one lie in
+     * the picture, and both the journey's opening shot and the planetarium
+     * call it - a second copy would be two orreries that slowly drifted
+     * apart.
+     *
+     * @param discScale multiplies every disc. The journey draws them at a
+     *   fixed size; the planetarium grows them as it zooms in, or zooming
+     *   would spread the orbits out around planets that stayed the same
+     *   handful of pixels across.
+     */
+    fun DrawScope.placeBody(
+        planet: Planet,
+        epochMillis: Long,
+        scalePx: Float,
+        tiltDegrees: Float,
+        spinDegrees: Float,
+        centre: Offset,
+        discScale: Float = 1f,
+    ): Placed {
+        val projected = project(
+            Astronomy.heliocentricEcliptic(planet, epochMillis),
+            size, scalePx, tiltDegrees, spinDegrees, centre,
+        )
+        val radius = size.minDimension * sizeOf(planet) * discScale
+        if (planet != Planet.MOON) return Placed(projected.at, radius, projected.depth)
+
+        // Pushed away from the Sun by a couple of Earth-widths, or it sits
+        // underneath the Earth and is never seen at all.
+        val earth = project(
+            Astronomy.heliocentricEcliptic(Planet.EARTH, epochMillis),
+            size, scalePx, tiltDegrees, spinDegrees, centre,
+        ).at
+        val away = Offset(earth.x - centre.x, earth.y - centre.y)
+        val length = hypot(away.x, away.y).coerceAtLeast(1f)
+        val step = size.minDimension * sizeOf(Planet.EARTH) * discScale * MOON_NUDGE
+        return Placed(
+            at = Offset(earth.x + away.x / length * step, earth.y + away.y / length * step),
+            radius = radius,
+            depth = projected.depth,
+        )
+    }
+
+    /**
+     * How far out a body is drawn, as a fraction of the picture's radius.
+     *
+     * Neptune is 1 by construction. Mercury is a thirtieth of its distance
+     * but a fifth of the way out, which is the compression doing its job -
+     * and it is what the planetarium needs to decide how far to zoom in
+     * when it is asked to focus on one world.
+     */
+    fun orbitFraction(planet: Planet, epochMillis: Long): Float = when (planet) {
+        // The Sun is at the middle, whatever the orbital elements say: it
+        // borrows the Earth's for the sake of having some.
+        Planet.SUN -> 0f
+        else -> compress(Astronomy.heliocentricDistanceAu(planet, epochMillis)).toFloat()
+    }
 
     /**
      * How far to shove the Moon off the Earth so that both can be seen.
@@ -174,3 +235,21 @@ object SolarSystem {
      */
     private const val COMPRESSION = 0.34
 }
+
+/**
+ * A body ready to draw: where it is, how big, and how far off.
+ *
+ * Shared by the orrery and by the crossing that follows it, because the
+ * camera move between them interpolates one into the other.
+ */
+data class Placed(val at: Offset, val radius: Float, val depth: Float)
+
+/** Part of the way from one placement to another. */
+fun lerp(from: Placed, to: Placed, t: Float) = Placed(
+    at = Offset(
+        from.at.x + (to.at.x - from.at.x) * t,
+        from.at.y + (to.at.y - from.at.y) * t,
+    ),
+    radius = from.radius + (to.radius - from.radius) * t,
+    depth = from.depth + (to.depth - from.depth) * t,
+)

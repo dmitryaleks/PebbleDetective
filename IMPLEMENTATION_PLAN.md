@@ -657,3 +657,46 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   close enough for the invention to show. What is left is what the few
   points can honestly carry: the coast of Kanto with Tokyo Bay cut into
   it, a block grid clipped to the land, and the crosshair on Koto.
+
+### Post-release — the planetarium
+
+- **The orrery became a screen of its own.** The geometry the journey's
+  opening shot used - projection, the compressed radii, the nudge that
+  stops the Moon hiding under the Earth - moved out of `JourneyScreen`
+  into `SolarSystem.placeBody`, along with `Placed` and `lerp`. Two
+  copies of an orrery are two orreries that drift apart.
+- **The moment is the state.** Every body's position is a pure function
+  of one number, an offset in days from when the screen was opened, so
+  scrubbing backwards is the same operation as running forwards and
+  there is nothing to keep in step. `Orrery` holds it, away from the
+  drawing, and is tested: that a dropped frame costs a longer step
+  rather than a slower sky, that time stops at the end of the range
+  rather than wrapping, and - against `Astronomy` - that a year of
+  running brings the Earth back round and half a Martian year puts Mars
+  across the Sun.
+- **Two clocks, deliberately.** The epoch, the zoom and the rotation are
+  read *only* inside the draw lambda, so a frame of running time
+  invalidates the drawing and neither composition nor layout. The date
+  label and the slider read a whole-day mark instead, which ticks twenty
+  times a second at the fastest speed rather than sixty.
+- **Labels needed decluttering before they were worth having.** At the
+  wide view the inner four planets are a few pixels apart and five names
+  landed in the same square inch, hiding the planets underneath.
+  Biggest-disc-first, then anything whose plate would overlap one
+  already placed is dropped; zooming in gives them room and they come
+  back. A label for a body wholly off the edge is dropped too - clamping
+  one back on screen put Uranus's name in the corner with no Uranus
+  under it.
+- **Focus is a slide, not a crop.** The chosen world is put at the middle
+  of the screen by shifting the whole picture, recomputed every frame,
+  so following a planet and then running time pins it still and sweeps
+  the rest past it. The zoom it opens at comes from the body's own
+  compressed orbit radius: Mercury needs three times what Earth does.
+- **Taps are hit-tested off a plain object, not snapshot state.** Where
+  everything ended up is written during the draw, and a state write
+  there would invalidate the drawing that wrote it.
+- **Four ways in, all of them a picture of a planet.** The claimed-origin
+  badge on the detection screen (which gained a disc to be tapped), the
+  result portrait, a logbook row and a pebble's own page. The focus
+  rides in the route rather than in session state, so the back stack
+  remembers which stone aimed it where.

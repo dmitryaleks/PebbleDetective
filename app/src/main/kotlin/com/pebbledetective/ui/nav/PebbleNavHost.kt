@@ -7,11 +7,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.capture.CaptureScreen
 import com.pebbledetective.ui.history.HistoryDetailScreen
 import com.pebbledetective.ui.history.HistoryScreen
 import com.pebbledetective.ui.journey.JourneyScreen
+import com.pebbledetective.ui.planetarium.PlanetariumScreen
 import com.pebbledetective.ui.radar.RadarScreen
 import com.pebbledetective.ui.research.ResearchScreen
 import com.pebbledetective.ui.result.ResultScreen
@@ -47,6 +49,9 @@ fun PebbleNavHost(session: SessionViewModel) {
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
                 onRadar = { navController.navigate(Routes.RADAR) },
                 onSky = { navController.navigate(Routes.SKY) },
+                onPlanetarium = { planet ->
+                    navController.navigate(Routes.planetarium(planet))
+                },
             )
         }
         composable(Routes.RESEARCH) {
@@ -67,6 +72,9 @@ fun PebbleNavHost(session: SessionViewModel) {
             ResultScreen(
                 session = session,
                 onJourney = { navController.navigate(Routes.JOURNEY) },
+                onPlanetarium = { planet ->
+                    navController.navigate(Routes.planetarium(planet))
+                },
                 onNewPebble = {
                     session.discardCapture()
                     navController.popBackStack(Routes.CAPTURE, inclusive = false)
@@ -91,6 +99,9 @@ fun PebbleNavHost(session: SessionViewModel) {
             HistoryScreen(
                 session = session,
                 onOpen = { id -> navController.navigate(Routes.historyDetail(id)) },
+                onPlanetarium = { planet ->
+                    navController.navigate(Routes.planetarium(planet))
+                },
                 onBack = navController::popBackStack,
                 onOpenCredits = { navController.navigate(Routes.CREDITS) },
             )
@@ -104,6 +115,9 @@ fun PebbleNavHost(session: SessionViewModel) {
                 entryId = backStackEntry.arguments?.getString("id").orEmpty(),
                 onBack = navController::popBackStack,
                 onReplay = { navController.navigate(Routes.JOURNEY) },
+                onPlanetarium = { planet ->
+                    navController.navigate(Routes.planetarium(planet))
+                },
             )
         }
         composable(Routes.RADAR) {
@@ -134,7 +148,30 @@ fun PebbleNavHost(session: SessionViewModel) {
                     session.stopSky()
                     navController.navigate(Routes.RADAR) { launchSingleTop = true }
                 },
+                onPlanetarium = {
+                    session.stopSky()
+                    navController.navigate(Routes.planetarium())
+                },
                 onOpenHistory = { navController.navigate(Routes.HISTORY) },
+            )
+        }
+        composable(
+            route = Routes.PLANETARIUM,
+            arguments = listOf(
+                navArgument("planet") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            ),
+        ) { backStackEntry ->
+            PlanetariumScreen(
+                session = session,
+                initialFocus = Planet.fromId(backStackEntry.arguments?.getString("planet")),
+                onBack = navController::popBackStack,
+                onOpenHistory = { navController.navigate(Routes.HISTORY) },
+                onSky = { navController.navigate(Routes.SKY) { launchSingleTop = true } },
+                onRadar = { navController.navigate(Routes.RADAR) { launchSingleTop = true } },
+                onDetection = { navController.toDetection() },
             )
         }
         composable(Routes.CREDITS) {

@@ -174,4 +174,16 @@
     <string name="journey_system">あのひの たいようけい</string>
     <string name="journey_closing">%1$sを さがしている</string>
     <string name="journey_au_away">たいようまでの きょりの %1$s ばい</string>
+    <string name="cd_planetarium">プラネタリウム</string>
+    <string name="cd_orrery">たいようけいの も㡑けい。ひろげて ズーム、なぞって かいてん、ほしを タップして おいかけよう。</string>
+    <string name="cd_orrery_scrubber">うごかして ひづけを かえる</string>
+    <string name="orrery_open">プラネタリウムを ひらく</string>
+    <string name="orrery_today">きょう</string>
+    <string name="orrery_show_all">ぜんぶを みる</string>
+    <string name="orrery_speed_caption">1びょうで すすむ にっすう</string>
+    <string name="orrery_pause">じかんを とめる</string>
+    <string name="orrery_backwards">じかんを もどす</string>
+    <string name="orrery_names">なまえ</string>
+    <string name="orrery_hint">ひろげて ズーム · なぞって かいてん · ほしを タップ</string>
+    <string name="orrery_focus_hint">%1$sを たいようけいで みる</string>
 </resources>

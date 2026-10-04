@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
 import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -105,6 +106,7 @@ fun SkyScreen(
     session: SessionViewModel,
     onRadar: () -> Unit,
     onDetection: () -> Unit,
+    onPlanetarium: () -> Unit,
     onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -382,6 +384,12 @@ fun SkyScreen(
                 color = if (sky.meteor != null) SignalAmber else ScannerGreen.copy(alpha = 0.75f),
                 textAlign = TextAlign.Center,
             )
+            // The same worlds from the outside rather than from the
+            // ground. Quieter than the radar button, which is the next
+            // step of the hunt rather than a side trip.
+            TextButton(onClick = onPlanetarium) {
+                Text(stringResource(R.string.orrery_open))
+            }
             // The next stage of the hunt, not the last one: find a world,
             // then let the radar put a piece of it somewhere nearby, then
             // go and photograph what you turn up.

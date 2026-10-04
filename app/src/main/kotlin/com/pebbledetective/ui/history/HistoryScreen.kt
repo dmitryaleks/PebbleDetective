@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -47,6 +48,7 @@ import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
 import com.pebbledetective.ui.common.formatCoordinates
 import com.pebbledetective.ui.result.nameRes
+import com.pebbledetective.ui.result.rememberPlanetDisc
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -57,6 +59,7 @@ import java.time.format.FormatStyle
 fun HistoryScreen(
     session: SessionViewModel,
     onOpen: (String) -> Unit,
+    onPlanetarium: (Planet) -> Unit,
     onBack: () -> Unit,
     onOpenCredits: () -> Unit,
 ) {
@@ -122,6 +125,7 @@ fun HistoryScreen(
                     entry = entry,
                     locale = language.locale,
                     onClick = { onOpen(entry.id) },
+                    onPlanetarium = onPlanetarium,
                 )
             }
 
@@ -144,6 +148,7 @@ private fun HistoryRow(
     entry: PebbleEntry,
     locale: java.util.Locale,
     onClick: () -> Unit,
+    onPlanetarium: (Planet) -> Unit,
 ) {
     var thumb by remember(entry.id) { mutableStateOf<Bitmap?>(null) }
     LaunchedEffect(entry.id) { thumb = session.thumbnail(entry.id) }
@@ -203,6 +208,29 @@ private fun HistoryRow(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             )
+        }
+
+        // The world, as a way through to the planetarium. A second target
+        // inside a row that is itself tappable, so it is set apart at the
+        // far end and given its own description rather than left to be
+        // discovered by accident.
+        if (planet != null) {
+            val disc by rememberPlanetDisc(planet)
+            disc?.let { bitmap ->
+                Image(
+                    bitmap = bitmap,
+                    contentDescription = stringResource(
+                        R.string.orrery_focus_hint,
+                        stringResource(planet.nameRes),
+                    ),
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .clickable { onPlanetarium(planet) }
+                        .padding(2.dp),
+                )
+            }
         }
     }
 }

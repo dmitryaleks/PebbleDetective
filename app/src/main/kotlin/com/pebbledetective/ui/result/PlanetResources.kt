@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.pebbledetective.R
+import com.pebbledetective.data.PlanetArt
 import com.pebbledetective.domain.Planet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -92,3 +93,35 @@ fun rememberPlanetImage(planet: Planet): State<ImageBitmap?> {
     }
     return image
 }
+
+/**
+ * The same photograph, prepared small and keyed to its disc.
+ *
+ * [rememberPlanetImage] decodes the whole frame, which is right for the
+ * portrait filling half the result screen and wasteful for a badge the
+ * size of a thumbnail - and the logbook wants one of these on every row.
+ *
+ * Kept in a small cache, because a lazy list disposes the rows it scrolls
+ * past and would otherwise decode the same nine pictures over and over.
+ * Nine bodies at a hundred pixels is a third of a megabyte in total.
+ */
+@Composable
+fun rememberPlanetDisc(planet: Planet, sizePx: Int = DISC_BADGE_PX): State<ImageBitmap?> {
+    val context = LocalContext.current
+    val image = remember(planet, sizePx) {
+        mutableStateOf(discCache[planet to sizePx])
+    }
+
+    LaunchedEffect(planet, sizePx) {
+        if (image.value != null) return@LaunchedEffect
+        val loaded = PlanetArt.disc(context, planet, sizePx)?.asImageBitmap()
+        if (loaded != null) discCache[planet to sizePx] = loaded
+        image.value = loaded
+    }
+    return image
+}
+
+/** Big enough for a 54dp badge on a three-times-density screen. */
+const val DISC_BADGE_PX = 192
+
+private val discCache = mutableMapOf<Pair<Planet, Int>, ImageBitmap>()

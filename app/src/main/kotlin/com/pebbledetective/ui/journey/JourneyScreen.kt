@@ -363,18 +363,6 @@ private fun DrawScope.legEarth(travel: Float): Placed {
     )
 }
 
-/** A body placed on screen: where, how big, how far back. */
-private data class Placed(val at: Offset, val radius: Float, val depth: Float)
-
-private fun lerp(from: Placed, to: Placed, t: Float) = Placed(
-    at = Offset(
-        from.at.x + (to.at.x - from.at.x) * t,
-        from.at.y + (to.at.y - from.at.y) * t,
-    ),
-    radius = from.radius + (to.radius - from.radius) * t,
-    depth = from.depth + (to.depth - from.depth) * t,
-)
-
 /**
  * The opening shot: the solar system as it stood on the day the pebble was
  * found, then the camera closing on the two worlds the story is about.
@@ -418,28 +406,8 @@ private fun DrawScope.drawSystemLeg(
         }
     }
 
-    fun placement(planet: Planet): Placed {
-        val world = Astronomy.heliocentricEcliptic(planet, epochMillis)
-        val projected = SolarSystem.project(world, size, scale, tilt, spin, centre)
-        var at = projected.at
-        if (planet == Planet.MOON) {
-            // Pushed away from the Sun by a couple of Earth-widths, or it
-            // sits underneath the Earth and is never seen at all.
-            val earth = SolarSystem.project(
-                Astronomy.heliocentricEcliptic(Planet.EARTH, epochMillis),
-                size, scale, tilt, spin, centre,
-            ).at
-            val away = Offset(earth.x - centre.x, earth.y - centre.y)
-            val length = kotlin.math.hypot(away.x, away.y).coerceAtLeast(1f)
-            val step = size.minDimension * SolarSystem.sizeOf(Planet.EARTH) *
-                SolarSystem.MOON_NUDGE
-            at = Offset(earth.x + away.x / length * step, earth.y + away.y / length * step)
-        }
-        return Placed(
-            at = at,
-            radius = size.minDimension * SolarSystem.sizeOf(planet),
-            depth = projected.depth,
-        )
+    fun placement(planet: Planet): Placed = with(SolarSystem) {
+        placeBody(planet, epochMillis, scale, tilt, spin, centre)
     }
 
     val sourceNow = lerp(placement(source), legSource(0f), closing)

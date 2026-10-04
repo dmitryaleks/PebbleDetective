@@ -6,6 +6,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import java.time.format.FormatStyle
 fun ResultScreen(
     session: SessionViewModel,
     onJourney: () -> Unit,
+    onPlanetarium: (Planet) -> Unit,
     onNewPebble: () -> Unit,
     onOpenHistory: () -> Unit,
 ) {
@@ -94,7 +96,7 @@ fun ResultScreen(
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
             )
 
-            PlanetPortrait(planet)
+            PlanetPortrait(planet, onOpen = { onPlanetarium(planet) })
 
             Text(
                 // The caption above reads "this pebble came from", so this
@@ -144,9 +146,14 @@ fun ResultScreen(
     }
 }
 
-/** The photograph, drifting gently so the screen does not feel like a poster. */
+/**
+ * The photograph, drifting gently so the screen does not feel like a poster.
+ *
+ * Tapping it opens the planetarium on that world. The screen has just
+ * named a planet, and "where is it, then?" is the next thing anyone asks.
+ */
 @Composable
-private fun PlanetPortrait(planet: Planet) {
+private fun PlanetPortrait(planet: Planet, onOpen: () -> Unit) {
     val image by rememberPlanetImage(planet)
     val transition = rememberInfiniteTransition(label = "planet")
     val breathe by transition.animateFloat(
@@ -166,9 +173,15 @@ private fun PlanetPortrait(planet: Planet) {
         } else {
             Image(
                 bitmap = bitmap,
-                contentDescription = stringResource(planet.nameRes),
+                contentDescription = stringResource(
+                    R.string.orrery_focus_hint,
+                    stringResource(planet.nameRes),
+                ),
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().scale(breathe),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(breathe)
+                    .clickable(onClick = onOpen),
             )
         }
     }

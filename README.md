@@ -261,6 +261,39 @@ makes no requests of its own, it simply hands the coordinates to whatever maps
 app is installed, and that app does the talking. Worth knowing, because those
 coordinates are where a child was standing.
 
+### 9 · Take the solar system apart
+
+<p>
+<img src="docs/screen-planetarium.png" width="250" alt="The planetarium, the whole system in frame" />
+&nbsp;
+<img src="docs/screen-planetarium-focus.png" width="250" alt="The planetarium following Mars" />
+</p>
+
+A **planetarium**: the solar system as a thing to play with rather than to
+watch. The same orrery the flight home opens on — the same orbits, the same
+photographs, the same arithmetic — but with the clock handed over.
+
+- **Slide the date** ten years each way, or let it run at **1, 5, 10 or 20
+  days a second**, forwards or backwards. At twenty, Mercury laps the Sun
+  every four seconds, Earth takes eighteen, and Saturn barely leans.
+- **Pinch to zoom, drag to turn it.** Sideways swings the camera round the
+  Sun; up and down flattens the plane towards edge-on.
+- **Tap a world to follow it.** It takes the middle of the screen and stays
+  there while the rest of the system sweeps past — which is the clearest
+  way to see that Mars really does loop backwards against the stars.
+- **Names on or off**, and the ones that would sit on top of each other are
+  dropped rather than overlapped; zoom in and they come back.
+
+**Every planet picture in the app is a door into it.** The badge on the
+detection banner, the portrait on the result screen, the world on a logbook
+row and the one on a pebble's own page all open the planetarium *on that
+world*, zoomed so its orbit fills the screen with everything else still in
+its real place around it.
+
+Only the distances are a lie, and they have to be: Mercury is a thirtieth of
+Neptune's distance from the Sun, so a true scale is a blank screen with a dot
+in the corner. The radii go through a power law, the angles do not.
+
 ---
 
 ## Three languages, at any moment
@@ -406,8 +439,8 @@ A few decisions worth knowing about:
   analysed disagree by ninety degrees on most phones.
 - **The sky is computed, not downloaded.** JPL’s approximate Keplerian
   elements for 1800 to 2050, Kepler’s equation solved by Newton’s method, and
-  two coordinate transforms. The whole planetarium is one file of arithmetic
-  with no assets behind it, and the unit tests check it against things that
+  two coordinate transforms. The whole of it is one file of arithmetic with
+  no assets behind it, and the unit tests check it against things that
   are true of the solar system - the equinoxes, the maximum elongations of
   Mercury and Venus, the opposition cycle of each outer planet - rather than
   against a copied table.
@@ -434,6 +467,13 @@ A few decisions worth knowing about:
   evening it was found rather than tonight. The radii are compressed by a
   power law, which is what every orrery ever built does and for the same
   reason.
+- **And the planetarium is the same orrery again.** One function places a
+  body, shared by the flight and by the screen you can scrub - two copies
+  would be two orreries that slowly drifted apart. What the planetarium
+  adds is the clock, and it keeps that clock out of composition: the
+  moment, the zoom and the rotation are read only inside the draw lambda,
+  so running time at twenty days a second invalidates the drawing and
+  nothing else.
 - **The landing is a map, drawn the same way.** Coastlines as lists of degrees,
   projected with the longitude squeezed by the cosine of the latitude, at three
   levels of detail that hand over as the scale drops - the islands of Japan,

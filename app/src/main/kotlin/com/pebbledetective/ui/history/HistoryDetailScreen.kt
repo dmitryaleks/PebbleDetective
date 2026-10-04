@@ -93,6 +93,7 @@ fun HistoryDetailScreen(
     entryId: String,
     onBack: () -> Unit,
     onReplay: () -> Unit,
+    onPlanetarium: (Planet) -> Unit,
 ) {
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
@@ -189,6 +190,7 @@ fun HistoryDetailScreen(
                     onReplay()
                 },
                 onDelete = { confirmDelete = entry },
+                onPlanetarium = onPlanetarium,
                 onBack = onBack,
                 onShare = {
                     scope.launch {
@@ -322,6 +324,7 @@ private fun PebblePage(
     language: AppLanguage,
     onReplay: () -> Unit,
     onDelete: () -> Unit,
+    onPlanetarium: (Planet) -> Unit,
     onBack: () -> Unit,
     onShare: () -> Unit,
     onSave: () -> Unit,
@@ -372,11 +375,18 @@ private fun PebblePage(
             if (planet != null) {
                 val planetImage by rememberPlanetImage(planet)
                 planetImage?.let {
+                    // The way into the planetarium from the logbook: the
+                    // world this stone came from, where it was that day.
                     Image(
                         bitmap = it,
-                        contentDescription = stringResource(planet.nameRes),
+                        contentDescription = stringResource(
+                            R.string.orrery_focus_hint,
+                            stringResource(planet.nameRes),
+                        ),
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(54.dp),
+                        modifier = Modifier
+                            .size(54.dp)
+                            .clickable { onPlanetarium(planet) },
                     )
                 }
             }

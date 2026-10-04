@@ -107,6 +107,23 @@ def find(desc: str = "", text: str = "", patience: float = 6.0) -> tuple[int, in
         time.sleep(0.5)
 
 
+def find_prefix(desc: str, patience: float = 6.0) -> tuple[int, int]:
+    """The first control whose description starts with [desc].
+
+    The planetarium badges name their world - "See Mars in the solar
+    system" - so there is no fixed label to look for, and which world a
+    run turns up depends on the colour of whatever the camera saw.
+    """
+    deadline = time.time() + patience
+    while True:
+        for node_desc, _, centre in nodes():
+            if node_desc.startswith(desc):
+                return centre
+        if time.time() > deadline:
+            raise LookupError("nothing on screen described %r..." % desc)
+        time.sleep(0.5)
+
+
 def tap(point: tuple[int, int]) -> None:
     adb("shell", "input", "tap", str(point[0]), str(point[1]))
 
@@ -223,6 +240,13 @@ def main() -> int:
     tap(TAP_FIRST_ENTRY)
     time.sleep(3)
     save(shot(), "screen-detail.png")
+
+    # 5b. And the planetarium, opened from that stone's own world, which
+    # is one of the two ways in that the logbook offers.
+    tap(find_prefix("See "))
+    time.sleep(4)
+    save(shot(), "screen-planetarium-focus.png")
+    press(text="Go back", settle=2)
     press(text="Go back", settle=2)
 
     # 6. The same logbook in Japanese, to show the language switch. Two
@@ -236,7 +260,13 @@ def main() -> int:
     tap(globe)  # back to English
     time.sleep(2)
 
-    # 7. Radar, which wants the camera behind it, so start from the sky.
+    # 7. The planetarium on its own, with the whole system in frame.
+    restart()
+    press(text="Open the planetarium", settle=4)
+    save(shot(), "screen-planetarium.png")
+    press(text="Go back", settle=2)
+
+    # 8. Radar, which wants the camera behind it, so start from the sky.
     restart()
     press(desc="Radar mode", settle=7)
     save(shot(), "screen-radar.png")
