@@ -44,6 +44,7 @@ import com.pebbledetective.R
 import com.pebbledetective.domain.ResearchPhase
 import com.pebbledetective.domain.ResearchTimeline
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.TopControls
 import com.pebbledetective.ui.common.animationsDisabled
 
 /**
@@ -62,6 +63,8 @@ fun ResearchScreen(
 ) {
     val captured by session.captured.collectAsStateWithLifecycle()
     val startedAt by session.researchStartedAt.collectAsStateWithLifecycle()
+    val language by session.language.collectAsStateWithLifecycle()
+    val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
 
     val frame = remember { mutableLongStateOf(0L) }
 
@@ -118,6 +121,20 @@ fun ResearchScreen(
         } else {
             ResearchSequence(elapsedMs = frame.longValue, onSkip = { session.skipResearch() })
         }
+
+        // The settings and nothing else. The spec asks for the language to
+        // be switchable at any stage and this is a stage; the mode buttons
+        // are left off deliberately, because wandering off mid-research
+        // abandons a stone that has already been photographed and written
+        // to the logbook, and because there is a Skip two inches below.
+        TopControls(
+            language = language,
+            soundEnabled = soundEnabled,
+            onCycleLanguage = session::cycleLanguage,
+            onToggleSound = session::toggleSound,
+            onOpenHistory = null,
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
     }
 }
 

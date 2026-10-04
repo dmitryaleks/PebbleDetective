@@ -261,6 +261,31 @@ makes no requests of its own, it simply hands the coordinates to whatever maps
 app is installed, and that app does the talking. Worth knowing, because those
 coordinates are where a child was standing.
 
+### Everywhere, from everywhere
+
+<img src="docs/screen-logbook.png" width="230" align="right" alt="The toolbar on the logbook" />
+
+The four modes are not a sequence. They are four ways of looking at the same
+hunt, so **every screen carries the whole toolbar**: language, sound, planets
+around you, the planetarium, the radar, the camera and the logbook. The
+button for the screen you are on is ringed, so the row says where you are as
+well as where you can go.
+
+It sizes itself. Seven controls at a comfortable size come to more than a
+small phone is wide, and a toolbar that overflows loses whichever button is
+last — the logbook, as it happens. Each control takes an equal share of
+whatever width there is. Pressing a mode you have already been through takes
+you *back* to it rather than stacking another copy, so the back button still
+retraces where you went.
+
+The two timed sequences — the research and the flight home — carry the
+language and sound buttons only. Wandering off mid-research abandons a stone
+that has already been photographed and logged, and seven buttons across the
+top of a twenty-five second showpiece is no way to watch it. Both have their
+own way out two inches below.
+
+---
+
 ### 9 · Take the solar system apart
 
 <p>
@@ -290,6 +315,14 @@ row and the one on a pebble's own page all open the planetarium *on that
 world*, zoomed so its orbit fills the screen with everything else still in
 its real place around it.
 
+**And the door swings both ways.** Follow a world that has sent you
+something and your own stones from it appear along the bottom — not a count
+and not a link to a filtered list, but the photographs you took, round like
+little moons. Tap one and you are on its page in the logbook. A child
+recognises a stone they picked up long before they recognise a number, and
+the strip turns up at exactly the moment the question arises, which is the
+moment they tapped that planet.
+
 Only the distances are a lie, and they have to be: Mercury is a thirtieth of
 Neptune's distance from the Sun, so a true scale is a blank screen with a dot
 in the corner. The radii go through a power law, the angles do not.
@@ -299,7 +332,9 @@ in the corner. The radii go through a power law, the angles do not.
 ## Three languages, at any moment
 
 **English, Russian and Japanese**, switched with the globe button on *every*
-screen — including halfway through the research or mid-flight.
+screen — including halfway through the research or mid-flight. The button
+carries the current code under it, so which of the three you are in is
+readable at a glance.
 
 The language is applied inside the composition rather than by restarting the
 activity, so switching it never interrupts the camera and never restarts an

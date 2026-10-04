@@ -22,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.ModeLinks
 import com.pebbledetective.ui.common.TopControls
 
 /** Where the bundled photographs and sounds came from. Full detail lives in ASSETS.md. */
 @Composable
-fun CreditsScreen(session: SessionViewModel, onBack: () -> Unit) {
+fun CreditsScreen(session: SessionViewModel, onBack: () -> Unit, modes: ModeLinks) {
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
 
@@ -36,7 +37,7 @@ fun CreditsScreen(session: SessionViewModel, onBack: () -> Unit) {
             soundEnabled = soundEnabled,
             onCycleLanguage = session::cycleLanguage,
             onToggleSound = session::toggleSound,
-            onOpenHistory = null,
+            modes = modes,
         )
         Column(
             modifier = Modifier

@@ -734,3 +734,40 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   right face to the Sun while it does it. The arithmetic came out of the
   `DrawScope` extension into `SolarSystem.moonOffset` so that a test can
   watch it go round.
+
+### Post-release - the toolbar everywhere, and a way back to the stones
+
+- **Seven controls would not fit.** The row was six buttons at fifty-two
+  density independent pixels plus a language label, which already came to
+  three hundred and fifty-four of a small phone's three hundred and sixty,
+  and the planetarium made seven. Material enforces a forty-eight point
+  minimum on `IconButton` whatever size it is given, so the buttons are
+  plain clickable boxes now and the row divides whatever width it has
+  between them, floored at forty and capped at fifty-two. The language
+  control folded its code inside the globe button, which bought back a
+  whole slot - and the code hangs below the icon rather than stacking
+  with it, or the globe rides visibly higher than every other icon in
+  the row.
+- **The current mode is ringed**, which turned a row of ways out into a
+  row that also says where you are. `skyActive`/`radarActive` became one
+  `TopMode`.
+- **Pressing a mode goes back to it rather than stacking it.** With every
+  screen carrying every mode, navigating forwards each time is a back
+  stack that grows for as long as a child keeps pressing buttons. The
+  `toDetection` trick - pop to it if it is behind you, push it if it is
+  not - generalised to `toMode`.
+- **The two cutscenes get the settings only.** The research sequence and
+  the flight home carry language and sound, which is what the spec asks
+  for and what the README has been claiming all along without it being
+  true; the mode buttons are left off, because leaving mid-research
+  abandons a stone that is already photographed and logged, and because
+  seven buttons across the top of the showpiece is no way to watch it.
+- **The way from a world to its stones is the stones.** A button reading
+  "3 pebbles from Mars" opening a filtered logbook was the obvious
+  design; the photographs themselves are better. They appear along the
+  bottom only while that world is being followed - so they answer a
+  question the child has just asked by tapping it - they are recognised
+  long before a count is, and they are one tap from the stone rather
+  than two and a list. Capped at eight, because a pocketful of grey
+  pebbles all land on the same world and a strip of twenty is a second
+  logbook.

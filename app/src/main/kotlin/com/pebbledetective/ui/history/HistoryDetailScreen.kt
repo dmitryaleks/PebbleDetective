@@ -68,7 +68,9 @@ import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.MapLink
 import com.pebbledetective.ui.common.formatCoordinates
 import com.pebbledetective.ui.common.shareImage
+import com.pebbledetective.ui.common.ModeLinks
 import com.pebbledetective.ui.common.TopControls
+import com.pebbledetective.ui.common.TopMode
 import com.pebbledetective.ui.result.nameRes
 import com.pebbledetective.ui.result.rememberPlanetImage
 import kotlinx.coroutines.launch
@@ -94,6 +96,7 @@ fun HistoryDetailScreen(
     onBack: () -> Unit,
     onReplay: () -> Unit,
     onPlanetarium: (Planet) -> Unit,
+    modes: ModeLinks,
 ) {
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
@@ -156,7 +159,8 @@ fun HistoryDetailScreen(
             soundEnabled = soundEnabled,
             onCycleLanguage = session::cycleLanguage,
             onToggleSound = session::toggleSound,
-            onOpenHistory = null,
+            modes = modes,
+            current = TopMode.HISTORY,
         )
 
         PagerControls(

@@ -186,4 +186,5 @@
     <string name="orrery_names">なまえ</string>
     <string name="orrery_hint">ひろげて ズーム · なぞって かいてん · ほしを タップ</string>
     <string name="orrery_focus_hint">%1$sを たいようけいで みる</string>
+    <string name="orrery_stones_from">%1$sから きた こいし</string>
 </resources>

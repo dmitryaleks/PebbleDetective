@@ -79,6 +79,7 @@ import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.SkyState
 import com.pebbledetective.ui.common.TopControls
+import com.pebbledetective.ui.common.TopMode
 import com.pebbledetective.ui.result.nameRes
 import com.pebbledetective.ui.theme.ScannerGreen
 import com.pebbledetective.ui.theme.SignalAmber
@@ -355,9 +356,10 @@ fun SkyScreen(
                 onOpenHistory = onOpenHistory,
                 // Already here, so this button lets every planet back in.
                 onSky = session::clearSkyFocus,
-                skyActive = true,
+                onPlanetarium = onPlanetarium,
                 onRadar = onRadar,
                 onDetection = onDetection,
+                current = TopMode.SKY,
             )
             PlanetBars(
                 sky = sky,

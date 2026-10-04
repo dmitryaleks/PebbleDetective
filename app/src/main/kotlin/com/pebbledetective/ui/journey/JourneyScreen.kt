@@ -51,6 +51,7 @@ import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.domain.Projection
 import com.pebbledetective.ui.SessionViewModel
+import com.pebbledetective.ui.common.TopControls
 import com.pebbledetective.ui.common.animationsDisabled
 import com.pebbledetective.ui.result.fromNameRes
 import com.pebbledetective.ui.result.nameRes
@@ -77,6 +78,8 @@ fun JourneyScreen(
 ) {
     val result by session.result.collectAsStateWithLifecycle()
     val startedAt by session.journeyStartedAt.collectAsStateWithLifecycle()
+    val language by session.language.collectAsStateWithLifecycle()
+    val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
     val source = Planet.fromId(result?.planetId) ?: Planet.MARS
 
     val frame = remember { mutableLongStateOf(0L) }
@@ -150,11 +153,23 @@ fun JourneyScreen(
             modifier = Modifier.fillMaxSize(),
         )
 
+        // The settings and nothing else, as on the research sequence. The
+        // mode buttons would sit across the top of the one shot in the app
+        // worth looking at, and the flight already ends in a Done button.
+        TopControls(
+            language = language,
+            soundEnabled = soundEnabled,
+            onCycleLanguage = session::cycleLanguage,
+            onToggleSound = session::toggleSound,
+            onOpenHistory = null,
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
+
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(start = 24.dp, end = 24.dp, top = 56.dp, bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {

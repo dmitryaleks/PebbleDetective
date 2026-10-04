@@ -42,6 +42,7 @@ import com.pebbledetective.data.locale
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.MapLink
+import com.pebbledetective.ui.common.ModeLinks
 import com.pebbledetective.ui.common.TopControls
 import java.time.Instant
 import java.time.ZoneId
@@ -55,7 +56,7 @@ fun ResultScreen(
     onJourney: () -> Unit,
     onPlanetarium: (Planet) -> Unit,
     onNewPebble: () -> Unit,
-    onOpenHistory: () -> Unit,
+    modes: ModeLinks,
 ) {
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
@@ -69,7 +70,7 @@ fun ResultScreen(
             soundEnabled = soundEnabled,
             onCycleLanguage = session::cycleLanguage,
             onToggleSound = session::toggleSound,
-            onOpenHistory = onOpenHistory,
+            modes = modes,
         )
 
         if (planet == null) {

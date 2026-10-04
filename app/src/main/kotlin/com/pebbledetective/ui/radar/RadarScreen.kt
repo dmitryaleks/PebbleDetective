@@ -46,6 +46,7 @@ import com.pebbledetective.R
 import com.pebbledetective.domain.Geo
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
+import com.pebbledetective.ui.common.TopMode
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -65,6 +66,7 @@ fun RadarScreen(
     session: SessionViewModel,
     onSwitchToDetection: () -> Unit,
     onSky: () -> Unit,
+    onPlanetarium: () -> Unit,
     onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -145,9 +147,10 @@ fun RadarScreen(
                 onToggleSound = session::toggleSound,
                 onOpenHistory = onOpenHistory,
                 onRadar = { session.startRadar() },
-                radarActive = true,
                 onSky = onSky,
+                onPlanetarium = onPlanetarium,
                 onDetection = onSwitchToDetection,
+                current = TopMode.RADAR,
             )
             Text(
                 text = radar.statusText(),

@@ -189,4 +189,5 @@
     <string name="orrery_names">Названия</string>
     <string name="orrery_hint">Сведи пальцы · проведи, чтобы повернуть · нажми на планету</string>
     <string name="orrery_focus_hint">Найти в Солнечной системе: %1$s</string>
+    <string name="orrery_stones_from">Твои камешки с %1$s</string>
 </resources>

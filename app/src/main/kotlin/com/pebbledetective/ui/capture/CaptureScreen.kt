@@ -59,6 +59,7 @@ import com.pebbledetective.ui.result.rememberPlanetDisc
 import com.pebbledetective.ui.theme.SignalAmber
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
+import com.pebbledetective.ui.common.TopMode
 
 /**
  * Live camera, targeting reticle, and the "target captured" freeze frame.
@@ -76,7 +77,7 @@ fun CaptureScreen(
     onOpenHistory: () -> Unit,
     onRadar: () -> Unit,
     onSky: () -> Unit,
-    onPlanetarium: (Planet) -> Unit,
+    onPlanetarium: (Planet?) -> Unit,
 ) {
     val context = LocalContext.current
     val language by session.language.collectAsStateWithLifecycle()
@@ -130,6 +131,9 @@ fun CaptureScreen(
                 onOpenHistory = onOpenHistory,
                 onRadar = onRadar,
                 onSky = onSky,
+                onPlanetarium = { onPlanetarium(claimedOrigin) },
+                onDetection = {},
+                current = TopMode.DETECTION,
             )
             claimedOrigin?.let { planet ->
                 ClaimedOriginBanner(

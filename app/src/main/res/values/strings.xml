@@ -189,4 +189,5 @@
     <string name="orrery_names">Names</string>
     <string name="orrery_hint">Pinch to zoom · drag to turn · tap a world to follow it</string>
     <string name="orrery_focus_hint">See %1$s in the solar system</string>
+    <string name="orrery_stones_from">Your stones from %1$s</string>
 </resources>

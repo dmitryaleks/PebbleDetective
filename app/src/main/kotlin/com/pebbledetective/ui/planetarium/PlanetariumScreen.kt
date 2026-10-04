@@ -1,6 +1,11 @@
 package com.pebbledetective.ui.planetarium
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -67,16 +72,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
 import com.pebbledetective.audio.SoundCue
+import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PlanetArt
 import com.pebbledetective.data.locale
 import com.pebbledetective.domain.Orrery
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
+import com.pebbledetective.ui.common.TopMode
 import com.pebbledetective.ui.journey.Placed
 import com.pebbledetective.ui.journey.SolarSystem
 import com.pebbledetective.ui.journey.Starfield
 import com.pebbledetective.ui.journey.drawPhotoPlanet
+import com.pebbledetective.ui.result.fromNameRes
 import com.pebbledetective.ui.result.nameRes
 import com.pebbledetective.ui.theme.ScannerGreen
 import com.pebbledetective.ui.theme.SignalAmber
@@ -123,10 +131,12 @@ fun PlanetariumScreen(
     onSky: () -> Unit,
     onRadar: () -> Unit,
     onDetection: () -> Unit,
+    onOpenPebble: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val language by session.language.collectAsStateWithLifecycle()
     val soundEnabled by session.soundEnabled.collectAsStateWithLifecycle()
+    val entries by session.entries.collectAsStateWithLifecycle()
 
     // Loaded one at a time, so the first frame does not wait for the last.
     val discs by produceState(initialValue = emptyMap<Planet, ImageBitmap>(), context) {
@@ -292,12 +302,38 @@ fun PlanetariumScreen(
                 onOpenHistory = onOpenHistory,
                 onRadar = onRadar,
                 onSky = onSky,
+                onPlanetarium = { focus = null },
                 onDetection = onDetection,
+                current = TopMode.PLANETARIUM,
+            )
+        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
+        ) {
+
+        // What this world has actually sent you, if anything has come
+        // from it. Only while that world is the one being followed, so
+        // it answers a question the child has just asked by tapping.
+        val stones = remember(entries, focus) { stonesFrom(entries, focus) }
+        if (stones.isNotEmpty()) {
+            StoneStrip(
+                session = session,
+                stones = stones,
+                heading = stringResource(
+                    R.string.orrery_stones_from,
+                    stringResource(focus!!.fromNameRes),
+                ),
+                locale = language.locale,
+                onOpen = { id ->
+                    session.sound.play(SoundCue.UI_TAP)
+                    onOpenPebble(id)
+                },
             )
         }
 
         TimeControls(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier.fillMaxWidth(),
             dateText = remember(dayMark, language, openedAt) {
                 DateTimeFormatter
                     .ofLocalizedDate(FormatStyle.MEDIUM)
@@ -333,6 +369,7 @@ fun PlanetariumScreen(
             },
             onBack = onBack,
         )
+        }
     }
 }
 
@@ -388,6 +425,112 @@ private fun DrawScope.drawLabels(
             cornerRadius = CornerRadius(5f * density, 5f * density),
         )
         drawText(textLayoutResult = label, topLeft = at)
+    }
+}
+
+
+/**
+ * The stones that came from one world, newest first.
+ *
+ * Capped, because this is a glance rather than the logbook: a child who
+ * has filled a pocket with grey pebbles can have twenty from Mercury,
+ * and a strip of twenty thumbnails is a second logbook rather than an
+ * answer to "what did this one send me".
+ */
+internal fun stonesFrom(
+    entries: List<PebbleEntry>,
+    planet: Planet?,
+    limit: Int = STONE_LIMIT,
+): List<PebbleEntry> {
+    if (planet == null) return emptyList()
+    return entries
+        .filter { it.planetId == planet.id }
+        .sortedByDescending { it.capturedAtEpochMs }
+        .take(limit)
+}
+
+/** As many as fit on a phone without becoming a list. */
+internal const val STONE_LIMIT = 8
+
+/**
+ * The pebbles from the world being followed, as a row of their own
+ * photographs.
+ *
+ * The obvious thing would have been a button saying "3 pebbles from
+ * Mars" that opened a filtered logbook. The stones themselves are
+ * better: a child recognises the photograph of a stone they picked up
+ * long before they recognise a count, the strip appears exactly when
+ * the question arises - they have just tapped that planet - and it is
+ * one tap to the stone rather than two and a list.
+ */
+@Composable
+private fun StoneStrip(
+    session: SessionViewModel,
+    stones: List<PebbleEntry>,
+    heading: String,
+    locale: java.util.Locale,
+    onOpen: (String) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color(0xFF070B16).copy(alpha = 0.82f))
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(
+            text = heading,
+            style = MaterialTheme.typography.labelLarge,
+            color = SignalAmber,
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            for (stone in stones) {
+                StoneThumbnail(session = session, stone = stone, locale = locale, onOpen = onOpen)
+            }
+        }
+    }
+}
+
+/** One stone: its own photograph, round, with a rim like a planet. */
+@Composable
+private fun StoneThumbnail(
+    session: SessionViewModel,
+    stone: PebbleEntry,
+    locale: java.util.Locale,
+    onOpen: (String) -> Unit,
+) {
+    var thumb by remember(stone.id) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    LaunchedEffect(stone.id) { thumb = session.thumbnail(stone.id) }
+
+    val found = remember(locale, stone.timeZoneId) {
+        DateTimeFormatter
+            .ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(locale)
+            .withZone(ZoneId.of(stone.timeZoneId))
+    }.format(Instant.ofEpochMilli(stone.capturedAtEpochMs))
+
+    Box(
+        modifier = Modifier
+            .size(54.dp)
+            .clip(CircleShape)
+            .background(Color.Black)
+            .border(1.5.dp, SignalAmber.copy(alpha = 0.55f), CircleShape)
+            .clickable { onOpen(stone.id) },
+        contentAlignment = Alignment.Center,
+    ) {
+        thumb?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = found,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().clip(CircleShape),
+            )
+        }
     }
 }
 
