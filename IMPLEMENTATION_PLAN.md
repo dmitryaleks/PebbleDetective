@@ -651,3 +651,9 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   sleep after a screen change is a guess, and the one before the radar
   shot was occasionally a frame short, which killed a whole run on its
   last step.
+- **The city furniture came off the landing map.** The rivers and the
+  loop line around the centre were drawn from a handful of points each,
+  and once the map is close enough for them to be distinct they are
+  close enough for the invention to show. What is left is what the few
+  points can honestly carry: the coast of Kanto with Tokyo Bay cut into
+  it, a block grid clipped to the land, and the crosshair on Koto.

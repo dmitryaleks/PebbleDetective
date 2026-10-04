@@ -13,7 +13,6 @@ import com.pebbledetective.ui.theme.SignalAmber
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.pow
-import kotlin.math.sin
 
 /** A point on the globe, in degrees. */
 data class LonLat(val lon: Double, val lat: Double)
@@ -51,7 +50,7 @@ private class Viewport(val centre: LonLat, spanDegrees: Double, size: Size) {
  * The last leg of the journey: the whole of Japan zooming in to the streets
  * of Koto, with the pebble dropping into the middle of it.
  *
- * Deliberately schematic - coastlines, a bay, the loop line and a river -
+ * Deliberately schematic - coastlines, a bay and a grid of streets -
  * rather than a map. It reads as the detective's display rather than
  * pretending to be satellite imagery, which keeps it of a piece with the
  * schematic planets earlier in the flight.
@@ -137,8 +136,8 @@ private fun DrawScope.drawIslands(view: Viewport, alpha: Float) {
  * simply where the land is not - which is what makes the bay recognisable.
  *
  * @param alpha the coastline itself.
- * @param detail the streets, the loop line and the river, which only earn
- *   their place once the map is close enough for them to be distinct.
+ * @param detail the streets, which only earn their place once the map is
+ *   close enough for them to be distinct.
  */
 private fun DrawScope.drawKanto(view: Viewport, alpha: Float, detail: Float) {
     val land = Path()
@@ -156,53 +155,9 @@ private fun DrawScope.drawKanto(view: Viewport, alpha: Float, detail: Float) {
 
     if (detail <= 0.01f) return
 
-    // Clipped to the land, so no road runs out across the water.
+    // Clipped to the land, so the grid stops at the water.
     clipPath(land) {
         drawBlocks(view, detail)
-
-        // The Yamanote loop, the most recognisable shape in the city from
-        // above, with the main roads radiating out of it.
-        val hub = view.project(YAMANOTE_CENTRE)
-        val rim = view.project(LonLat(YAMANOTE_CENTRE.lon, YAMANOTE_CENTRE.lat + LOOP_DEGREES))
-        val loop = hub.y - rim.y
-
-        // Stubs out of the hub, not lines across the whole screen: drawn
-        // full length they stopped reading as roads and became a star.
-        val reach = loop * 1.9f
-        for (i in 0 until 6) {
-            val angle = Math.toRadians(i * 60.0 + 15.0)
-            drawLine(
-                color = ScannerGreen.copy(alpha = detail * 0.35f),
-                start = hub,
-                end = Offset(
-                    hub.x + (cos(angle) * reach).toFloat(),
-                    hub.y + (sin(angle) * reach).toFloat(),
-                ),
-                strokeWidth = 2f * density,
-            )
-        }
-        if (loop > 2f) {
-            drawCircle(
-                color = ScannerGreen.copy(alpha = detail * 0.75f),
-                radius = loop,
-                center = hub,
-                style = Stroke(width = 2.5f * density),
-            )
-        }
-    }
-
-    // The Sumida and the Arakawa, with Koto between them as it really is.
-    for (course in listOf(SUMIDA, ARAKAWA)) {
-        val river = Path()
-        course.forEachIndexed { index, point ->
-            val at = view.project(point)
-            if (index == 0) river.moveTo(at.x, at.y) else river.lineTo(at.x, at.y)
-        }
-        drawPath(
-            path = river,
-            color = RIVER.copy(alpha = detail),
-            style = Stroke(width = 4f * density, cap = StrokeCap.Round),
-        )
     }
 }
 
@@ -236,8 +191,6 @@ private fun DrawScope.drawBlocks(view: Viewport, alpha: Float) {
 /** About a kilometre, which is roughly a block of central Tokyo. */
 private const val BLOCK = 0.01
 
-/** The radius of the loop line, in degrees of latitude. */
-private const val LOOP_DEGREES = 0.030
 
 /** The target: a closing crosshair while falling, then the impact. */
 private fun DrawScope.drawLandingSite(
@@ -307,12 +260,10 @@ private fun DrawScope.drawFallingPebble(view: Viewport, zoom: Float, alpha: Floa
 }
 
 private val SEA = Color(0xFF04121E)
-private val RIVER = Color(0xFF2E7FB8)
 
 private const val COUNTRY_SPAN = 15.0
 private const val SITE_SPAN = 0.17
 private val COUNTRY_CENTRE = LonLat(137.5, 37.6)
-private val YAMANOTE_CENTRE = LonLat(139.7450, 35.6850)
 
 // Coarse outlines: these are drawn a few hundred pixels across and are meant
 // to read as a diagram, not as a chart anyone could navigate by.
@@ -364,14 +315,3 @@ private val KANTO = listOf(
     LonLat(138.30, 35.50), LonLat(138.40, 36.00),
 )
 
-/** The Sumida, north to south into the bay, west of Koto. */
-private val SUMIDA = listOf(
-    LonLat(139.800, 35.790), LonLat(139.805, 35.750), LonLat(139.795, 35.715),
-    LonLat(139.800, 35.690), LonLat(139.790, 35.665), LonLat(139.780, 35.645),
-)
-
-/** The Arakawa, east of Koto. */
-private val ARAKAWA = listOf(
-    LonLat(139.830, 35.795), LonLat(139.845, 35.755), LonLat(139.850, 35.720),
-    LonLat(139.860, 35.690), LonLat(139.865, 35.665), LonLat(139.870, 35.645),
-)
