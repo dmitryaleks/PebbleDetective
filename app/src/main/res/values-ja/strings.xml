@@ -51,7 +51,9 @@
     <string name="planet_venus_name">きんせい</string>
     <string name="planet_venus_fact">いちばん あつい わくせい。さんの あめが ふるんだ！</string>
     <string name="planet_earth_name">ちきゅう</string>
+    <string name="planet_moon_name">つき</string>
     <string name="planet_earth_fact">わたしたちの いえ。こいしも ひとも いる ゆいいつの ばしょ。</string>
+    <string name="planet_moon_fact">ちきゅうの つき。ひとが あるいたことが あって、かけらが いんせきとして ふってきたことも あるよ。</string>
     <string name="planet_mars_name">かせい</string>
     <string name="planet_mars_fact">あかい わくせい。さびで まっかなんだ！</string>
     <string name="planet_jupiter_name">もくせい</string>
@@ -68,6 +70,7 @@
     <string name="planet_mercury_from">すいせい</string>
     <string name="planet_venus_from">きんせい</string>
     <string name="planet_earth_from">ちきゅう</string>
+    <string name="planet_moon_from">つき</string>
     <string name="planet_mars_from">かせい</string>
     <string name="planet_jupiter_from">もくせい</string>
     <string name="planet_saturn_from">どせい</string>

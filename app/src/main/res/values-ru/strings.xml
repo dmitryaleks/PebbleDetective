@@ -51,7 +51,9 @@
     <string name="planet_venus_name">Венера</string>
     <string name="planet_venus_fact">Самая горячая планета. Там идут кислотные дожди!</string>
     <string name="planet_earth_name">Земля</string>
+    <string name="planet_moon_name">Луна</string>
     <string name="planet_earth_fact">Наш дом и единственное место, где есть и камешки, и люди.</string>
+    <string name="planet_moon_fact">Наша Луна. По ней ходили люди, а её осколки падали к нам метеоритами.</string>
     <string name="planet_mars_name">Марс</string>
     <string name="planet_mars_fact">Красная планета. Она красная, потому что покрыта ржавчиной!</string>
     <string name="planet_jupiter_name">Юпитер</string>
@@ -68,6 +70,7 @@
     <string name="planet_mercury_from">Меркурия</string>
     <string name="planet_venus_from">Венеры</string>
     <string name="planet_earth_from">Земли</string>
+    <string name="planet_moon_from">Луны</string>
     <string name="planet_mars_from">Марса</string>
     <string name="planet_jupiter_from">Юпитера</string>
     <string name="planet_saturn_from">Сатурна</string>

@@ -31,6 +31,7 @@ object Astronomy {
     /** The bodies the sky mode can show. Earth is where you are standing. */
     val VISIBLE_BODIES: List<Planet> = listOf(
         Planet.SUN,
+        Planet.MOON,
         Planet.MERCURY,
         Planet.VENUS,
         Planet.MARS,
@@ -81,14 +82,21 @@ object Astronomy {
         longitudeDegrees: Double,
     ): Sighting {
         val julianDay = julianDay(epochMillis)
-        val geocentric = geocentricEcliptic(planet, julianDay)
-        val equatorial = eclipticToEquatorial(geocentric)
+        val siderealTime = localSiderealTime(julianDay, longitudeDegrees)
+
+        // Measured from where the observer is standing rather than from the
+        // centre of the Earth. For the planets this moves nothing - the
+        // offset is a ten-thousandth of the distance to Venus - but the
+        // Moon is close enough that it is worth up to a degree, which is
+        // two of its own diameters and plainly visible to anyone checking.
+        val equatorial = eclipticToEquatorial(geocentricEcliptic(planet, julianDay)) -
+            observer(siderealTime, latitudeDegrees)
         val distance = equatorial.length
 
         val rightAscension = normalise(Math.toDegrees(atan2(equatorial.y, equatorial.x)))
         val declination = Math.toDegrees(asin(equatorial.z / distance))
 
-        val hourAngle = localSiderealTime(julianDay, longitudeDegrees) - rightAscension
+        val hourAngle = siderealTime - rightAscension
         val (altitude, azimuth) = horizon(hourAngle, declination, latitudeDegrees)
 
         return Sighting(
@@ -134,6 +142,7 @@ object Astronomy {
      * opposite direction to the Earth seen from the Sun.
      */
     private fun geocentricEcliptic(planet: Planet, julianDay: Double): Vector {
+        if (planet == Planet.MOON) return moonEcliptic(julianDay)
         val earth = heliocentric(EARTH, julianDay)
         if (planet == Planet.SUN) return -earth
         return heliocentric(elementsFor(planet), julianDay) - earth
@@ -199,6 +208,71 @@ object Astronomy {
         }
         return Math.toRadians(eccentric)
     }
+
+    /**
+     * Where the Moon is, which is the one body here that is not an ellipse.
+     *
+     * The Moon is pulled about by the Sun as hard as a Keplerian orbit can
+     * stand: fit it with six elements like a planet and it is several
+     * degrees out, which for something half a degree wide and hanging in
+     * plain sight is not good enough. These are the leading periodic terms
+     * from the Astronomical Almanac's low-precision formulae - the
+     * equation of the centre, evection, variation and the annual equation
+     * in longitude, and the principal terms in latitude and parallax.
+     * Good to about a third of a degree, which is well inside what the
+     * phone's compass can tell you anyway.
+     */
+    private fun moonEcliptic(julianDay: Double): Vector {
+        val t = (julianDay - J2000) / DAYS_PER_CENTURY
+
+        val longitude = 218.32 + 481267.881 * t +
+            6.29 * sinDegrees(135.0 + 477198.87 * t) -
+            1.27 * sinDegrees(259.3 - 413335.36 * t) +
+            0.66 * sinDegrees(235.7 + 890534.22 * t) +
+            0.21 * sinDegrees(269.9 + 954397.74 * t) -
+            0.19 * sinDegrees(357.5 + 35999.05 * t) -
+            0.11 * sinDegrees(186.6 + 966404.03 * t)
+
+        val latitude = 5.13 * sinDegrees(93.3 + 483202.02 * t) +
+            0.28 * sinDegrees(228.2 + 960400.89 * t) -
+            0.28 * sinDegrees(318.3 + 6003.15 * t) -
+            0.17 * sinDegrees(217.6 - 407332.21 * t)
+
+        // Horizontal parallax, which is how the distance is expressed: the
+        // angle the Earth's radius subtends as seen from the Moon.
+        val parallax = 0.9508 +
+            0.0518 * cosDegrees(135.0 + 477198.87 * t) +
+            0.0095 * cosDegrees(259.3 - 413335.38 * t) +
+            0.0078 * cosDegrees(235.7 + 890534.22 * t) +
+            0.0028 * cosDegrees(269.9 + 954397.70 * t)
+
+        val distance = (1.0 / sin(Math.toRadians(parallax))) * EARTH_RADIUS_AU
+        val cosLatitude = cos(Math.toRadians(latitude))
+        return Vector(
+            x = distance * cosLatitude * cos(Math.toRadians(longitude)),
+            y = distance * cosLatitude * sin(Math.toRadians(longitude)),
+            z = distance * sin(Math.toRadians(latitude)),
+        )
+    }
+
+    /**
+     * Where the observer is, relative to the centre of the Earth, in the
+     * equatorial frame. A sphere is plenty: the flattening moves this by
+     * twenty kilometres, which is a thousandth of the Moon's parallax.
+     */
+    private fun observer(siderealTimeDegrees: Double, latitudeDegrees: Double): Vector {
+        val latitude = Math.toRadians(latitudeDegrees)
+        val sidereal = Math.toRadians(siderealTimeDegrees)
+        return Vector(
+            x = EARTH_RADIUS_AU * cos(latitude) * cos(sidereal),
+            y = EARTH_RADIUS_AU * cos(latitude) * sin(sidereal),
+            z = EARTH_RADIUS_AU * sin(latitude),
+        )
+    }
+
+    private fun sinDegrees(degrees: Double) = sin(Math.toRadians(degrees))
+
+    private fun cosDegrees(degrees: Double) = cos(Math.toRadians(degrees))
 
     /** Tilts the ecliptic frame onto the equatorial one. */
     private fun eclipticToEquatorial(v: Vector): Vector {
@@ -293,7 +367,10 @@ object Astronomy {
     private fun elementsFor(planet: Planet): Elements = when (planet) {
         Planet.MERCURY -> MERCURY
         Planet.VENUS -> VENUS
-        Planet.EARTH, Planet.SUN -> EARTH
+        // The Moon never reaches here for a position - see moonEcliptic -
+        // but it shares the Earth's orbit around the Sun to a quarter of a
+        // percent, which is what heliocentricDistanceAu is asking about.
+        Planet.EARTH, Planet.SUN, Planet.MOON -> EARTH
         Planet.MARS -> MARS
         Planet.JUPITER -> JUPITER
         Planet.SATURN -> SATURN
@@ -383,6 +460,9 @@ object Astronomy {
     private const val MILLIS_PER_DAY = 86_400_000.0
     private const val DAYS_PER_CENTURY = 36525.0
     private const val OBLIQUITY_J2000 = 23.43928
+
+    /** The Earth's radius, in astronomical units. */
+    private const val EARTH_RADIUS_AU = 6378.137 / 149_597_870.7
     private const val KEPLER_PASSES = 12
     private const val KEPLER_TOLERANCE_DEGREES = 1e-7
 }

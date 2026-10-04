@@ -94,6 +94,7 @@ private fun lookFor(planet: Planet): PlanetLook = when (planet) {
     Planet.MERCURY -> PlanetLook(core = Color(0xFFBFBFBF), edge = Color(0xFF6B6B6B))
     Planet.VENUS -> PlanetLook(core = Color(0xFFF6E2A8), edge = Color(0xFFB98B3C))
     Planet.EARTH -> PlanetLook(core = Color(0xFF6FC3F7), edge = Color(0xFF1C4E8A), band = Color(0xFF4CAF50))
+    Planet.MOON -> PlanetLook(core = Color(0xFFE8E6E1), edge = Color(0xFF7D7A75))
     Planet.MARS -> PlanetLook(core = Color(0xFFE2703A), edge = Color(0xFF8C3415))
     Planet.JUPITER -> PlanetLook(core = Color(0xFFE8CBA4), edge = Color(0xFF9A6B3F), band = Color(0xFFC1733F))
     Planet.SATURN -> PlanetLook(core = Color(0xFFF0DFAE), edge = Color(0xFFAD8B4A), ring = Color(0xFFD9C79A))

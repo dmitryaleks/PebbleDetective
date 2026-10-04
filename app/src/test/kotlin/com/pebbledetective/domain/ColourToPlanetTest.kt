@@ -106,6 +106,37 @@ class PlanetPickerTest {
         assertEquals(Planet.SATURN, pickPlanet(hsv(40f, s = 0.15f, v = 0.7f)))
     }
 
+    /**
+     * The one grey a child can name themselves.
+     *
+     * A pale grey stone is the Moon. It is the only world in the game they
+     * have looked straight at, it is exactly this colour, and sending that
+     * stone to a random planet throws away the one guess they could have
+     * made on their own.
+     */
+    @Test
+    fun `pale grey is the Moon`() {
+        for (hue in 0 until 360 step 30) {
+            for (seed in 0 until 5) {
+                assertEquals(
+                    "hue=$hue",
+                    Planet.MOON,
+                    pickPlanet(hsv(hue.toFloat(), s = 0.05f, v = 0.8f), Random(seed)),
+                )
+            }
+        }
+        // And it is not simply swallowing every grey: a darker one still
+        // goes to the random pool, and a near-black one is Mercury.
+        assertEquals(Planet.MERCURY, pickPlanet(hsv(0f, s = 0.05f, v = 0.1f)))
+        val dim = (0 until 60).map { pickPlanet(hsv(0f, s = 0.05f, v = 0.35f), Random(it)) }
+        assertTrue("mid grey stopped being random: ${dim.toSet()}", dim.toSet().size > 3)
+    }
+
+    @Test
+    fun `the moon is a world a pebble can come from`() {
+        assertTrue(Planet.MOON in Planet.sources)
+    }
+
     /** The brief: grey or unknown pebbles pick a planet at random. */
     @Test
     fun `grey picks at random and never lands on Earth`() {

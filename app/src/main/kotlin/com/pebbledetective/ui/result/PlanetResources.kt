@@ -23,6 +23,7 @@ val Planet.nameRes: Int
         Planet.MERCURY -> R.string.planet_mercury_name
         Planet.VENUS -> R.string.planet_venus_name
         Planet.EARTH -> R.string.planet_earth_name
+        Planet.MOON -> R.string.planet_moon_name
         Planet.MARS -> R.string.planet_mars_name
         Planet.JUPITER -> R.string.planet_jupiter_name
         Planet.SATURN -> R.string.planet_saturn_name
@@ -45,6 +46,7 @@ val Planet.fromNameRes: Int
         Planet.MERCURY -> R.string.planet_mercury_from
         Planet.VENUS -> R.string.planet_venus_from
         Planet.EARTH -> R.string.planet_earth_from
+        Planet.MOON -> R.string.planet_moon_from
         Planet.MARS -> R.string.planet_mars_from
         Planet.JUPITER -> R.string.planet_jupiter_from
         Planet.SATURN -> R.string.planet_saturn_from
@@ -60,6 +62,7 @@ val Planet.factRes: Int
         Planet.MERCURY -> R.string.planet_mercury_fact
         Planet.VENUS -> R.string.planet_venus_fact
         Planet.EARTH -> R.string.planet_earth_fact
+        Planet.MOON -> R.string.planet_moon_fact
         Planet.MARS -> R.string.planet_mars_fact
         Planet.JUPITER -> R.string.planet_jupiter_fact
         Planet.SATURN -> R.string.planet_saturn_fact

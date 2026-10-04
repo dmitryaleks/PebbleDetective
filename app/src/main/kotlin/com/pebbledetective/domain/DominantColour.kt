@@ -99,6 +99,11 @@ fun pickPlanet(colour: Hsv, random: Random = Random.Default): Planet {
     // Grey or unknown: the brief says pick at random.
     if (colour.saturation < 0.18f) {
         if (colour.saturation >= 0.12f && colour.hue in 25f..60f) return Planet.SATURN
+        // Except for a pale grey stone, which is the Moon and nothing else.
+        // It is the one world in the game a child has looked straight at,
+        // and it is exactly this colour; sending that stone to a random
+        // planet throws away the one guess they could have made themselves.
+        if (colour.value >= 0.55f) return Planet.MOON
         return Planet.sources.random(random)
     }
 

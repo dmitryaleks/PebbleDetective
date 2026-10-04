@@ -45,6 +45,7 @@ BODIES = {
     "mercury": ("PIA15160", "Mercury MESSENGER global mosaic"),
     "venus": ("PIA00271", "Venus Magellan global view"),
     "earth": ("PIA18033", "Earth full disk"),
+    "moon": ("GSFC_20171208_Archive_e001861", "Moon full disk, LRO"),
     "mars": ("PIA00407", "Mars Viking global mosaic"),
     "jupiter": ("PIA22946", "Jupiter Juno"),
     "saturn": ("PIA11141", "Saturn Cassini"),

@@ -551,3 +551,36 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   the drawn ones, which compress to almost nothing: the journey GIF dropped
   from 38 frames to 22 before that was spotted. Each script now uses the
   one that suits what it photographs.
+
+### Post-release — the Moon
+
+- **A tenth world, and the first that is not an ellipse.** The Moon is
+  pulled about by the Sun hard enough that six Keplerian elements leave it
+  several degrees out - fine for Neptune, useless for something half a
+  degree wide that a child can point at. It uses the leading periodic terms
+  of the Astronomical Almanac's low-precision formulae instead: the
+  equation of the centre, evection, variation and the annual equation, plus
+  the principal terms in latitude and parallax. Good to about a third of a
+  degree.
+- **It is also the one body close enough for parallax to matter.** Standing
+  somewhere else moves it by up to a degree, two of its own diameters, so
+  sightings are now topocentric: the observer's position is subtracted from
+  every body, which does nothing measurable for the planets and fixes the
+  Moon.
+- **Solar eclipses are the test.** Every other check would pass with a
+  constant error bolted on to the lunar longitude - the months would still
+  be the right length and the distance still right. An eclipse pins the
+  epoch, the mean rate and the node all at once, because the Moon has to be
+  in front of the Sun on one particular morning and on no other. Four
+  published eclipses, 2026 to 2028, all land on the right date with a
+  minimum separation under 1.1 degrees.
+- **Pale grey is the Moon** rather than a random planet. The brief sends
+  grey stones to a random world, and that stays true of a mid or dark grey;
+  but a pale grey stone is the Moon, the one world a child has looked
+  straight at, and sending it elsewhere throws away the only guess they
+  could have made on their own.
+- **Verified on device**: the Moon in the sky toolbar with its real
+  photograph, 31 degrees up to the west in the late morning - a waning
+  crescent, which is where it belongs 53 days after the new moon of 12
+  August 2026 that the eclipse test pins - and a lunar pebble flying home
+  past the Earth.

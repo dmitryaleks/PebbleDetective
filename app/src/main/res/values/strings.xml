@@ -52,7 +52,9 @@
     <string name="planet_venus_name">Venus</string>
     <string name="planet_venus_fact">The hottest planet of all. The clouds there rain acid!</string>
     <string name="planet_earth_name">Earth</string>
+    <string name="planet_moon_name">The Moon</string>
     <string name="planet_earth_fact">Our home, and the only place we know with pebbles AND people.</string>
+    <string name="planet_moon_fact">Our own moon. People have walked on it, and bits of it have fallen here as meteorites.</string>
     <string name="planet_mars_name">Mars</string>
     <string name="planet_mars_fact">The red planet. It is red because it is covered in rust!</string>
     <string name="planet_jupiter_name">Jupiter</string>
@@ -70,6 +72,7 @@
     <string name="planet_mercury_from">Mercury</string>
     <string name="planet_venus_from">Venus</string>
     <string name="planet_earth_from">Earth</string>
+    <string name="planet_moon_from">the Moon</string>
     <string name="planet_mars_from">Mars</string>
     <string name="planet_jupiter_from">Jupiter</string>
     <string name="planet_saturn_from">Saturn</string>

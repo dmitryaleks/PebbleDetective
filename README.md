@@ -54,8 +54,8 @@ sky — rather than at the camera.
 </p>
 
 Hold the phone up and the solar system is drawn over whatever the camera can
-see, each world a real NASA photograph hanging in the place it actually
-occupies in the sky. The toolbar splits them into what is **up now** and what
+see — the Sun, the Moon and the seven planets — each one a real NASA
+photograph hanging in the place it actually occupies in the sky. The toolbar splits them into what is **up now** and what
 is **below** your feet; tap one to follow just that body, and an arrow points
 the way until you have swung the phone round to it.
 
@@ -194,7 +194,7 @@ swelling ahead, until the air starts to glow orange around it.
 
 Both worlds are photographs rather than drawings. Earth is specifically a
 photograph of the side with Japan on it, because that is where the pebble is
-going: the nine library full-disk Earths are all the Americas or Africa, so
+going: every library full-disk Earth is the Americas or Africa, so
 this one comes from DSCOVR, which sits a million miles out at the Earth–Sun L1
 point and photographs the whole sunlit disc every couple of hours — one frame a
 day is centred on the Pacific.
@@ -306,7 +306,12 @@ the blown-out white of a wet stone, and takes the dominant hue.
 | green, teal, pale blue | **Uranus** |
 | deep blue | **Neptune** |
 | almost black | **Mercury** |
+| **pale grey** | **the Moon** |
 | **grey, or no clear colour** | **anywhere — picked at random** |
+
+Pale grey is the Moon on purpose. It is the one world in the game a child has
+looked straight at, it is exactly that colour, and sending that stone off to a
+random planet throws away the one guess they could have made themselves.
 
 Earth is never an answer. A pebble that flew from Earth to Earth is not a story.
 
@@ -385,8 +390,16 @@ A few decisions worth knowing about:
   two coordinate transforms. The whole planetarium is one file of arithmetic
   with no assets behind it, and the unit tests check it against things that
   are true of the solar system - the equinoxes, the maximum elongations of
-  Mercury and Venus, and the opposition cycle of each outer planet - rather
-  than against a copied table.
+  Mercury and Venus, the opposition cycle of each outer planet - rather than
+  against a copied table.
+- **The Moon is the exception, and gets its own theory.** It is pulled about
+  by the Sun as hard as an ellipse can stand, so six elements leave it
+  several degrees out, which for something half a degree wide and hanging in
+  plain sight will not do. It uses the leading periodic terms instead, and it
+  is close enough that the app also has to allow for where on the Earth you
+  are standing. The test for it is solar eclipses: on four published dates it
+  has to pass in front of the Sun, which pins the theory absolutely rather
+  than merely consistently.
 - **The compass needs correcting before it can point at a planet.** It reports
   bearings from magnetic north and the sky is worked out from true north, a
   difference of up to twenty degrees depending where you are standing.

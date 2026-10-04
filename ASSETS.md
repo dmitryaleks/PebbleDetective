@@ -15,6 +15,7 @@ Source: [NASA Image and Video Library](https://images.nasa.gov/). NASA media are
 | Mercury | `app/src/main/assets/planets/mercury.jpg` | [PIA15160](https://images.nasa.gov/details/PIA15160) | Mercury MESSENGER global mosaic | 1280x1280, 273KB |
 | Venus | `app/src/main/assets/planets/venus.jpg` | [PIA00271](https://images.nasa.gov/details/PIA00271) | Venus Magellan global view | 1280x1280, 208KB |
 | Earth | `app/src/main/assets/planets/earth.jpg` | [PIA18033](https://images.nasa.gov/details/PIA18033) | Earth full disk | 1280x1280, 239KB |
+| Moon | `app/src/main/assets/planets/moon.jpg` | [GSFC_20171208_Archive_e001861](https://images.nasa.gov/details/GSFC_20171208_Archive_e001861) | Moon full disk, LRO | 1280x1280, 179KB |
 | Mars | `app/src/main/assets/planets/mars.jpg` | [PIA00407](https://images.nasa.gov/details/PIA00407) | Mars Viking global mosaic | 1280x1280, 181KB |
 | Jupiter | `app/src/main/assets/planets/jupiter.jpg` | [PIA22946](https://images.nasa.gov/details/PIA22946) | Jupiter Juno | 1280x1280, 90KB |
 | Saturn | `app/src/main/assets/planets/saturn.jpg` | [PIA11141](https://images.nasa.gov/details/PIA11141) | Saturn Cassini | 1280x619, 28KB |

@@ -6,12 +6,17 @@ package com.pebbledetective.domain
  * Earth is present because it is the *destination* of the journey, but it is
  * never a source - a pebble that flew from Earth to Earth is not a story.
  * [sources] is the set the picker draws from.
+ *
+ * The Moon is a source like any other. It is the one of these a child has
+ * actually seen with their own eyes, and lunar meteorites are real: a few
+ * hundred of them have been picked up on Earth.
  */
 enum class Planet(val id: String) {
     SUN("sun"),
     MERCURY("mercury"),
     VENUS("venus"),
     EARTH("earth"),
+    MOON("moon"),
     MARS("mars"),
     JUPITER("jupiter"),
     SATURN("saturn"),
