@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.pebbledetective.domain.Astronomy
 import com.pebbledetective.domain.Planet
 import kotlin.math.cos
-import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -65,19 +64,75 @@ object SolarSystem {
         val radius = size.minDimension * sizeOf(planet) * discScale
         if (planet != Planet.MOON) return Placed(projected.at, radius, projected.depth)
 
-        // Pushed away from the Sun by a couple of Earth-widths, or it sits
-        // underneath the Earth and is never seen at all.
+        // The Moon keeps its own direction and borrows a bigger orbit.
+        //
+        // Its real offset from the Earth is a four-hundredth of the
+        // Earth's distance from the Sun, which at this compression is a
+        // fraction of a pixel. The first version gave up on the direction
+        // as well and simply parked it on the far side of the Earth from
+        // the Sun - which looks right in a still, and in the planetarium
+        // meant the Moon never went round at all. Only the *length* of
+        // the offset is a lie now: the bearing is the real one, so the
+        // Moon circles the Earth in its twenty-seven days and shows the
+        // right face to the Sun while it does it.
         val earth = project(
             Astronomy.heliocentricEcliptic(Planet.EARTH, epochMillis),
             size, scalePx, tiltDegrees, spinDegrees, centre,
-        ).at
-        val away = Offset(earth.x - centre.x, earth.y - centre.y)
-        val length = hypot(away.x, away.y).coerceAtLeast(1f)
-        val step = size.minDimension * sizeOf(Planet.EARTH) * discScale * MOON_NUDGE
+        )
+        val moon = moonOffset(
+            epochMillis = epochMillis,
+            earthDiscPx = size.minDimension * sizeOf(Planet.EARTH) * discScale,
+            scalePx = scalePx,
+            tiltDegrees = tiltDegrees,
+            spinDegrees = spinDegrees,
+        )
         return Placed(
-            at = Offset(earth.x + away.x / length * step, earth.y + away.y / length * step),
+            at = Offset(earth.at.x + moon.screenPx.x, earth.at.y + moon.screenPx.y),
             radius = radius,
-            depth = projected.depth,
+            depth = earth.depth + moon.depthDelta,
+        )
+    }
+
+    /** How far the Moon is drawn from the Earth, and on which side of it. */
+    data class MoonOffset(val screenPx: Offset, val depthDelta: Float)
+
+    /**
+     * The Moon's place relative to the Earth, blown up to be visible.
+     *
+     * Only the *length* of the offset is a lie. The bearing is the real
+     * one, so the Moon goes round the Earth in its twenty-seven days and
+     * shows the right face to the Sun while it does it. The first version
+     * gave up on the bearing too and simply parked the Moon on the far
+     * side of the Earth from the Sun, which looks right in a still and
+     * meant that in the planetarium the Moon never moved at all.
+     */
+    fun moonOffset(
+        epochMillis: Long,
+        earthDiscPx: Float,
+        scalePx: Float,
+        tiltDegrees: Float,
+        spinDegrees: Float,
+    ): MoonOffset {
+        val offset = Astronomy.heliocentricEcliptic(Planet.MOON, epochMillis) -
+            Astronomy.heliocentricEcliptic(Planet.EARTH, epochMillis)
+
+        val spin = Math.toRadians(spinDegrees.toDouble())
+        val across = offset.x * cos(spin) - offset.y * sin(spin)
+        val along = offset.x * sin(spin) + offset.y * cos(spin)
+        val tilt = Math.toRadians(tiltDegrees.toDouble())
+
+        // Pixels per astronomical unit of lunar offset: an orbit a couple
+        // of Earth-discs wide, whatever size the Earth is drawn at.
+        val blowUp = earthDiscPx * MOON_NUDGE / MEAN_LUNAR_DISTANCE_AU
+        val up = (along * cos(tilt) - offset.z * sin(tilt)) * blowUp
+
+        return MoonOffset(
+            // Screen y runs down, so up on the plane is negative here.
+            screenPx = Offset((across * blowUp).toFloat(), -up.toFloat()),
+            // Just in front of the Earth or just behind it, so the near
+            // half of the month passes over the disc and the far half
+            // goes behind it.
+            depthDelta = (along * sin(tilt) * blowUp / scalePx).toFloat(),
         )
     }
 
@@ -97,14 +152,17 @@ object SolarSystem {
     }
 
     /**
-     * How far to shove the Moon off the Earth so that both can be seen.
+     * The radius of the Moon's drawn orbit, in Earth discs.
      *
-     * At this compression the Moon's real offset is a fraction of a pixel:
-     * it is a four-hundredth of the Earth's distance from the Sun. Every
-     * orrery ever built tells the same lie, and the alternative is a Moon
-     * that is simply not there.
+     * At this compression its real offset is a fraction of a pixel: it is
+     * a four-hundredth of the Earth's distance from the Sun. Every orrery
+     * ever built tells the same lie, and the alternative is a Moon that is
+     * simply not there.
      */
     const val MOON_NUDGE = 2.6f
+
+    /** The Moon's mean distance, 384,400 km, in astronomical units. */
+    private const val MEAN_LUNAR_DISTANCE_AU = 0.00257
 
     /**
      * Projects a heliocentric position onto the screen.

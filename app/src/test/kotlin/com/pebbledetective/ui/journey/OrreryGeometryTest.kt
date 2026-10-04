@@ -176,4 +176,67 @@ class OrreryGeometryTest {
             )
         }
     }
+
+    /**
+     * The Moon goes round the Earth, and in a month.
+     *
+     * Its drawn distance is exaggerated - at this compression the real
+     * one is a fraction of a pixel - but its bearing is not, and the
+     * first version threw the bearing away too and parked it on the far
+     * side of the Earth from the Sun. That looks right in a still and
+     * means the Moon never moves, which is exactly how it was found.
+     */
+    @Test
+    fun `the Moon goes round the Earth in a month`() {
+        val start = 1_767_225_600_000L
+        var swept = 0.0
+        var previous: Double? = null
+        var shortest = Double.MAX_VALUE
+        var longest = 0.0
+
+        // A sidereal month, half a day at a time.
+        for (half in 0..55) {
+            val offset = SolarSystem.moonOffset(
+                epochMillis = Orrery.epochAt(start, half * 0.5),
+                earthDiscPx = 30f,
+                scalePx = scale,
+                tiltDegrees = 0f,
+                spinDegrees = 0f,
+            ).screenPx
+            val reach = hypot(offset.x, offset.y).toDouble()
+            shortest = minOf(shortest, reach)
+            longest = maxOf(longest, reach)
+
+            val angle = Math.toDegrees(Math.atan2(offset.y.toDouble(), offset.x.toDouble()))
+            previous?.let {
+                var step = angle - it
+                if (step > 180) step -= 360.0
+                if (step < -180) step += 360.0
+                swept += step
+            }
+            previous = angle
+        }
+
+        assertEquals("a sidereal month is a full turn", 360.0, abs(swept), 25.0)
+        // And it keeps its distance: the real orbit is eccentric by about
+        // a twentieth, and nothing in the drawing may add to that.
+        assertTrue(
+            "the Moon's drawn orbit ran from $shortest to $longest",
+            longest < shortest * 1.15,
+        )
+    }
+
+    /** It is drawn clear of the Earth, which is the whole point of the lie. */
+    @Test
+    fun `the Moon is drawn clear of the Earth`() {
+        val offset = SolarSystem.moonOffset(
+            epochMillis = 1_767_225_600_000L,
+            earthDiscPx = 30f,
+            scalePx = scale,
+            tiltDegrees = 55f,
+            spinDegrees = -28f,
+        ).screenPx
+        val reach = hypot(offset.x, offset.y)
+        assertTrue("the Moon sat on top of the Earth at $reach px", reach > 30f)
+    }
 }

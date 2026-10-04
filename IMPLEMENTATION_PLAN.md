@@ -721,3 +721,16 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   crosses an axis, that each planet is drawn on its ring, that the rings
   hold still over four hundred days, that Earth keeps its distance all
   the way round, and that the orbits stay in order.
+- **And the Moon did not go round at all.** Its drawn offset from the
+  Earth has to be exaggerated - the real one is a four-hundredth of the
+  Earth's distance from the Sun, which at this compression is a fraction
+  of a pixel - but the first version threw the *bearing* away as well
+  and simply parked it on the far side of the Earth from the Sun. In a
+  four-second still that looks exactly right. With the clock running it
+  meant the Moon was glued in place for twenty years of model time. Only
+  the length is a lie now: the bearing is the real one, so the Moon
+  circles in its twenty-seven days, passes in front of the Earth for
+  half of each month and behind it for the other half, and shows the
+  right face to the Sun while it does it. The arithmetic came out of the
+  `DrawScope` extension into `SolarSystem.moonOffset` so that a test can
+  watch it go round.
