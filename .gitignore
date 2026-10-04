@@ -55,3 +55,7 @@ captures/
 keystore.properties
 *.jks
 *.keystore
+
+# Python bytecode from the tools directory
+__pycache__/
+*.pyc
