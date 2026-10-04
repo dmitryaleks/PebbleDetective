@@ -615,3 +615,16 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
 - **Fire took two passes.** One row of translucent discs behind the pebble
   came out as a string of beads. Two rows - wide dull smoke, narrow bright
   flame - plus a white-hot leading face is what reads as burning.
+
+### Post-release — one Earth for the whole flight
+
+- **The continents changed under you at the handover.** The opening orrery
+  drew Earth from the small set loaded for the system map, which is the
+  library Blue Marble and shows the Americas; the crossing flies towards
+  the Japan-side DSCOVR frame, because that is where the pebble lands. At
+  the moment the camera arrived, the planet swapped face.
+- Both scenes take the same bitmap now. The system-map copy survives only
+  as a stand-in for the frame or two before the large one decodes, which
+  is also why the two were ever different: the small set was loaded for
+  the planets, and Earth went along with them without anyone asking which
+  Earth it was.

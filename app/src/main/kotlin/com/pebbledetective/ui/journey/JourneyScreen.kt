@@ -261,7 +261,10 @@ private fun JourneyCanvas(
         val leg: DrawScope.() -> Unit = {
             if (closing < 1f) {
                 // Still on the map of the system, or on the way out of it.
-                drawSystemLeg(source, system, starfield, foundAtEpochMs, elapsedMs)
+                drawSystemLeg(
+                    source, system, origin, earth, starfield,
+                    foundAtEpochMs, elapsedMs,
+                )
             } else {
                 drawSpaceLeg(
                     source, origin, earth, pebbleColour,
@@ -383,6 +386,8 @@ private fun lerp(from: Placed, to: Placed, t: Float) = Placed(
 private fun DrawScope.drawSystemLeg(
     source: Planet,
     discs: Map<Planet, ImageBitmap>,
+    origin: ImageBitmap?,
+    earth: ImageBitmap?,
     starfield: Starfield,
     epochMillis: Long,
     elapsedMs: Long,
@@ -451,13 +456,23 @@ private fun DrawScope.drawSystemLeg(
         }
     }
 
-    // The two that matter, drawn last and at full strength throughout.
+    // The two that matter, drawn last and at full strength throughout -
+    // and from the same frames the crossing will use.
+    //
+    // They used to come out of the small set loaded for the system map,
+    // which for Earth is a different photograph entirely: the library
+    // Blue Marble shows the Americas and the crossing flies towards the
+    // Japan-side DSCOVR frame. The continents changed under you at the
+    // moment the camera arrived. The system-map copies are only a
+    // stand-in now, for the frame or two before the large ones decode.
+    val sourceFace = origin ?: discs[source]
+    val earthFace = earth ?: discs[Planet.EARTH]
     if (sourceNow.depth > earthNow.depth) {
-        drawPhotoPlanet(discs[source], sourceNow.at, sourceNow.radius, source)
-        drawPhotoPlanet(discs[Planet.EARTH], earthNow.at, earthNow.radius, Planet.EARTH)
+        drawPhotoPlanet(sourceFace, sourceNow.at, sourceNow.radius, source)
+        drawPhotoPlanet(earthFace, earthNow.at, earthNow.radius, Planet.EARTH)
     } else {
-        drawPhotoPlanet(discs[Planet.EARTH], earthNow.at, earthNow.radius, Planet.EARTH)
-        drawPhotoPlanet(discs[source], sourceNow.at, sourceNow.radius, source)
+        drawPhotoPlanet(earthFace, earthNow.at, earthNow.radius, Planet.EARTH)
+        drawPhotoPlanet(sourceFace, sourceNow.at, sourceNow.radius, source)
     }
     return sourceNow to earthNow
 }
