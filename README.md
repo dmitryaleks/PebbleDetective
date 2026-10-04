@@ -297,18 +297,18 @@ photographs leaves the phone.
 The app samples a disc around the point the child tapped, throws away shadow and
 the blown-out white of a wet stone, and takes the dominant hue.
 
-| The stone looks… | It came from |
-|---|---|
-| red, rusty | **Mars** |
-| orange, brown | **Jupiter** |
-| bright yellow | **the Sun** |
-| creamy, dull yellow | **Venus** |
-| pale gold, sandy | **Saturn** |
-| green, teal, pale blue | **Uranus** |
-| deep blue | **Neptune** |
-| almost black | **Mercury** |
-| **pale grey** | **the Moon** |
-| **grey, or no clear colour** | **anywhere — picked at random** |
+| The stone looks… | | It came from |
+|---|:-:|---|
+| red, rusty | <img src="docs/worlds/mars.png" width="34" alt="" /> | **Mars** |
+| orange, brown | <img src="docs/worlds/jupiter.png" width="34" alt="" /> | **Jupiter** |
+| bright yellow | <img src="docs/worlds/sun.png" width="34" alt="" /> | **the Sun** |
+| creamy, dull yellow | <img src="docs/worlds/venus.png" width="34" alt="" /> | **Venus** |
+| pale gold, sandy | <img src="docs/worlds/saturn.png" width="34" alt="" /> | **Saturn** |
+| green, teal, pale blue | <img src="docs/worlds/uranus.png" width="34" alt="" /> | **Uranus** |
+| deep blue | <img src="docs/worlds/neptune.png" width="34" alt="" /> | **Neptune** |
+| almost black | <img src="docs/worlds/mercury.png" width="34" alt="" /> | **Mercury** |
+| **pale grey** | <img src="docs/worlds/moon.png" width="34" alt="" /> | **the Moon** |
+| **grey, or no clear colour** | | **anywhere — picked at random** |
 
 Pale grey is the Moon on purpose. It is the one world in the game a child has
 looked straight at, it is exactly that colour, and sending that stone off to a
@@ -349,6 +349,7 @@ passwords are in this repository.
 
 ```console
 python tools/make_banner.py                  # the hero image
+python tools/make_world_thumbs.py            # the discs in the colour table
 python tools/fetch_assets.py                 # the bundled photos and sounds
 python tools/capture_docs.py  <serial>       # every screen but the sky
 python tools/capture_sky.py   <serial>       # the sky, and a meteor
