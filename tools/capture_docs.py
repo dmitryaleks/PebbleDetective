@@ -87,13 +87,24 @@ def nodes() -> list[tuple[str, str, tuple[int, int]]]:
     return found
 
 
-def find(desc: str = "", text: str = "") -> tuple[int, int]:
-    for node_desc, node_text, centre in nodes():
-        if desc and node_desc == desc:
-            return centre
-        if text and node_text == text:
-            return centre
-    raise LookupError("nothing on screen with desc=%r text=%r" % (desc, text))
+def find(desc: str = "", text: str = "", patience: float = 6.0) -> tuple[int, int]:
+    """Where a labelled control is, waiting for it to turn up.
+
+    Polls rather than reading the screen once. A fixed sleep after a
+    screen change is a guess, and the one before the radar shot was
+    occasionally a frame short - the dump came back from a screen that
+    had not finished composing and the whole run died on its last step.
+    """
+    deadline = time.time() + patience
+    while True:
+        for node_desc, node_text, centre in nodes():
+            if desc and node_desc == desc:
+                return centre
+            if text and node_text == text:
+                return centre
+        if time.time() > deadline:
+            raise LookupError("nothing on screen with desc=%r text=%r" % (desc, text))
+        time.sleep(0.5)
 
 
 def tap(point: tuple[int, int]) -> None:

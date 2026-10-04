@@ -628,3 +628,26 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   is also why the two were ever different: the small set was loaded for
   the planets, and Earth went along with them without anyone asking which
   Earth it was.
+
+### Post-release — the rock leaves from rest
+
+- **It was already in flight when the camera arrived.** The arc began a
+  hundred world units clear of a planet of radius a hundred and ninety,
+  so the moment the pair came into view the stone was hanging beside its
+  world rather than lying on it. The arc now starts at a point on the
+  planet's own face, on the side leaning towards Earth and slightly
+  towards the camera, so it is in front of the disc rather than behind
+  it.
+- **And it left at a constant speed.** The rock has its own parameter
+  along the arc now, the worlds keeping the steady one: it barely moves
+  for the first second after letting go and arrives fast, which is what
+  falling towards something looks like and what makes the fire at the end
+  feel earned. A true inverse-square pull loitered by the home planet for
+  half the crossing, so the exponent is gentler than a square.
+- **The spin was backwards.** It used to turn fastest while still
+  attached and settle as it got clear; it now turns slowly on the surface
+  and tumbles harder the faster it goes.
+- **The capture script waits for controls instead of guessing.** A fixed
+  sleep after a screen change is a guess, and the one before the radar
+  shot was occasionally a frame short, which killed a whole run on its
+  last step.

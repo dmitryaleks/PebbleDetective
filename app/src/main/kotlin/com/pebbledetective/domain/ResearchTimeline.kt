@@ -1,5 +1,7 @@
 package com.pebbledetective.domain
 
+import kotlin.math.pow
+
 /** The beats of the Deep Research sequence. */
 enum class ResearchPhase { ACQUIRING, SIGNAL, ANALYSING, MATCH }
 
@@ -170,15 +172,36 @@ object JourneyTimeline {
     }
 
     /**
+     * How far along its arc the pebble itself is.
+     *
+     * Not the same as [travel], which moves the worlds at a steady rate.
+     * The rock starts at rest on the surface it broke off and picks up
+     * speed the whole way, so it barely moves for the first second and
+     * arrives fast - which is what falling towards something looks like,
+     * and what makes the fire at the end feel earned.
+     */
+    fun pebbleTravel(elapsedMs: Long): Float {
+        val linear = travel(elapsedMs)
+        return linear.pow(ACCELERATION)
+    }
+
+    /**
      * How hard the pebble itself is burning. Nothing for most of the
      * crossing, then a sheath of fire through the last of it as Earth's
      * air starts to bite.
      */
     fun pebbleFire(elapsedMs: Long): Float {
-        val travel = travel(elapsedMs)
-        if (travel < FIRE_FROM) return 0f
-        return ((travel - FIRE_FROM) / (1f - FIRE_FROM)).coerceIn(0f, 1f)
+        val along = pebbleTravel(elapsedMs)
+        if (along < FIRE_FROM) return 0f
+        return ((along - FIRE_FROM) / (1f - FIRE_FROM)).coerceIn(0f, 1f)
     }
+
+    /**
+     * How sharply the rock speeds up. A square is a true constant pull and
+     * leaves it loitering by its own planet for half the crossing; this is
+     * gentler and still obviously accelerating.
+     */
+    private const val ACCELERATION = 1.7f
 
     private const val FIRE_FROM = 0.62f
 

@@ -145,8 +145,38 @@ class JourneyTimelineTest {
     fun `the pebble only burns near the end of the crossing`() {
         assertEquals(0f, JourneyTimeline.pebbleFire(9_200), 0.001f)
         assertEquals(0f, JourneyTimeline.pebbleFire(12_000), 0.001f)
-        assertTrue(JourneyTimeline.pebbleFire(16_500) > 0.5f)
+        assertTrue(JourneyTimeline.pebbleFire(16_800) > 0.5f)
         assertEquals(1f, JourneyTimeline.pebbleFire(17_500), 0.001f)
+    }
+
+    /**
+     * The rock leaves from rest and keeps gaining on itself.
+     *
+     * It used to run at the same steady rate as the worlds, which put it
+     * a good way clear of its own planet the moment the camera arrived -
+     * a stone that had already left rather than one about to.
+     */
+    @Test
+    fun `the pebble starts from rest and accelerates`() {
+        assertEquals(0f, JourneyTimeline.pebbleTravel(7_000), 0.001f)
+        assertEquals(0f, JourneyTimeline.pebbleTravel(9_200), 0.001f)
+        assertEquals(1f, JourneyTimeline.pebbleTravel(17_500), 0.001f)
+
+        // Barely off the surface a second after it lets go.
+        assertTrue(
+            "it bolted: ${JourneyTimeline.pebbleTravel(10_200)}",
+            JourneyTimeline.pebbleTravel(10_200) < 0.05f,
+        )
+        // And every second covers more ground than the one before it.
+        var previous = 0f
+        var last = 0f
+        for (t in 9_200..17_500 step 500) {
+            val now = JourneyTimeline.pebbleTravel(t.toLong())
+            val step = now - last
+            assertTrue("it slowed down at ${t}ms", step >= previous - 1e-4f)
+            previous = step
+            last = now
+        }
     }
 
     @Test

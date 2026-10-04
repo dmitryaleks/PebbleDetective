@@ -503,9 +503,12 @@ private fun DrawScope.drawSpaceLeg(
     val sourceZ = sourcePlace.depth
     val earthZ = earthPlace.depth
 
-    val pebbleZ = Projection.bezier(500f, 900f, 430f, travel)
-    val pebbleX = Projection.bezier(-80f, 260f, 40f, travel)
-    val pebbleY = Projection.bezier(-40f, -190f, 30f, travel)
+    // The rock runs on its own clock: still on the surface while the
+    // worlds have already begun to move, then accelerating away.
+    val along = JourneyTimeline.pebbleTravel(elapsedMs)
+    val pebbleZ = Projection.bezier(PEBBLE_FROM_Z, 900f, 430f, along)
+    val pebbleX = Projection.bezier(PEBBLE_FROM_X, 260f, 40f, along)
+    val pebbleY = Projection.bezier(PEBBLE_FROM_Y, -190f, 30f, along)
 
     data class Body(val z: Float, val draw: () -> Unit)
 
@@ -528,28 +531,28 @@ private fun DrawScope.drawSpaceLeg(
                 Projection.screenY(pebbleY, pebbleZ, centreY),
             )
             val r = Projection.screenRadius(16f, pebbleZ)
-            if (travel > 0f) {
-                val back = (travel - 0.03f).coerceAtLeast(0f)
+            if (along > 0f) {
+                val back = (along - 0.03f).coerceAtLeast(0f)
                 val trailFrom = Offset(
                     Projection.screenX(
-                        Projection.bezier(-80f, 260f, 40f, back),
-                        Projection.bezier(500f, 900f, 430f, back),
+                        Projection.bezier(PEBBLE_FROM_X, 260f, 40f, back),
+                        Projection.bezier(PEBBLE_FROM_Z, 900f, 430f, back),
                         centreX,
                     ),
                     Projection.screenY(
-                        Projection.bezier(-40f, -190f, 30f, back),
-                        Projection.bezier(500f, 900f, 430f, back),
+                        Projection.bezier(PEBBLE_FROM_Y, -190f, 30f, back),
+                        Projection.bezier(PEBBLE_FROM_Z, 900f, 430f, back),
                         centreY,
                     ),
                 )
                 drawTrail(trailFrom, at, r * 0.7f, Color(0x66FFC65C))
             }
-            // Spun out of the surface rather than simply appearing: fast
-            // at first and settling as it gets clear.
+            // Lying on the surface and turning slowly, then tumbling
+            // harder the faster it goes.
             val breakout = JourneyTimeline.breakout(elapsedMs)
-            val spin = seconds * (3.1f + 9f * (1f - breakout))
-            drawPebble(at, r * (0.3f + 0.7f * breakout), spin, pebbleColour)
-            drawPebbleFire(at, r, JourneyTimeline.pebbleFire(elapsedMs), travel)
+            val spin = seconds * (1.2f + 5.5f * along)
+            drawPebble(at, r * (0.65f + 0.35f * breakout), spin, pebbleColour)
+            drawPebbleFire(at, r, JourneyTimeline.pebbleFire(elapsedMs), along)
         }
     }
 
@@ -561,6 +564,20 @@ private const val EARTH_PX = 1024
 
 /** The rest of the system is never more than a few dozen pixels across. */
 private const val SYSTEM_PX = 256
+
+/**
+ * Where the rock starts: lying on the source planet rather than hanging
+ * beside it.
+ *
+ * The source is a sphere of world radius 190 centred at (-340, -200, 520)
+ * when the crossing opens, so this is a point on its face, on the side
+ * that leans towards Earth and slightly towards the camera. The arc used
+ * to begin a hundred units clear of the surface, which read as a rock
+ * that had already left.
+ */
+private const val PEBBLE_FROM_X = -188f
+private const val PEBBLE_FROM_Y = -95f
+private const val PEBBLE_FROM_Z = 482f
 
 /** For a pebble whose colour was never measured, or came out black. */
 private val DEFAULT_PEBBLE = Color(0xFF9AA3B2)
