@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
 import com.pebbledetective.data.PlanetArt
+import com.pebbledetective.domain.Astronomy
 import com.pebbledetective.domain.JourneyPhase
 import com.pebbledetective.domain.JourneyTimeline
 import com.pebbledetective.domain.Planet
@@ -52,6 +53,7 @@ import com.pebbledetective.domain.Projection
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.animationsDisabled
 import com.pebbledetective.ui.result.fromNameRes
+import com.pebbledetective.ui.result.nameRes
 
 /**
  * The pebble's flight home: twenty seconds of schematic space travel.
@@ -94,6 +96,17 @@ fun JourneyScreen(
     val origin by produceState(initialValue = null as ImageBitmap?, context, source) {
         value = PlanetArt.disc(context, source, SOURCE_PX)?.asImageBitmap()
     }
+    // And the rest of the system, for the opening shot. Small, because
+    // none of them is ever more than a few dozen pixels across, and loaded
+    // one at a time so the first frame does not wait for the last.
+    val system by produceState(initialValue = emptyMap<Planet, ImageBitmap>(), context) {
+        val loaded = LinkedHashMap<Planet, ImageBitmap>()
+        for (planet in SolarSystem.BODIES + Planet.SUN) {
+            val bitmap = PlanetArt.disc(context, planet, SYSTEM_PX) ?: continue
+            loaded[planet] = bitmap.asImageBitmap()
+            value = LinkedHashMap(loaded)
+        }
+    }
 
     val reducedMotion = animationsDisabled()
 
@@ -115,6 +128,13 @@ fun JourneyScreen(
 
     val elapsed = frame.longValue
     val phase = JourneyTimeline.phaseAt(elapsed)
+    // The solar system is drawn as it stood when the pebble was picked up,
+    // which for a stone found a minute ago is now, and for one replayed
+    // out of the logbook is the evening it was found.
+    val foundAt = result?.capturedAtEpochMs ?: System.currentTimeMillis()
+    // The pebble in the animation is the colour of the pebble in the hand.
+    val pebbleColour = result?.dominantColourArgb?.takeIf { it != 0 }
+        ?.let { Color(it) } ?: DEFAULT_PEBBLE
     val landed = phase == JourneyPhase.TOUCHDOWN
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFF03040A))) {
@@ -122,6 +142,9 @@ fun JourneyScreen(
             source = source,
             origin = origin,
             earth = earth,
+            system = system,
+            foundAtEpochMs = foundAt,
+            pebbleColour = pebbleColour,
             elapsedMs = elapsed,
             starfield = starfield,
             modifier = Modifier.fillMaxSize(),
@@ -137,6 +160,9 @@ fun JourneyScreen(
         ) {
             Text(
                 text = when (phase) {
+                    JourneyPhase.SYSTEM -> stringResource(R.string.journey_system)
+                    JourneyPhase.CLOSING ->
+                        stringResource(R.string.journey_closing, stringResource(source.nameRes))
                     JourneyPhase.DEPARTURE, JourneyPhase.LAUNCH ->
                         stringResource(R.string.journey_departing, stringResource(source.fromNameRes))
                     JourneyPhase.CRUISE -> stringResource(R.string.journey_cruising)
@@ -155,6 +181,12 @@ fun JourneyScreen(
             // place itself.
             Text(
                 text = when (phase) {
+                    // Real, and different every time: the distance to that
+                    // world on the day the stone was found.
+                    JourneyPhase.SYSTEM, JourneyPhase.CLOSING -> stringResource(
+                        R.string.journey_au_away,
+                        "%.1f".format(Astronomy.distanceFromEarthAu(source, foundAt)),
+                    )
                     JourneyPhase.DEPARTURE, JourneyPhase.LAUNCH, JourneyPhase.CRUISE ->
                         stringResource(
                             R.string.journey_distance,
@@ -204,6 +236,9 @@ private fun JourneyCanvas(
     source: Planet,
     origin: ImageBitmap?,
     earth: ImageBitmap?,
+    system: Map<Planet, ImageBitmap>,
+    foundAtEpochMs: Long,
+    pebbleColour: Color,
     elapsedMs: Long,
     starfield: Starfield,
     modifier: Modifier = Modifier,
@@ -222,12 +257,24 @@ private fun JourneyCanvas(
         // strength over each other, a schematic Honshu the size of the
         // Pacific slides across a photograph of the real one, which reads
         // as a bug rather than as a transition.
+        val closing = JourneyTimeline.closing(elapsedMs)
+        val leg: DrawScope.() -> Unit = {
+            if (closing < 1f) {
+                // Still on the map of the system, or on the way out of it.
+                drawSystemLeg(source, system, starfield, foundAtEpochMs, elapsedMs)
+            } else {
+                drawSpaceLeg(
+                    source, origin, earth, pebbleColour,
+                    elapsedMs, starfield, centreX, centreY,
+                )
+            }
+        }
         when {
-            reveal <= 0f -> drawSpaceLeg(source, origin, earth, elapsedMs, starfield, centreX, centreY)
+            reveal <= 0f -> leg()
             reveal < 1f -> drawIntoCanvas { canvas ->
                 fade.alpha = 1f - reveal
                 canvas.saveLayer(Rect(Offset.Zero, size), fade)
-                drawSpaceLeg(source, origin, earth, elapsedMs, starfield, centreX, centreY)
+                leg()
                 canvas.restore()
             }
         }
@@ -271,11 +318,157 @@ private fun JourneyCanvas(
     }
 }
 
+/**
+ * Where the source planet sits during the crossing.
+ *
+ * Pulled out of the drawing so the opening shot can aim at it: the camera
+ * closes in by interpolating from where the planet is on the map of the
+ * solar system to exactly here, which is what makes the two scenes one
+ * move rather than a cut.
+ */
+private fun DrawScope.legSource(travel: Float): Placed {
+    val z = 520f + travel * 2_600f
+    // Perspective pulls everything toward the centre as z grows, so the
+    // two bodies would converge with small world offsets. The source
+    // drifts aside as it recedes.
+    val x = -340f - travel * 420f
+    val y = -200f - travel * 160f
+    return Placed(
+        at = Offset(
+            Projection.screenX(x, z, size.width / 2f),
+            Projection.screenY(y, z, size.height / 2f),
+        ),
+        radius = Projection.screenRadius(190f, z),
+        depth = z,
+    )
+}
+
+/** And Earth, which comes the other way. */
+private fun DrawScope.legEarth(travel: Float): Placed {
+    val z = 3_400f - travel * 2_980f
+    // Earth slides to the middle as it closes, or it leaves the screen
+    // entirely at the end.
+    val x = 320f * (1f - travel)
+    val y = 180f * (1f - travel)
+    return Placed(
+        at = Offset(
+            Projection.screenX(x, z, size.width / 2f),
+            Projection.screenY(y, z, size.height / 2f),
+        ),
+        radius = Projection.screenRadius(210f, z),
+        depth = z,
+    )
+}
+
+/** A body placed on screen: where, how big, how far back. */
+private data class Placed(val at: Offset, val radius: Float, val depth: Float)
+
+private fun lerp(from: Placed, to: Placed, t: Float) = Placed(
+    at = Offset(
+        from.at.x + (to.at.x - from.at.x) * t,
+        from.at.y + (to.at.y - from.at.y) * t,
+    ),
+    radius = from.radius + (to.radius - from.radius) * t,
+    depth = from.depth + (to.depth - from.depth) * t,
+)
+
+/**
+ * The opening shot: the solar system as it stood on the day the pebble was
+ * found, then the camera closing on the two worlds the story is about.
+ *
+ * The planets other than those two fade out as the move finishes, and the
+ * two that remain are interpolated straight onto their marks in the
+ * crossing that follows, so there is no cut between the scenes at all.
+ */
+private fun DrawScope.drawSystemLeg(
+    source: Planet,
+    discs: Map<Planet, ImageBitmap>,
+    starfield: Starfield,
+    epochMillis: Long,
+    elapsedMs: Long,
+): Pair<Placed, Placed> {
+    val closing = JourneyTimeline.closing(elapsedMs)
+    val drift = JourneyTimeline.systemDrift(elapsedMs)
+    val centre = Offset(size.width / 2f, size.height * 0.46f)
+
+    // The view barely moves while it is being read, then swings as the
+    // camera leaves. Tilt opens up a little so the plane flattens out.
+    val spin = -28f + drift * 14f
+    val tilt = 55f - closing * 14f
+    val scale = size.minDimension * 0.46f * (1f + drift * 0.06f)
+    val fade = 1f - closing
+
+    // The stars come up as the system map goes down, so the crossing does
+    // not begin with a field of them snapping into existence.
+    if (closing > 0.01f) {
+        starfield.drawAt(
+            this, elapsedMs / 1000f, 120f,
+            Color(0xFFCFE6FF).copy(alpha = 0.85f * closing),
+        )
+    }
+    if (fade > 0.01f) {
+        with(SolarSystem) {
+            drawSunGlow(centre, size.minDimension * 0.42f, fade)
+            drawOrbits(epochMillis, scale, tilt, centre, fade)
+        }
+    }
+
+    fun placement(planet: Planet): Placed {
+        val world = Astronomy.heliocentricEcliptic(planet, epochMillis)
+        val projected = SolarSystem.project(world, size, scale, tilt, spin, centre)
+        var at = projected.at
+        if (planet == Planet.MOON) {
+            // Pushed away from the Sun by a couple of Earth-widths, or it
+            // sits underneath the Earth and is never seen at all.
+            val earth = SolarSystem.project(
+                Astronomy.heliocentricEcliptic(Planet.EARTH, epochMillis),
+                size, scale, tilt, spin, centre,
+            ).at
+            val away = Offset(earth.x - centre.x, earth.y - centre.y)
+            val length = kotlin.math.hypot(away.x, away.y).coerceAtLeast(1f)
+            val step = size.minDimension * SolarSystem.sizeOf(Planet.EARTH) *
+                SolarSystem.MOON_NUDGE
+            at = Offset(earth.x + away.x / length * step, earth.y + away.y / length * step)
+        }
+        return Placed(
+            at = at,
+            radius = size.minDimension * SolarSystem.sizeOf(planet),
+            depth = projected.depth,
+        )
+    }
+
+    val sourceNow = lerp(placement(source), legSource(0f), closing)
+    val earthNow = lerp(placement(Planet.EARTH), legEarth(0f), closing)
+
+    // Everything else, furthest first, fading as the camera leaves.
+    if (fade > 0.01f) {
+        val others = (SolarSystem.BODIES + Planet.SUN)
+            .filter { it != source && it != Planet.EARTH }
+            .map { it to placement(it) }
+            .sortedBy { (_, p) -> -p.depth }
+        for ((planet, at) in others) {
+            drawPhotoPlanet(discs[planet], at.at, at.radius, planet, alpha = fade)
+        }
+    }
+
+    // The two that matter, drawn last and at full strength throughout.
+    if (sourceNow.depth > earthNow.depth) {
+        drawPhotoPlanet(discs[source], sourceNow.at, sourceNow.radius, source)
+        drawPhotoPlanet(discs[Planet.EARTH], earthNow.at, earthNow.radius, Planet.EARTH)
+    } else {
+        drawPhotoPlanet(discs[Planet.EARTH], earthNow.at, earthNow.radius, Planet.EARTH)
+        drawPhotoPlanet(discs[source], sourceNow.at, sourceNow.radius, source)
+    }
+    return sourceNow to earthNow
+}
+
+/** The part of the flight that happens between the worlds. */
 /** The part of the flight that happens between the worlds. */
 private fun DrawScope.drawSpaceLeg(
     source: Planet,
     origin: ImageBitmap?,
     earth: ImageBitmap?,
+    pebbleColour: Color,
     elapsedMs: Long,
     starfield: Starfield,
     centreX: Float,
@@ -290,17 +483,10 @@ private fun DrawScope.drawSpaceLeg(
 
     // Painter's algorithm: just three bodies, so sort by depth directly.
     // The source recedes behind the camera while Earth comes forward.
-    val sourceZ = 520f + travel * 2_600f
-    val earthZ = 3_400f - travel * 2_980f
-
-    // Perspective pulls everything toward the centre as z grows, so the two
-    // bodies would converge and overlap with small world offsets. The source
-    // drifts aside as it recedes; Earth slides to the middle as it closes,
-    // otherwise it leaves the screen entirely at the end.
-    val sourceX = -340f - travel * 420f
-    val sourceY = -200f - travel * 160f
-    val earthX = 320f * (1f - travel)
-    val earthY = 180f * (1f - travel)
+    val sourcePlace = legSource(travel)
+    val earthPlace = legEarth(travel)
+    val sourceZ = sourcePlace.depth
+    val earthZ = earthPlace.depth
 
     val pebbleZ = Projection.bezier(500f, 900f, 430f, travel)
     val pebbleX = Projection.bezier(-80f, 260f, 40f, travel)
@@ -312,28 +498,12 @@ private fun DrawScope.drawSpaceLeg(
 
     if (Projection.isVisible(sourceZ)) {
         bodies += Body(sourceZ) {
-            drawPhotoPlanet(
-                image = origin,
-                centre = Offset(
-                    Projection.screenX(sourceX, sourceZ, centreX),
-                    Projection.screenY(sourceY, sourceZ, centreY),
-                ),
-                radius = Projection.screenRadius(190f, sourceZ),
-                planet = source,
-            )
+            drawPhotoPlanet(origin, sourcePlace.at, sourcePlace.radius, source)
         }
     }
     if (Projection.isVisible(earthZ)) {
         bodies += Body(earthZ) {
-            drawPhotoPlanet(
-                image = earth,
-                centre = Offset(
-                    Projection.screenX(earthX, earthZ, centreX),
-                    Projection.screenY(earthY, earthZ, centreY),
-                ),
-                radius = Projection.screenRadius(210f, earthZ),
-                planet = Planet.EARTH,
-            )
+            drawPhotoPlanet(earth, earthPlace.at, earthPlace.radius, Planet.EARTH)
         }
     }
     if (Projection.isVisible(pebbleZ) && elapsedMs > 1_200L) {
@@ -359,7 +529,12 @@ private fun DrawScope.drawSpaceLeg(
                 )
                 drawTrail(trailFrom, at, r * 0.7f, Color(0x66FFC65C))
             }
-            drawPebble(at, r, seconds * 3.1f)
+            // Spun out of the surface rather than simply appearing: fast
+            // at first and settling as it gets clear.
+            val breakout = JourneyTimeline.breakout(elapsedMs)
+            val spin = seconds * (3.1f + 9f * (1f - breakout))
+            drawPebble(at, r * (0.3f + 0.7f * breakout), spin, pebbleColour)
+            drawPebbleFire(at, r, JourneyTimeline.pebbleFire(elapsedMs), travel)
         }
     }
 
@@ -368,6 +543,12 @@ private fun DrawScope.drawSpaceLeg(
 
 /** Earth fills most of the screen on the approach, so decode it big. */
 private const val EARTH_PX = 1024
+
+/** The rest of the system is never more than a few dozen pixels across. */
+private const val SYSTEM_PX = 256
+
+/** For a pebble whose colour was never measured, or came out black. */
+private val DEFAULT_PEBBLE = Color(0xFF9AA3B2)
 
 /** The source peaks at about six hundred pixels across as it departs. */
 private const val SOURCE_PX = 768

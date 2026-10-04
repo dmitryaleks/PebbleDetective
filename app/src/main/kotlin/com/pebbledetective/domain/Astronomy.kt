@@ -67,6 +67,7 @@ object Astronomy {
     /** A point in space, in astronomical units. */
     data class Vector(val x: Double, val y: Double, val z: Double) {
         val length: Double get() = sqrt(x * x + y * y + z * z)
+        operator fun plus(other: Vector) = Vector(x + other.x, y + other.y, z + other.z)
         operator fun minus(other: Vector) = Vector(x - other.x, y - other.y, z - other.z)
         operator fun unaryMinus() = Vector(-x, -y, -z)
     }
@@ -121,6 +122,28 @@ object Astronomy {
     /** Distance from the Sun, which is a fixed property of the orbit. */
     fun heliocentricDistanceAu(planet: Planet, epochMillis: Long): Double =
         heliocentric(elementsFor(planet), julianDay(epochMillis)).length
+
+    /**
+     * Where a body is around the Sun, for drawing the system from outside
+     * rather than from the ground.
+     *
+     * The Moon is given as the Earth plus its own offset, which is the
+     * honest answer and keeps the two together on any map of the system.
+     */
+    fun heliocentricEcliptic(planet: Planet, epochMillis: Long): Vector {
+        val julianDay = julianDay(epochMillis)
+        val earth = heliocentric(EARTH, julianDay)
+        return when (planet) {
+            Planet.SUN -> Vector(0.0, 0.0, 0.0)
+            Planet.EARTH -> earth
+            Planet.MOON -> earth + moonEcliptic(julianDay)
+            else -> heliocentric(elementsFor(planet), julianDay)
+        }
+    }
+
+    /** How far the body is from Earth today, which is never the same twice. */
+    fun distanceFromEarthAu(planet: Planet, epochMillis: Long): Double =
+        geocentricEcliptic(planet, julianDay(epochMillis)).length
 
     // ---- the machinery --------------------------------------------------
 

@@ -174,4 +174,7 @@
     <string name="cd_detection">Detection mode</string>
     <string name="capture_origin_claimed">You saw a piece of %1$s land. The next stone is from there.</string>
     <string name="capture_origin_forget">No, check it</string>
+    <string name="journey_system">The solar system that day</string>
+    <string name="journey_closing">Finding %1$s</string>
+    <string name="journey_au_away">%1$s times the distance to the Sun away</string>
 </resources>

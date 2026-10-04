@@ -705,9 +705,13 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
         journeyCueJob = viewModelScope.launch {
             // Cues follow their own clock rather than the frame loop, so a
             // dropped frame cannot nudge the soundtrack out of step.
-            delay(1_400)
-            container.sound.play(SoundCue.LAUNCH_WHOOSH)
+            // The opening shot: a long room tone over the solar system
+            // while the camera finds the right pair of worlds.
             container.sound.loop(SoundCue.SPACE_DRONE)
+            delay(4_000)
+            container.sound.play(SoundCue.SATELLITE_PING)
+            delay(3_400)
+            container.sound.play(SoundCue.LAUNCH_WHOOSH)
             delay(7_600)
             container.sound.stop(SoundCue.SPACE_DRONE)
             container.sound.play(SoundCue.ENTRY_RUMBLE)
@@ -715,11 +719,11 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
             // quickening as the ground comes up.
             delay(2_500)
             container.sound.play(SoundCue.SERVO)
-            // Eight pings over the seven seconds of the descent, each gap a
+            // Eight pings over the six seconds of the descent, each gap a
             // little shorter than the last, landing on touchdown.
             repeat(8) {
                 container.sound.play(SoundCue.SCANNER_BLIP)
-                delay(1_050 - it * 50L)
+                delay(890 - it * 40L)
             }
             container.sound.play(SoundCue.ARRIVAL_CHIME)
         }

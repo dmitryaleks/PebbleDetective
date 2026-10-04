@@ -171,4 +171,7 @@
     <string name="cd_detection">たんさく モード</string>
     <string name="capture_origin_claimed">%1$sの かけらが ふってきたよ。つぎの こいしは そこから。</string>
     <string name="capture_origin_forget">しらべる</string>
+    <string name="journey_system">あのひの たいようけい</string>
+    <string name="journey_closing">%1$sを さがしている</string>
+    <string name="journey_au_away">たいようまでの きょりの %1$s ばい</string>
 </resources>

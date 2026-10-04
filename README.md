@@ -187,11 +187,26 @@ planet every time you looked at it would be no fun at all.
 
 ### 7 · Fly it home
 
-<img src="docs/journey.gif" width="260" align="right" alt="The pebble's twenty second flight to Earth" />
+<img src="docs/journey.gif" width="260" align="right" alt="The pebble's flight home, from the solar system to a street in Tokyo" />
 
-Twenty seconds of space flight. The pebble launches, tumbles along a curving
+It opens on the whole solar system **as it actually stood on the day that
+pebble was picked up** — every planet, the Sun and the Moon, each at its real
+angle around the Sun, worked out on the phone from the same orbits the sky
+mode uses. Only the distances are squashed, because Mercury is a thirtieth of
+Neptune's and a true scale is a blank screen with a dot in the corner.
+
+Then the camera picks its two worlds out of that map and closes on them, the
+rest of the system fading as the stars come up. The pebble tears itself off
+its home world, spinning, and sets out.
+
+Twenty-five seconds of space flight in all. The pebble tumbles along a curving
 arc through a warping starfield, its home world shrinking behind it and Earth
-swelling ahead, until the air starts to glow orange around it.
+swelling ahead, until the last of the crossing lights it up: a sheath of fire
+and a wake streaming off the back as Earth’s air starts to bite.
+
+**And it is the right colour.** The pebble in the animation is painted with
+the colour measured off the real stone in the photograph, so a rusty one
+arrives rusty.
 
 Both worlds are photographs rather than drawings. Earth is specifically a
 photograph of the side with Japan on it, because that is where the pebble is
@@ -210,6 +225,8 @@ film again.
 <br clear="right" />
 
 <p>
+<img src="docs/screen-system.png" width="190" alt="The solar system at its real positions" />
+&nbsp;
 <img src="docs/screen-cruise.png" width="190" alt="Jupiter astern, Earth ahead" />
 &nbsp;
 <img src="docs/screen-descent.png" width="190" alt="Falling towards Japan" />
@@ -411,6 +428,12 @@ A few decisions worth knowing about:
   allocates nothing per frame. The two worlds in it are the real
   photographs, projected into that scene and lit at the limb; everything
   around them — the stars, the pebble, its trail, the fire — is drawn.
+- **The opening shot is the same arithmetic as the sky mode.** The orrery
+  is not a picture: every body is placed from its own orbit at the moment
+  the pebble was found, so replaying an old entry shows the sky of the
+  evening it was found rather than tonight. The radii are compressed by a
+  power law, which is what every orrery ever built does and for the same
+  reason.
 - **The landing is a map, drawn the same way.** Coastlines as lists of degrees,
   projected with the longitude squeezed by the cosine of the latitude, at three
   levels of detail that hand over as the scale drops - the islands of Japan,

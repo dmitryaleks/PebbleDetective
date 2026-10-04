@@ -187,15 +187,18 @@ def main() -> int:
 
     # 4. The whole flight, as a GIF, and the landing it ends on.
     press(text="Watch it fly home", settle=0)
-    burst(20.5, "journey.gif", stride=2)
+    burst(25.5, "journey.gif", stride=3)
     time.sleep(1)
     save(shot(), "screen-landing.png")
 
-    # 4b. Two stills from the flight itself: the cruise, where both worlds
-    # are photographs, and the descent over Japan. The GIF passes through
-    # both too quickly to show them.
+    # 4b. Three stills from the flight itself: the solar system it opens
+    # on, the crossing where both worlds are photographs, and the descent
+    # over Japan. The GIF passes through all three too quickly to show
+    # them, and the first is the one worth looking at.
     press(text="Done")
-    press(text="Watch it fly home", settle=6.5)
+    press(text="Watch it fly home", settle=2.6)
+    save(shot(), "screen-system.png")
+    time.sleep(9.5)
     save(shot(), "screen-cruise.png")
     time.sleep(6.5)
     save(shot(), "screen-descent.png")

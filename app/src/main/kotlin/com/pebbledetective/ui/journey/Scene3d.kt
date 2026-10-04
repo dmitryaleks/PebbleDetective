@@ -210,14 +210,16 @@ fun DrawScope.drawPhotoPlanet(
     centre: Offset,
     radius: Float,
     planet: Planet,
+    alpha: Float = 1f,
 ) {
-    if (radius <= 0.5f) return
+    if (radius <= 0.5f || alpha <= 0.01f) return
     // Until the decode lands, the schematic one stands in, so arriving at
     // the screen early never shows a hole in space.
     if (image == null) {
         drawSchematicPlanet(planet, centre, radius, spin = 0f)
         return
     }
+    if (alpha < 1f && radius < 2f) return
 
     when (planet) {
         // Air, lit from behind at the limb. Two layers, because a single
@@ -242,7 +244,7 @@ fun DrawScope.drawPhotoPlanet(
                 brush = androidx.compose.ui.graphics.Brush.radialGradient(
                     colors = listOf(
                         Color.Transparent,
-                        Color(0xFF2E6FCC).copy(alpha = 0.22f),
+                        Color(0xFF2E6FCC).copy(alpha = 0.22f * alpha),
                         Color.Transparent,
                     ),
                     center = centre,
@@ -257,7 +259,7 @@ fun DrawScope.drawPhotoPlanet(
         Planet.SUN -> {
             for (step in 3 downTo 1) {
                 drawCircle(
-                    color = Color(0xFFFFB74D).copy(alpha = 0.13f * step),
+                    color = Color(0xFFFFB74D).copy(alpha = 0.13f * step * alpha),
                     radius = radius * (1f + 0.26f * step),
                     center = centre,
                 )
@@ -271,7 +273,7 @@ fun DrawScope.drawPhotoPlanet(
                 brush = androidx.compose.ui.graphics.Brush.radialGradient(
                     0.00f to Color.Transparent,
                     0.78f to Color.Transparent,
-                    0.86f to lookFor(planet).core.copy(alpha = 0.34f),
+                    0.86f to lookFor(planet).core.copy(alpha = 0.34f * alpha),
                     1.00f to Color.Transparent,
                     center = centre,
                     radius = radius * 1.22f,
@@ -289,6 +291,7 @@ fun DrawScope.drawPhotoPlanet(
         srcSize = IntSize(image.width, image.height),
         dstOffset = IntOffset((centre.x - radius).toInt(), (centre.y - radius).toInt()),
         dstSize = IntSize(side, side),
+        alpha = alpha,
     )
 
     // Shading toward the lower right, clipped to the globe. The library
@@ -308,7 +311,7 @@ fun DrawScope.drawPhotoPlanet(
     clipPath(disc) {
         drawCircle(
             brush = androidx.compose.ui.graphics.Brush.radialGradient(
-                colors = listOf(Color.Transparent, Color(0xFF02060F).copy(alpha = 0.38f)),
+                colors = listOf(Color.Transparent, Color(0xFF02060F).copy(alpha = 0.38f * alpha)),
                 center = Offset(centre.x - radius * 0.38f, centre.y - radius * 0.42f),
                 radius = radius * 1.75f,
             ),
@@ -324,7 +327,12 @@ fun DrawScope.drawPhotoPlanet(
  * Drawn from a fixed outline rotated in two axes; at the sizes involved a
  * real mesh would be invisible effort.
  */
-fun DrawScope.drawPebble(centre: Offset, radius: Float, spin: Float) {
+fun DrawScope.drawPebble(
+    centre: Offset,
+    radius: Float,
+    spin: Float,
+    colour: Color = Color(0xFF9AA3B2),
+) {
     if (radius <= 0.5f) return
     val facets = 7
     val path = androidx.compose.ui.graphics.Path()
@@ -338,13 +346,97 @@ fun DrawScope.drawPebble(centre: Offset, radius: Float, spin: Float) {
     }
     path.close()
 
-    drawPath(path, color = Color(0xFF9AA3B2))
-    drawPath(path, color = Color(0xFFD7DEE8), style = Stroke(width = radius * 0.14f))
+    // The colour measured off the real stone, with the lit edge and the
+    // pitting derived from it. Taking it straight would give a flat chip
+    // of paint; a rock needs the same hue three ways.
+    drawPath(path, color = colour)
+    drawPath(path, color = colour.lighten(0.45f), style = Stroke(width = radius * 0.14f))
     drawCircle(
-        color = Color(0xFF6C7686),
+        color = colour.darken(0.3f),
         radius = radius * 0.3f,
         center = Offset(centre.x + radius * 0.22f, centre.y + radius * 0.18f),
     )
+}
+
+/** Toward white, for the lit edge. */
+private fun Color.lighten(amount: Float) = Color(
+    red = red + (1f - red) * amount,
+    green = green + (1f - green) * amount,
+    blue = blue + (1f - blue) * amount,
+    alpha = alpha,
+)
+
+/** Toward black, for the pitting. */
+private fun Color.darken(amount: Float) =
+    Color(red * (1f - amount), green * (1f - amount), blue * (1f - amount), alpha)
+
+/**
+ * The pebble catching fire as Earth's air starts to bite.
+ *
+ * A sheath around it and a wake streaming off the back, both growing with
+ * the last third of the crossing. It is the same construction as the
+ * meteor in the sky mode, at a tenth of the size: a hot core, a plasma
+ * halo and a tapering tail, because no one of those reads as burning on
+ * its own.
+ */
+fun DrawScope.drawPebbleFire(centre: Offset, radius: Float, fire: Float, travel: Float) {
+    if (fire <= 0.01f || radius <= 0.5f) return
+
+    val reach = radius * (4f + 16f * fire)
+    // Streaming back the way it came, which on this arc is up and behind.
+    val backX = -0.42f
+    val backY = -1f
+
+    // Smoke first, wide and dull, then the flame inside it. One pass of
+    // translucent discs came out as a string of beads; two passes at
+    // different widths is what makes it read as something burning.
+    val steps = 14
+    for (i in steps downTo 1) {
+        val along = i.toFloat() / steps
+        val at = Offset(centre.x + backX * reach * along, centre.y + backY * reach * along)
+        drawCircle(
+            color = Color(0xFF7A4A2A).copy(alpha = fire * 0.16f * (1f - along)),
+            radius = radius * (2.2f - 1.1f * along) * (0.8f + fire),
+            center = at,
+        )
+    }
+    for (i in steps downTo 1) {
+        val along = i.toFloat() / steps
+        val at = Offset(centre.x + backX * reach * along, centre.y + backY * reach * along)
+        drawCircle(
+            color = trailHeat(1f - along).copy(alpha = fire * 0.55f * (1f - along * 0.85f)),
+            radius = radius * (1.25f - 0.75f * along) * (0.7f + fire),
+            center = at,
+        )
+    }
+
+    val halo = radius * (3.2f + 3.6f * fire)
+    drawCircle(
+        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+            colors = listOf(
+                Color(0xFFFFE9C0).copy(alpha = 0.90f * fire),
+                Color(0xFFFF8A2A).copy(alpha = 0.42f * fire),
+                Color.Transparent,
+            ),
+            center = centre,
+            radius = halo,
+        ),
+        radius = halo,
+        center = centre,
+    )
+    // The leading face, which is the part actually ploughing into the air
+    // and the only part that should be white hot.
+    drawCircle(
+        color = Color(0xFFFFF6E0).copy(alpha = 0.85f * fire * travel),
+        radius = radius * (0.7f + 0.3f * fire),
+        center = Offset(centre.x - backX * radius * 0.45f, centre.y - backY * radius * 0.45f),
+    )
+}
+
+private fun trailHeat(t: Float): Color = when {
+    t > 0.75f -> Color(0xFFFFF3D2)
+    t > 0.45f -> Color(0xFFFFB043)
+    else -> Color(0xFFE2651C)
 }
 
 /** A trailing streak behind the pebble, to sell the speed. */

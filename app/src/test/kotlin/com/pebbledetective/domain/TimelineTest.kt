@@ -67,14 +67,14 @@ class JourneyTimelineTest {
 
     /**
      * The brief asked for ten to fifteen seconds, which covered the flight
-     * through space only. The landing sequence - atmosphere, Japan, Tokyo -
-     * was added afterwards and takes the whole thing to twenty. Long enough
-     * to matter, short enough that the skip button is a courtesy rather
-     * than a necessity.
+     * through space only. The landing was added to one end and the opening
+     * shot of the solar system to the other, which takes the whole thing
+     * to twenty-five. Long enough that the skip button has stopped being a
+     * courtesy, which is why it is on screen throughout.
      */
     @Test
-    fun `the journey lasts twenty seconds`() {
-        assertEquals(20_000L, JourneyTimeline.TOTAL_MS)
+    fun `the journey lasts twenty five seconds`() {
+        assertEquals(25_000L, JourneyTimeline.TOTAL_MS)
     }
 
     @Test
@@ -90,6 +90,8 @@ class JourneyTimelineTest {
         }
         assertEquals(
             listOf(
+                JourneyPhase.SYSTEM,
+                JourneyPhase.CLOSING,
                 JourneyPhase.DEPARTURE,
                 JourneyPhase.LAUNCH,
                 JourneyPhase.CRUISE,
@@ -105,20 +107,56 @@ class JourneyTimelineTest {
     @Test
     fun `the pebble stays put until it launches then reaches Earth`() {
         assertEquals(0f, JourneyTimeline.travel(0), 0.001f)
-        assertEquals(0f, JourneyTimeline.travel(2_000), 0.001f)
-        assertTrue(JourneyTimeline.travel(6_000) > 0.3f)
-        assertEquals(1f, JourneyTimeline.travel(11_500), 0.001f)
+        assertEquals(0f, JourneyTimeline.travel(9_200), 0.001f)
+        assertTrue(JourneyTimeline.travel(12_500) > 0.3f)
+        assertEquals(1f, JourneyTimeline.travel(17_500), 0.001f)
         assertEquals(1f, JourneyTimeline.travel(JourneyTimeline.TOTAL_MS), 0.001f)
+    }
+
+    /**
+     * The opening shot holds still long enough to be read as a map of
+     * where the planets actually were, then leaves.
+     */
+    @Test
+    fun `the camera holds on the system before it closes in`() {
+        assertEquals(0f, JourneyTimeline.closing(0), 0.001f)
+        assertEquals(0f, JourneyTimeline.closing(4_000), 0.001f)
+        val early = JourneyTimeline.closing(4_500)
+        assertTrue("it bolted straight off the mark: $early", early < 0.15f)
+        assertEquals(1f, JourneyTimeline.closing(7_000), 0.001f)
+        assertEquals(1f, JourneyTimeline.closing(JourneyTimeline.TOTAL_MS), 0.001f)
+    }
+
+    /** And the pebble only leaves the surface once the camera has arrived. */
+    @Test
+    fun `the pebble breaks out after the camera has settled`() {
+        assertEquals(0f, JourneyTimeline.breakout(7_000), 0.001f)
+        assertTrue(JourneyTimeline.breakout(8_200) > 0.4f)
+        assertEquals(1f, JourneyTimeline.breakout(9_200), 0.001f)
+        // Clear of the planet before it starts crossing.
+        assertEquals(0f, JourneyTimeline.travel(9_200), 0.001f)
+    }
+
+    /**
+     * It catches fire near Earth and not before. A pebble burning in deep
+     * space is the kind of thing a child notices and an adult does not.
+     */
+    @Test
+    fun `the pebble only burns near the end of the crossing`() {
+        assertEquals(0f, JourneyTimeline.pebbleFire(9_200), 0.001f)
+        assertEquals(0f, JourneyTimeline.pebbleFire(12_000), 0.001f)
+        assertTrue(JourneyTimeline.pebbleFire(16_500) > 0.5f)
+        assertEquals(1f, JourneyTimeline.pebbleFire(17_500), 0.001f)
     }
 
     @Test
     fun `the descent zooms from the whole country down to the street`() {
         // Nothing happens until the atmosphere has been crossed.
         assertEquals(0f, JourneyTimeline.descentZoom(0), 0.001f)
-        assertEquals(0f, JourneyTimeline.descentZoom(11_500), 0.001f)
-        val middle = JourneyTimeline.descentZoom(15_000)
+        assertEquals(0f, JourneyTimeline.descentZoom(17_500), 0.001f)
+        val middle = JourneyTimeline.descentZoom(20_500)
         assertTrue("halfway down was $middle", middle in 0.4f..0.6f)
-        assertEquals(1f, JourneyTimeline.descentZoom(18_500), 0.001f)
+        assertEquals(1f, JourneyTimeline.descentZoom(23_500), 0.001f)
         assertEquals(1f, JourneyTimeline.descentZoom(JourneyTimeline.TOTAL_MS), 0.001f)
     }
 
@@ -138,30 +176,34 @@ class JourneyTimelineTest {
      */
     @Test
     fun `the map fades in under the brightest part of the entry glow`() {
-        assertEquals(0f, JourneyTimeline.mapReveal(9_000), 0.001f)
-        assertEquals(0f, JourneyTimeline.mapReveal(10_900), 0.001f)
-        assertEquals(1f, JourneyTimeline.mapReveal(11_500), 0.001f)
-        val midway = JourneyTimeline.mapReveal(11_200)
+        assertEquals(0f, JourneyTimeline.mapReveal(15_000), 0.001f)
+        assertEquals(0f, JourneyTimeline.mapReveal(16_900), 0.001f)
+        assertEquals(1f, JourneyTimeline.mapReveal(17_500), 0.001f)
+        val midway = JourneyTimeline.mapReveal(17_200)
         assertTrue("reveal was $midway", midway in 0.2f..0.8f)
         assertTrue(
             "the glow must still be strong while the map appears",
-            JourneyTimeline.entryHeat(11_200) > 0.6f,
+            JourneyTimeline.entryHeat(17_200) > 0.6f,
         )
+        // And the map must not start showing through the crossing, which
+        // is what happened when the flight was stretched and this was
+        // left behind as an absolute time.
+        assertEquals(0f, JourneyTimeline.mapReveal(12_000), 0.001f)
     }
 
     @Test
     fun `altitude counts down to the ground and stops there`() {
         assertEquals(120, JourneyTimeline.altitudeKm(0))
-        assertEquals(120, JourneyTimeline.altitudeKm(9_000))
-        assertTrue(JourneyTimeline.altitudeKm(14_000) in 1..119)
-        assertEquals(0, JourneyTimeline.altitudeKm(18_500))
+        assertEquals(120, JourneyTimeline.altitudeKm(15_000))
+        assertTrue(JourneyTimeline.altitudeKm(20_000) in 1..119)
+        assertEquals(0, JourneyTimeline.altitudeKm(23_500))
         assertEquals(0, JourneyTimeline.altitudeKm(99_999))
     }
 
     @Test
     fun `the impact only spreads once the pebble is down`() {
-        assertEquals(0f, JourneyTimeline.landedFraction(18_000), 0.001f)
-        assertEquals(0f, JourneyTimeline.landedFraction(18_500), 0.001f)
+        assertEquals(0f, JourneyTimeline.landedFraction(23_000), 0.001f)
+        assertEquals(0f, JourneyTimeline.landedFraction(23_500), 0.001f)
         assertEquals(1f, JourneyTimeline.landedFraction(JourneyTimeline.TOTAL_MS), 0.001f)
     }
 

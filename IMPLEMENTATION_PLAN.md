@@ -584,3 +584,34 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   crescent, which is where it belongs 53 days after the new moon of 12
   August 2026 that the eclipse test pins - and a lunar pebble flying home
   past the Earth.
+
+### Post-release — the flight opens on the real solar system
+
+- **Twenty-five seconds now, with five of them before the pebble moves.**
+  The flight opens on an orrery of the actual solar system at the moment
+  the pebble was found - not tonight, which matters when an old logbook
+  entry is replayed - and the camera then picks the two worlds out of it.
+- **Positions real, radii not.** Mercury is a thirtieth of Neptune's
+  distance, so a true scale is a blank screen with a dot in the corner.
+  The angles come straight from the same orbits the sky mode solves; the
+  radii go through a power law. The first attempt used 0.42 and put all
+  four inner planets inside the Sun's own disc, which is the one thing a
+  compressed orrery exists to prevent.
+- **The handover is a move, not a cut.** Rather than dissolve the orrery
+  into the crossing, the source planet and Earth are interpolated from
+  where they sit on the map to exactly where the crossing starts them,
+  which took pulling those two positions out of the drawing code into
+  functions both scenes can call. The other planets fade and the stars
+  come up underneath.
+- **Stretching the flight broke two things quietly.** The map reveal and
+  the end of the entry glow were written as absolute times against the old
+  twenty-second clock, so the schematic Japan started bleeding through
+  during the crossing. Both are now derived from the phase they belong to,
+  and there is a test that the map stays hidden mid-crossing.
+- **The pebble is the colour of the pebble.** The dominant colour was
+  already measured and stored for every entry and was being used for
+  nothing but the record; the animation now paints the rock with it, and
+  derives the lit edge and the pitting from the same hue.
+- **Fire took two passes.** One row of translucent discs behind the pebble
+  came out as a string of beads. Two rows - wide dull smoke, narrow bright
+  flame - plus a white-hot leading face is what reads as burning.

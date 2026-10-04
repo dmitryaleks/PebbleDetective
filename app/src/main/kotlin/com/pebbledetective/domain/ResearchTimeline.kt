@@ -68,28 +68,37 @@ object ResearchTimeline {
 }
 
 /** The beats of the pebble's flight home. */
-enum class JourneyPhase { DEPARTURE, LAUNCH, CRUISE, ENTRY, APPROACH, DESCENT, TOUCHDOWN }
+enum class JourneyPhase {
+    SYSTEM, CLOSING, DEPARTURE, LAUNCH, CRUISE, ENTRY, APPROACH, DESCENT, TOUCHDOWN
+}
 
 /**
  * The journey, as a pure function of elapsed time.
  *
- * Longer than the brief's original ten to fifteen seconds, deliberately: the
- * flight now carries on past atmospheric entry, down through a schematic
- * Japan and in over Tokyo to the spot where the pebble lands. The arrival is
- * the payoff, and it was previously over in a second.
+ * Longer than the brief's original ten to fifteen seconds, in both
+ * directions. It opens on the whole solar system as it actually stands on
+ * the day the pebble was found and closes in on the two worlds that matter;
+ * and at the far end it carries on past atmospheric entry, down through a
+ * schematic Japan and in over Tokyo to the spot where the pebble lands.
+ * Both ends were added because the middle was the only part anyone
+ * remembered.
  */
 object JourneyTimeline {
 
-    const val TOTAL_MS = 20_000L
+    const val TOTAL_MS = 25_000L
 
-    private const val DEPARTURE_END = 1_500L
-    private const val LAUNCH_END = 2_500L
-    private const val CRUISE_END = 9_000L
-    private const val ENTRY_END = 11_500L
-    private const val APPROACH_END = 15_000L
-    private const val DESCENT_END = 18_500L
+    private const val SYSTEM_END = 4_000L
+    private const val CLOSING_END = 7_000L
+    private const val DEPARTURE_END = 8_200L
+    private const val LAUNCH_END = 9_200L
+    private const val CRUISE_END = 15_000L
+    private const val ENTRY_END = 17_500L
+    private const val APPROACH_END = 20_500L
+    private const val DESCENT_END = 23_500L
 
     fun phaseAt(elapsedMs: Long): JourneyPhase = when {
+        elapsedMs < SYSTEM_END -> JourneyPhase.SYSTEM
+        elapsedMs < CLOSING_END -> JourneyPhase.CLOSING
         elapsedMs < DEPARTURE_END -> JourneyPhase.DEPARTURE
         elapsedMs < LAUNCH_END -> JourneyPhase.LAUNCH
         elapsedMs < CRUISE_END -> JourneyPhase.CRUISE
@@ -128,6 +137,52 @@ object JourneyTimeline {
     }
 
     /**
+     * The opening shot: 0 as the solar system appears, 1 by the time the
+     * camera has settled on the two worlds that matter.
+     *
+     * Eased hard at the end so the move lands rather than stopping dead,
+     * and so the first second or so is almost still - long enough to read
+     * the thing as a map of where everything actually is.
+     */
+    fun closing(elapsedMs: Long): Float {
+        if (elapsedMs <= SYSTEM_END) return 0f
+        val span = (CLOSING_END - SYSTEM_END).toFloat()
+        val t = ((elapsedMs - SYSTEM_END) / span).coerceIn(0f, 1f)
+        return t * t * (3f - 2f * t)
+    }
+
+    /**
+     * How far the opening view has drifted while it is being looked at.
+     * A still picture of the solar system reads as a diagram; a slowly
+     * turning one reads as somewhere you are.
+     */
+    fun systemDrift(elapsedMs: Long): Float =
+        (elapsedMs.coerceAtMost(CLOSING_END).toFloat() / CLOSING_END)
+
+    /**
+     * The pebble tearing itself off the source planet: 0 still buried, 1
+     * clear of the surface and on its way.
+     */
+    fun breakout(elapsedMs: Long): Float {
+        if (elapsedMs <= CLOSING_END) return 0f
+        val span = (LAUNCH_END - CLOSING_END).toFloat()
+        return ((elapsedMs - CLOSING_END) / span).coerceIn(0f, 1f)
+    }
+
+    /**
+     * How hard the pebble itself is burning. Nothing for most of the
+     * crossing, then a sheath of fire through the last of it as Earth's
+     * air starts to bite.
+     */
+    fun pebbleFire(elapsedMs: Long): Float {
+        val travel = travel(elapsedMs)
+        if (travel < FIRE_FROM) return 0f
+        return ((travel - FIRE_FROM) / (1f - FIRE_FROM)).coerceIn(0f, 1f)
+    }
+
+    private const val FIRE_FROM = 0.62f
+
+    /**
      * The descent zoom, 0 looking at the whole of Japan and 1 down on the
      * part of Tokyo where the pebble lands.
      *
@@ -158,7 +213,7 @@ object JourneyTimeline {
         return ((elapsedMs - MAP_REVEAL_START) / span).coerceIn(0f, 1f)
     }
 
-    private const val MAP_REVEAL_START = 10_900L
+    private const val MAP_REVEAL_START = 16_900L
 
     /**
      * How far into the landing itself, 0 the moment before touchdown and 1
@@ -197,5 +252,5 @@ object JourneyTimeline {
         else -> 0f
     }.coerceIn(0f, 1f)
 
-    private const val HEAT_END = 13_000L
+    private const val HEAT_END = 19_000L
 }

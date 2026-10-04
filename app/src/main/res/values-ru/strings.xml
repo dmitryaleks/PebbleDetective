@@ -174,4 +174,7 @@
     <string name="cd_detection">Режим поиска</string>
     <string name="capture_origin_claimed">Ты видел, как упал осколок %1$s. Следующий камешек оттуда.</string>
     <string name="capture_origin_forget">Нет, проверить</string>
+    <string name="journey_system">Солнечная система в тот день</string>
+    <string name="journey_closing">Ищем: %1$s</string>
+    <string name="journey_au_away">До него %1$s расстояний до Солнца</string>
 </resources>
