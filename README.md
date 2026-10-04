@@ -36,8 +36,9 @@ real photograph from NASA and a fact about that world.
 <img src="docs/screen-splash.png" width="260" align="right" alt="The title sequence" />
 
 The app opens on the picture above, assembled a piece at a time: the sky, then
-the solar system arriving left to right, then a pebble falling in on an amber
-trail with the scanner brackets closing on it.
+the solar system arriving left to right, then Earth and its Moon in the corner,
+then a pebble falling in on an amber trail with the scanner brackets closing on
+it.
 
 Four seconds, and a tap anywhere ends it early. Then the titles hand over to
 **Planets around**, so the app begins where the hunt does — pointing at the

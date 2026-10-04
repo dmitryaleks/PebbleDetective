@@ -49,7 +49,8 @@ object SplashTimeline {
         return t * t * (3f - 2f * t)
     }
 
-    const val BODY_COUNT = 8
+    /** Everything the sequence brings in one at a time. */
+    const val BODY_COUNT = 10
     private const val BODIES_START = 225L
     private const val BODY_STAGGER = 105L
     private const val BODY_FADE = 780L

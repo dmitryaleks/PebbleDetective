@@ -390,6 +390,10 @@ private val ARC = listOf(
     // Earth is last so it draws over the chain: it is the destination, not
     // part of the line, and it sits close enough to run off the corner.
     Body(Planet.EARTH, 1.00f, 0.95f, 0.95f),
+    // And its Moon, just off the limb. It belongs beside Earth rather than
+    // in the row of planets, which is both where it really is and what
+    // makes the bottom corner read as a pair rather than as one big world.
+    Body(Planet.MOON, 0.625f, 0.781f, 0.085f),
 )
 
 private const val DISC_PX = 256
