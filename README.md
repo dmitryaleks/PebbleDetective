@@ -7,7 +7,8 @@
 Point the camera at a pebble. Tap it. The app scans it, decides which world it
 fell from, and flies it home across the solar system.
 
-[![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](#building-it-yourself)
+[![Download](https://img.shields.io/github/v/release/dmitryaleks/PebbleDetective?label=download&color=3DDC84&logo=android&logoColor=white)](#get-it-on-a-phone)
+[![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](#get-it-on-a-phone)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4-7F52FF?logo=kotlin&logoColor=white)](#how-it-is-built)
 [![Compose](https://img.shields.io/badge/Jetpack%20Compose-1.12-4285F4)](#how-it-is-built)
 [![Offline](https://img.shields.io/badge/network%20permissions-none-4DFFA6)](#it-never-touches-the-network)
@@ -26,6 +27,28 @@ journey it must have made to land at their feet.
 
 The science is make-believe. The curiosity is not — every answer comes with a
 real photograph from NASA and a fact about that world.
+
+---
+
+## Get it on a phone
+
+**[Download the latest APK](https://github.com/dmitryaleks/PebbleDetective/releases/latest)** — open that
+link in the browser *on the phone*, tap the `.apk`, and it installs.
+
+Two things to expect, both normal for an app that does not come from the Play
+Store:
+
+- the browser asks to be allowed to **install unknown apps**. Allow it once.
+- **Play Protect** says something like *"unsafe app blocked"*. That is what
+  Android says about every sideloaded app, not a finding about this one. Tap
+  *More details → Install anyway*.
+
+Needs **Android 8.0** or newer. On first run it asks for the **camera**;
+location is optional and refusing it blocks nothing — pebbles are simply
+logged without a place.
+
+Over USB instead, or from source, see [Building it
+yourself](#building-it-yourself).
 
 ---
 
@@ -91,6 +114,9 @@ why it works in a field with no signal, and why it will still be right in
 accuracy is the phone’s compass, which is routinely ten degrees out indoors.
 
 <br clear="right" />
+
+From here a button also opens the [planetarium](#the-planetarium), which is
+the same worlds seen from the outside rather than from the ground.
 
 ### 2 · Scan the ground for it
 
@@ -261,9 +287,14 @@ makes no requests of its own, it simply hands the coordinates to whatever maps
 app is installed, and that app does the talking. Worth knowing, because those
 coordinates are where a child was standing.
 
-### Everywhere, from everywhere
+---
 
-<img src="docs/screen-logbook.png" width="230" align="right" alt="The toolbar on the logbook" />
+## Anywhere, from anywhere
+
+The walkthrough above is one way through. It is not the only one, and after
+the first pebble it is not even the usual one.
+
+<img src="docs/screen-logbook.png" width="230" align="right" alt="The toolbar, with the logbook ringed" />
 
 The four modes are not a sequence. They are four ways of looking at the same
 hunt, so **every screen carries the whole toolbar**: language, sound, planets
@@ -284,9 +315,9 @@ that has already been photographed and logged, and seven buttons across the
 top of a twenty-five second showpiece is no way to watch it. Both have their
 own way out two inches below.
 
----
+<br clear="right" />
 
-### 9 · Take the solar system apart
+### The planetarium
 
 <p>
 <img src="docs/screen-planetarium.png" width="250" alt="The planetarium, the whole system in frame" />
@@ -323,9 +354,14 @@ recognises a stone they picked up long before they recognise a number, and
 the strip turns up at exactly the moment the question arises, which is the
 moment they tapped that planet.
 
-Only the distances are a lie, and they have to be: Mercury is a thirtieth of
-Neptune's distance from the Sun, so a true scale is a blank screen with a dot
-in the corner. The radii go through a power law, the angles do not.
+**Only distances are lies here, and only where they have to be.** Mercury is
+a thirtieth of Neptune's distance from the Sun, so a true scale is a blank
+screen with a dot in the corner: the radii go through a power law and the
+angles do not. The Moon gets the same treatment for the same reason — its
+real offset from the Earth is a fraction of a pixel at this scale — but only
+its *distance* is exaggerated. Its bearing is the true one, so it circles in
+its twenty-seven days and passes in front of the Earth for half of each
+month and behind it for the other half.
 
 ---
 
@@ -414,7 +450,7 @@ echo "sdk.dir=/path/to/Android/Sdk" > local.properties
 
 ./gradlew :app:assembleDebug          # build
 ./gradlew :app:installDebug           # install over USB
-./gradlew :app:testDebugUnitTest      # 56 unit tests
+./gradlew :app:testDebugUnitTest      # 146 unit tests
 ```
 
 For a signed release build, create `keystore.properties` beside `local.properties`:
@@ -509,6 +545,15 @@ A few decisions worth knowing about:
   moment, the zoom and the rotation are read only inside the draw lambda,
   so running time at twenty days a second invalidates the drawing and
   nothing else.
+- **A compression has to be applied to the distance, not to the
+  coordinates.** Squashing x and y apart is not a compression but a warp
+  of the plane: circular orbits came out as rounded squares, and because
+  a power law has an infinite slope at zero, a planet leapt sideways
+  every time a coordinate crossed an axis. Neither was visible in the
+  four seconds the flight home shows the orrery for. Both were the first
+  thing anyone saw once the planetarium could run a clock at twenty days
+  a second - which is the argument for building the toy version of a
+  thing you have already shipped.
 - **The landing is a map, drawn the same way.** Coastlines as lists of degrees,
   projected with the longitude squeezed by the cosine of the latitude, at three
   levels of detail that hand over as the scale drops - the islands of Japan,
