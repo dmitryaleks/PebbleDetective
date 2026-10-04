@@ -119,9 +119,24 @@ object Astronomy {
         return Math.toDegrees(kotlin.math.acos(dot.coerceIn(-1.0, 1.0)))
     }
 
-    /** Distance from the Sun, which is a fixed property of the orbit. */
+    /** How far from the Sun the body is right now, which is not fixed. */
     fun heliocentricDistanceAu(planet: Planet, epochMillis: Long): Double =
         heliocentric(elementsFor(planet), julianDay(epochMillis)).length
+
+    /**
+     * The long half of the body's orbit, in astronomical units.
+     *
+     * Not the same as [heliocentricDistanceAu], which is where the body
+     * happens to be today: Mercury's distance swings by a fifth either
+     * way over its eighty-eight days. Anything that draws the orbit
+     * itself wants this one, or the ring pulses in and out as the planet
+     * goes round and the whole picture looks like it is breathing.
+     */
+    fun semiMajorAxisAu(planet: Planet, epochMillis: Long): Double {
+        val elements = elementsFor(planet)
+        val centuries = (julianDay(epochMillis) - J2000) / DAYS_PER_CENTURY
+        return elements.a + elements.aRate * centuries
+    }
 
     /**
      * Where a body is around the Sun, for drawing the system from outside

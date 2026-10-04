@@ -700,3 +700,24 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   result portrait, a logbook row and a pebble's own page. The focus
   rides in the route rather than in session state, so the back stack
   remembers which stone aimed it where.
+- **The compression was wrong, and only a running clock could show it.**
+  Each Cartesian coordinate was squashed on its own, which is not a
+  compression but a warp of the plane: a circular orbit came out as a
+  rounded square, so a planet wandered a tenth of its orbit's width on
+  and off its ring four times a year. Worse, a power law has an infinite
+  slope at zero, so every time a coordinate crossed an axis the planet
+  leapt sideways. Both were invisible in the journey, which shows the
+  orrery for four seconds; at twenty days a second they are the first
+  thing anyone notices. The radius is now what gets squashed and the
+  direction is kept exactly.
+- **And the rings were sized from today's distance.** Mercury's swings by
+  a fifth over its eighty-eight days, so its ring swelled and shrank
+  while the planet went round and the whole system appeared to breathe.
+  They come off the orbit's long half axis now, which `Astronomy` had to
+  be asked for; a planet crosses its own ring by its eccentricity and
+  nothing more.
+- **Six tests that fail against the old projection**, which is the point
+  of writing them: that a circle stays a circle, that nothing jumps as it
+  crosses an axis, that each planet is drawn on its ring, that the rings
+  hold still over four hundred days, that Earth keeps its distance all
+  the way round, and that the orbits stay in order.

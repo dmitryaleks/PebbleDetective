@@ -12,6 +12,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * The solar system as it actually stands, seen from above and to one side.
@@ -92,7 +93,7 @@ object SolarSystem {
         // The Sun is at the middle, whatever the orbital elements say: it
         // borrows the Earth's for the sake of having some.
         Planet.SUN -> 0f
-        else -> compress(Astronomy.heliocentricDistanceAu(planet, epochMillis)).toFloat()
+        else -> compress(Astronomy.semiMajorAxisAu(planet, epochMillis)).toFloat()
     }
 
     /**
@@ -125,12 +126,27 @@ object SolarSystem {
         val spin = Math.toRadians(spinDegrees.toDouble())
         val x = position.x * cos(spin) - position.y * sin(spin)
         val y = position.x * sin(spin) + position.y * cos(spin)
+        val z = position.z
+
+        // Pulled in along the line from the Sun, so only the distance is
+        // squashed and the direction survives untouched.
+        //
+        // The first version squashed each coordinate on its own, which is
+        // not the same thing at all and was plainly wrong once the clock
+        // started running: a circular orbit came out as a rounded square,
+        // so a planet wandered a tenth of its orbit's width on and off
+        // the ring four times a year - and worse, the power law has an
+        // infinite slope at zero, so every time a coordinate crossed an
+        // axis the planet leapt sideways. Compressing the radius has
+        // neither problem: circles stay circles, concentric and smooth.
+        val radius = sqrt(x * x + y * y + z * z)
+        val squash = if (radius < 1e-9) 0.0 else compress(radius) / radius
 
         val tilt = Math.toRadians(tiltDegrees.toDouble())
-        val screenX = compress(x)
+        val screenX = x * squash
         // Foreshortened: the far side of the orbit rides up the screen.
-        val screenY = compress(y) * cos(tilt) - compress(position.z) * sin(tilt)
-        val depth = (compress(y) * sin(tilt)).toFloat()
+        val screenY = y * squash * cos(tilt) - z * squash * sin(tilt)
+        val depth = (y * squash * sin(tilt)).toFloat()
 
         return Placement(
             at = Offset(
@@ -143,17 +159,12 @@ object SolarSystem {
     }
 
     /**
-     * Squashes a distance in astronomical units into something drawable.
-     *
-     * Signed, so it can be applied to a coordinate rather than only to a
-     * radius: the compression has to be the same function on both axes or
-     * the circles stop being circles.
+     * Squashes a distance in astronomical units into a fraction of the
+     * picture's radius. Neptune's orbit comes out at 1.
      */
     private fun compress(au: Double): Double {
-        val magnitude = kotlin.math.abs(au)
-        if (magnitude < 1e-9) return 0.0
-        val squashed = (magnitude / OUTER_AU).pow(COMPRESSION)
-        return if (au < 0) -squashed else squashed
+        if (au < 1e-9) return 0.0
+        return (au / OUTER_AU).pow(COMPRESSION)
     }
 
     /** How big to draw each body, as a fraction of the screen's short side. */
@@ -173,10 +184,17 @@ object SolarSystem {
     /**
      * The orbit rings.
      *
-     * Drawn as ellipses rather than computed from the ellipse of each
-     * orbit: at this compression the difference between a real orbit and a
-     * circle is a pixel or two, and a ring that the planet sits exactly on
-     * is worth more than one that is technically eccentric.
+     * Circles rather than the true ellipses: at this compression the
+     * difference is a few pixels for every planet but Mercury, and a ring
+     * that holds still is worth more than one that is technically
+     * eccentric.
+     *
+     * Each is sized from the orbit's own long half axis and not from
+     * where the planet happens to be today. Today's distance was the
+     * first attempt, and it meant Mercury's ring swelled and shrank by a
+     * seventh every eighty-eight days - a still picture could not show
+     * it, and the planetarium, which can run at twenty days a second,
+     * made the whole system look like it was breathing.
      */
     fun DrawScope.drawOrbits(
         epochMillis: Long,
@@ -189,7 +207,7 @@ object SolarSystem {
         val squash = cos(Math.toRadians(tiltDegrees.toDouble())).toFloat()
         for (planet in BODIES) {
             if (planet == Planet.MOON) continue
-            val au = Astronomy.heliocentricDistanceAu(planet, epochMillis)
+            val au = Astronomy.semiMajorAxisAu(planet, epochMillis)
             val radius = (compress(au) * scalePx).toFloat()
             if (radius < 4f) continue
             drawOval(
