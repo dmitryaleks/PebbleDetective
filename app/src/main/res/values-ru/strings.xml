@@ -190,6 +190,6 @@
     <string name="orrery_hint">Сведи пальцы · проведи, чтобы повернуть · нажми на планету</string>
     <string name="orrery_focus_hint">Найти в Солнечной системе: %1$s</string>
     <string name="orrery_stones_from">Твои камешки с %1$s</string>
-    <string name="sky_comet_add">Добавить комету</string>
+    <string name="sky_comet_add">Поиск комет</string>
     <string name="sky_comet_at">Комета %1$d · %2$s</string>
 </resources>

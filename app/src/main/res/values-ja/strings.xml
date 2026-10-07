@@ -187,6 +187,6 @@
     <string name="orrery_hint">ひろげて ズーム · なぞって かいてん · ほしを タップ</string>
     <string name="orrery_focus_hint">%1$sを たいようけいで みる</string>
     <string name="orrery_stones_from">%1$sから きた こいし</string>
-    <string name="sky_comet_add">すいせいを だす</string>
+    <string name="sky_comet_add">すいせい たんさく</string>
     <string name="sky_comet_at">すいせい %1$d · %2$s</string>
 </resources>

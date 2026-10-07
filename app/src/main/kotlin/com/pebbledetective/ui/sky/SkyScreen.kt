@@ -792,11 +792,24 @@ private fun SkyCameraBackdrop(enabled: Boolean) {
     AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
 }
 
-/** Half as wide again as a planet: a comet is meant to be easy to hit. */
-private const val COMET_TAP_SLOP_PX = 110f
+/**
+ * Nearly three times a planet's: a comet is meant to be easy to hit.
+ *
+ * The reach was always generous, but the head was drawn small enough
+ * that nobody aimed at the generous part - they aimed at the bright dot
+ * and missed by a finger's width. Drawing it bigger is most of the fix;
+ * this is the rest.
+ */
+private const val COMET_TAP_SLOP_PX = 170f
 
-/** How big the head is drawn, as a fraction of the screen's short side. */
-private const val COMET_HEAD = 0.068f
+/**
+ * How big the head is drawn, as a fraction of the screen's short side.
+ *
+ * Giant, which is the point of them. At this size the coma alone is
+ * about a fifth of the screen across and the tail runs off the edge,
+ * which is what a great comet does.
+ */
+private const val COMET_HEAD = 0.095f
 
 private val LABEL_STYLE = TextStyle(
     fontSize = 13.sp,

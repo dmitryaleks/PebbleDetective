@@ -123,8 +123,8 @@ The real sky is not always helpful. On a given evening two planets may be
 up and both behind a building, and tapping one drops the meteor towards a
 main road rather than the park.
 
-**Add a comet** does something about that, and does nothing at all until
-it is tapped. The first tap hangs one due south, high enough to clear the
+**Comet detection** does something about that, and does nothing at all
+until it is tapped. The first tap hangs one due south, high enough to clear the
 roofs; tap again and it moves to the south-west, then west, and on round
 the compass, one at a time, eight in all. Walk it round until it is over
 somewhere worth walking to and tap the comet itself: the meteor falls that
