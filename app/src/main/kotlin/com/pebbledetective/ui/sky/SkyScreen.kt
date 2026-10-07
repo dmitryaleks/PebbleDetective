@@ -10,6 +10,7 @@ import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,6 +75,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pebbledetective.R
 import com.pebbledetective.data.PlanetArt
 import com.pebbledetective.domain.Astronomy
+import com.pebbledetective.domain.Comet
 import com.pebbledetective.domain.MeteorTimeline
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
@@ -194,7 +196,7 @@ fun SkyScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .pointerInput(shown, verticalFov) {
+            .pointerInput(shown, sky.comet, verticalFov) {
                 detectTapGestures { tap ->
                     val canvas = Size(size.width.toFloat(), size.height.toFloat())
                     val focal = focalPixels(canvas.height, verticalFov)
@@ -209,7 +211,27 @@ fun SkyScreen(
                         }
                         .filter { (_, at) -> hypot(at.x - tap.x, at.y - tap.y) < TAP_SLOP_PX * density }
                         .minByOrNull { (_, at) -> hypot(at.x - tap.x, at.y - tap.y) }
-                    if (hit != null) session.launchMeteor(hit.first.planet)
+                    if (hit != null) {
+                        session.launchMeteor(hit.first.planet)
+                        return@detectTapGestures
+                    }
+                    // The comet is a target of its own, and a far bigger
+                    // one: the head alone is half as wide again as a
+                    // planet, and the whole point of it is to be hit.
+                    val comet = sky.comet
+                    if (comet != null) {
+                        val head = attitude.value.project(
+                            comet.azimuthDegrees - declination,
+                            comet.altitudeDegrees,
+                            canvas,
+                            focal,
+                        )
+                        if (head != null &&
+                            hypot(head.x - tap.x, head.y - tap.y) < COMET_TAP_SLOP_PX * density
+                        ) {
+                            session.launchCometMeteor()
+                        }
+                    }
                 }
             },
     ) {
@@ -249,6 +271,41 @@ fun SkyScreen(
             val pointing = attitude.value
             val focal = focalPixels(size.height, verticalFov)
 
+            // The comet first, so a planet that happens to lie across it
+            // is in front of it rather than lost inside the coma.
+            val comet = sky.comet
+            if (comet != null) {
+                val head = pointing.project(
+                    comet.azimuthDegrees - declination,
+                    comet.altitudeDegrees,
+                    size,
+                    focal,
+                )
+                if (head != null && head.isOnScreen(size, margin = size.minDimension * 1.2f)) {
+                    // Both tails stream away from the Sun, wherever the
+                    // Sun happens to be - including under your feet,
+                    // where the direction is still perfectly well defined
+                    // and the comet hangs in a night sky with its tail
+                    // pointing up away from the ground.
+                    val sun = sky.of(Planet.SUN)
+                    val away = if (sun == null) {
+                        Offset(0f, -1f)
+                    } else {
+                        val toSun = pointing.screenDirection(
+                            sun.azimuthDegrees - declination, sun.altitudeDegrees,
+                        )
+                        Offset(-toSun.x, -toSun.y)
+                    }
+                    drawComet(
+                        comet = comet,
+                        at = head,
+                        headRadius = size.minDimension * COMET_HEAD,
+                        awayFromSun = away,
+                        seconds = android.os.SystemClock.elapsedRealtime() / 1000f,
+                    )
+                }
+            }
+
             for (sighting in shown) {
                 val at = pointing.project(
                     sighting.azimuthDegrees - declination,
@@ -270,6 +327,32 @@ fun SkyScreen(
                         dimmed = !sighting.isUp,
                     )
                 )
+            }
+
+            // And an arrow to the comet while nothing else is being
+            // tracked. A grown-up who has just put one over the park
+            // should not have to sweep the whole sky to find it again.
+            if (comet != null && sky.focus == null && sky.meteor == null) {
+                val offAxis = pointing.offAxisDegrees(
+                    comet.azimuthDegrees - declination, comet.altitudeDegrees,
+                )
+                // By whether it is actually in the frame, not by an angle.
+                // A comet is six times the width of a planet, so at the
+                // angle that hides a planet the comet is still filling a
+                // third of the screen - and the arrow was being drawn
+                // across the top of it.
+                val head = pointing.project(
+                    comet.azimuthDegrees - declination, comet.altitudeDegrees, size, focal,
+                )
+                if (head?.isOnScreen(size, margin = -size.minDimension * 0.12f) != true) {
+                    drawGuideArrow(
+                        direction = pointing.screenDirection(
+                            comet.azimuthDegrees - declination, comet.altitudeDegrees,
+                        ),
+                        offAxisDegrees = offAxis,
+                        label = measurer.measure("${offAxis.toInt()}°", ARROW_STYLE),
+                    )
+                }
             }
 
             // The arrow, for whatever is being tracked but is not in view.
@@ -368,6 +451,7 @@ fun SkyScreen(
                 onFocus = session::toggleSkyFocus,
             )
             SkyStatus(sky = sky, names = names)
+            CometControl(comet = sky.comet, onCycle = session::cycleComet)
         }
 
         Column(
@@ -524,6 +608,67 @@ private fun PlanetChip(
     }
 }
 
+/**
+ * The opt-in: one tap puts a comet up, the next moves it round a point.
+ *
+ * Deliberately a plain, quiet row rather than a button in the toolbar.
+ * It is a grown-up's control - it exists so that the hunt can be steered
+ * towards the park instead of the main road - and it does nothing at all
+ * until it is asked to, which is the whole of what "opt in" means here.
+ *
+ * The chip carries the comet it would put up next, drawn with the same
+ * code that draws it in the sky, so it is obvious both that there are
+ * several and that they are not the same one moved along.
+ */
+@Composable
+private fun CometControl(comet: Comet?, onCycle: () -> Unit) {
+    val compass = stringArrayResource(R.array.compass_points)
+    val label = if (comet == null) {
+        stringResource(R.string.sky_comet_add)
+    } else {
+        stringResource(
+            R.string.sky_comet_at,
+            comet.number,
+            compass[Astronomy.compassPoint(comet.azimuthDegrees)],
+        )
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.Black.copy(alpha = 0.45f))
+                .clickable(onClick = onCycle)
+                .padding(start = 6.dp, end = 12.dp, top = 4.dp, bottom = 4.dp)
+                .semantics { contentDescription = label },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Canvas(modifier = Modifier.size(34.dp)) {
+                // The one it is showing, or the one the next tap brings.
+                val shown = comet ?: Comet.FIRST
+                drawComet(
+                    comet = shown,
+                    at = Offset(size.width * 0.74f, size.height * 0.5f),
+                    headRadius = size.minDimension * 0.13f,
+                    awayFromSun = Offset(-1f, 0f),
+                    seconds = 0f,
+                )
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (comet == null) {
+                    ScannerGreen.copy(alpha = 0.6f)
+                } else {
+                    SignalAmber
+                },
+            )
+        }
+    }
+}
+
 /** The line under the toolbar: what you are looking for and where it is. */
 @Composable
 private fun SkyStatus(sky: SkyState, names: Map<Planet, String>) {
@@ -646,6 +791,12 @@ private fun SkyCameraBackdrop(enabled: Boolean) {
 
     AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
 }
+
+/** Half as wide again as a planet: a comet is meant to be easy to hit. */
+private const val COMET_TAP_SLOP_PX = 110f
+
+/** How big the head is drawn, as a fraction of the screen's short side. */
+private const val COMET_HEAD = 0.068f
 
 private val LABEL_STYLE = TextStyle(
     fontSize = 13.sp,

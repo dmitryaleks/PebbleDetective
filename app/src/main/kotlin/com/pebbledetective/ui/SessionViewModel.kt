@@ -15,6 +15,7 @@ import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PebbleStatus
 import com.pebbledetective.data.ShareCardText
 import com.pebbledetective.domain.Astronomy
+import com.pebbledetective.domain.Comet
 import com.pebbledetective.domain.Geo
 import com.pebbledetective.domain.GeoPoint
 import com.pebbledetective.domain.Planet
@@ -531,22 +532,53 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
      */
     fun launchMeteor(planet: Planet) {
         val sighting = _sky.value.sightings.firstOrNull { it.planet == planet } ?: return
-        meteorJob?.cancel()
         // You watched a piece of this one land nearby, so the next stone
         // you pick up is from there. The detection screen says so and lets
         // you say otherwise.
         _claimedOrigin.value = planet
+        dropMeteor(planet, sighting.azimuthDegrees, sighting.altitudeDegrees)
+    }
+
+    /**
+     * Puts the next comet up, or takes the last one down.
+     *
+     * Off, then one through eight, then off again. One at a time: the
+     * point is not a light show but a direction, and a grown-up walking
+     * it round the compass until it is over the park is choosing where
+     * the hunt will end.
+     */
+    fun cycleComet() {
+        container.sound.play(SoundCue.UI_TAP)
+        _sky.value = _sky.value.copy(comet = Comet.next(_sky.value.comet))
+    }
+
+    /**
+     * Drops a stone out of the comet.
+     *
+     * No claimed origin, unlike a planet. A comet in this app is an
+     * invention and says nothing about where a pebble came from; what it
+     * decides is *where it will be*, which is the one thing the real sky
+     * cannot be asked for. The stone's own colour still answers the
+     * question the child is actually asking.
+     */
+    fun launchCometMeteor() {
+        val comet = _sky.value.comet ?: return
+        dropMeteor(null, comet.azimuthDegrees, comet.altitudeDegrees)
+    }
+
+    private fun dropMeteor(planet: Planet?, azimuthDegrees: Double, altitudeDegrees: Double) {
+        meteorJob?.cancel()
         _sky.value = _sky.value.copy(
             meteor = MeteorShot(
                 planet = planet,
                 startedAtElapsedMs = SystemClock.elapsedRealtime(),
-                fromAzimuthDegrees = sighting.azimuthDegrees,
-                fromAltitudeDegrees = sighting.altitudeDegrees,
+                fromAzimuthDegrees = azimuthDegrees,
+                fromAltitudeDegrees = altitudeDegrees,
                 // Down and a little to one side of where it came from: it
                 // lands in the street, not on the observer. The spread is
                 // kept narrow because the whole fall has to stay findable
                 // by swinging the phone down the way it came.
-                toAzimuthDegrees = sighting.azimuthDegrees + Random.nextDouble(-12.0, 12.0),
+                toAzimuthDegrees = azimuthDegrees + Random.nextDouble(-12.0, 12.0),
                 toAltitudeDegrees = Random.nextDouble(-13.0, -5.0),
             ),
         )
@@ -825,6 +857,8 @@ data class SkyState(
     val declinationDegrees: Double = 0.0,
     /** The one body being tracked, or null to show them all. */
     val focus: Planet? = null,
+    /** The invented comet currently hanging over a compass point, if any. */
+    val comet: Comet? = null,
     val meteor: MeteorShot? = null,
 ) {
     val above: List<Astronomy.Sighting> get() = sightings.filter { it.isUp }
@@ -835,7 +869,8 @@ data class SkyState(
 
 /** A meteor on its way down, held in world directions rather than in pixels. */
 data class MeteorShot(
-    val planet: Planet,
+    /** The world it was called from, or null when a comet dropped it. */
+    val planet: Planet?,
     val startedAtElapsedMs: Long,
     val fromAzimuthDegrees: Double,
     val fromAltitudeDegrees: Double,

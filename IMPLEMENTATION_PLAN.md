@@ -771,3 +771,47 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   than two and a list. Capped at eight, because a pocketful of grey
   pebbles all land on the same world and a strip of twenty is a second
   logbook.
+
+### Post-release - comets, for choosing where the hunt ends
+
+- **The problem is the real sky.** Two planets up and both behind a
+  building is a normal evening, and the meteor lands wherever the planet
+  happens to be. A grown-up who wants the hunt to end in the park needs
+  to pick the direction, so: eight invented comets, one per point of the
+  compass, cycled by a single opt-in control - nothing until it is
+  tapped, then south, south-west, west, and round.
+- **One at a time, deliberately.** Eight at once is a light show. One
+  that a grown-up walks round the compass is a way of saying "go and
+  look over there".
+- **A comet claims nothing.** Tapping a planet sets the next stone's
+  origin; tapping a comet does not, because a comet here is an invention
+  and the app will not have it saying where a real pebble came from. It
+  decides *where*, and the colour still decides *what*. `MeteorShot`'s
+  planet became nullable and the cue schedule came out into a shared
+  `dropMeteor`.
+- **Light, not paint - except where the camera is pointed at a wall.**
+  Additive blending is what a glowing thing does and it is beautiful
+  over a night sky. Over a sunlit wall it vanishes. The tails are
+  ordinary translucent discs now, over a single dark pass down the
+  middle of the fan that gives them something to read against - the same
+  trick the planet labels use - with the inner coma left additive, where
+  blowing out to white is right.
+- **A fan, not a torch beam.** Three evenly bright strands of discs made
+  a cone with a hard edge. Five, weighted bright in the middle and faint
+  at the edges, starting narrow and opening quadratically, is a comet.
+  The first pass was also far too short and fat: every span went up by
+  about half and every spread came down.
+- **No `Brush` inside the draw.** The coma started as two radial
+  gradients, which compiles two shaders per frame on the one canvas in
+  the app that redraws at the rate the rotation sensor reports, over a
+  live camera preview. Stacked discs with a quadratic falloff look the
+  same and cost nothing to build.
+- **The arrow pointed at a comet that was plainly in view.** It used the
+  same off-axis angle the planets use, but a comet is six times the
+  width of a planet, so at twelve degrees off centre the arrow was being
+  drawn across the top of it. It now asks whether the head is actually
+  in the frame.
+- **An emulator that had been up for three days wedged the system
+  server** in the middle of this and looked exactly like an ANR in the
+  app. It was not: a fresh emulator ran the same build without a
+  complaint. Worth remembering before debugging the wrong thing.

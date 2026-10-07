@@ -115,6 +115,34 @@ accuracy is the phone’s compass, which is routinely ten degrees out indoors.
 
 <br clear="right" />
 
+#### For the grown-up: a comet, to choose where the hunt ends
+
+<img src="docs/screen-comet.png" width="240" align="right" alt="A comet hanging in the south-east" />
+
+The real sky is not always helpful. On a given evening two planets may be
+up and both behind a building, and tapping one drops the meteor towards a
+main road rather than the park.
+
+**Add a comet** does something about that, and does nothing at all until
+it is tapped. The first tap hangs one due south, high enough to clear the
+roofs; tap again and it moves to the south-west, then west, and on round
+the compass, one at a time, eight in all. Walk it round until it is over
+somewhere worth walking to and tap the comet itself: the meteor falls that
+way, and the radar sends the children after it.
+
+The eight are different objects rather than one light moved along — ice
+blue, carbon green, a dusty gold, violet, teal, rose, a needle of ion and
+a dirty orange one — each with the honest trade between its two tails.
+Both tails stream away from the Sun, wherever the Sun happens to be, which
+is the thing everyone half-remembers about comets and gets wrong.
+
+They are inventions, and the app never pretends otherwise: **no stone is
+ever said to have come from a comet.** A comet decides *where* a pebble
+will be, which is the one thing the real sky cannot be asked for. What it
+came from is still the stone's own colour to answer.
+
+<br clear="right" />
+
 From here a button also opens the [planetarium](#the-planetarium), which is
 the same worlds seen from the outside rather than from the ground.
 
