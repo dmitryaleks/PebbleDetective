@@ -21,7 +21,7 @@ import kotlin.math.sin
  * with a broad curved dust fan has a short faint ion tail, and the ones
  * with a needle of ion reaching halfway across the sky barely have a fan.
  */
-private data class CometLook(
+internal data class CometLook(
     val core: Color,
     val coma: Color,
     val dust: Color,
@@ -38,7 +38,7 @@ private data class CometLook(
     val nucleus: Float,
 )
 
-private fun lookOf(comet: Comet): CometLook = when (comet) {
+internal fun lookOf(comet: Comet): CometLook = when (comet) {
     // Ice. The one everyone pictures.
     Comet.FIRST -> CometLook(
         core = Color(0xFFFFFFFF), coma = Color(0xFFBFE4FF),
@@ -114,20 +114,71 @@ fun DrawScope.drawComet(
     headRadius: Float,
     awayFromSun: Offset,
     seconds: Float,
+) = drawComet(
+    look = lookOf(comet),
+    phase = comet.number.toFloat(),
+    at = at,
+    headRadius = headRadius,
+    awayFromSun = awayFromSun,
+    seconds = seconds,
+)
+
+/**
+ * The same, for a comet that is not one of the eight.
+ *
+ * @param phase shifts the shimmer, so two comets on one screen do not
+ *   breathe in step.
+ * @param tailScale shortens both tails. A comet only grows them near the
+ *   Sun: out at aphelion it is a bare lump of ice, and Halley, which is
+ *   out there now, should not be drawn streaming.
+ */
+internal fun DrawScope.drawComet(
+    look: CometLook,
+    phase: Float,
+    at: Offset,
+    headRadius: Float,
+    awayFromSun: Offset,
+    seconds: Float,
+    tailScale: Float = 1f,
 ) {
-    val look = lookOf(comet)
+    val scaled = look.copy(
+        span = look.span * tailScale,
+        ionReach = look.ionReach * tailScale,
+    )
     // A unit vector across the tail, for the fan and the curve.
     val across = Offset(-awayFromSun.y, awayFromSun.x)
     // Slow, shallow, and out of phase between the two tails, so the thing
     // breathes rather than blinks.
-    val pulse = 1f + 0.06f * sin(seconds * 0.9f + comet.number)
-    val flicker = 1f + 0.18f * sin(seconds * 2.3f + comet.number * 1.7f)
+    val pulse = 1f + 0.06f * sin(seconds * 0.9f + phase)
+    val flicker = 1f + 0.18f * sin(seconds * 2.3f + phase * 1.7f)
 
-    drawDustTail(at, headRadius, awayFromSun, across, look, pulse)
-    drawIonTail(at, headRadius, awayFromSun, across, look, seconds, flicker)
-    drawComa(at, headRadius, awayFromSun, look, pulse)
-    drawNucleus(at, headRadius, look, flicker)
+    drawDustTail(at, headRadius, awayFromSun, across, scaled, pulse)
+    drawIonTail(at, headRadius, awayFromSun, across, scaled, seconds, flicker)
+    drawComa(at, headRadius, awayFromSun, scaled, pulse)
+    drawNucleus(at, headRadius, scaled, flicker)
 }
+
+/**
+ * Halley's Comet: ice and dust, and the one everyone pictures.
+ *
+ * Longer in the tail than any of the eight, because the eight are drawn
+ * hanging over a street and this one is drawn crossing the solar system.
+ */
+internal val HALLEY_LOOK = CometLook(
+    core = Color(0xFFFFFFFF), coma = Color(0xFFCFE7FF),
+    dust = Color(0xFFE6F0FF), ion = Color(0xFF79C0FF),
+    span = 13.0f, spread = 2.3f, curve = 0.50f, ionReach = 15.0f, nucleus = 0.34f,
+)
+
+/**
+ * How much of a tail a comet has at a given distance from the Sun.
+ *
+ * All of it close in, a stub far out. Never nothing: out at aphelion a
+ * comet really is a bare nucleus, but a bare dot at the rim of an orrery
+ * is indistinguishable from a speck of dust on the screen.
+ */
+fun cometTailScale(distanceAu: Double): Float =
+    (1.0 - (distanceAu - 1.0) / 20.0).coerceIn(0.35, 1.0).toFloat()
 
 /**
  * The broad curved fan: strands of grains, each one a chain of discs.

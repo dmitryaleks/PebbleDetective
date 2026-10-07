@@ -93,12 +93,20 @@ class OrreryGeometryTest {
         )
     }
 
-    /** Further out is further out, however hard the distances are squashed. */
+    /**
+     * Further out is further out, however hard the distances are
+     * squashed.
+     *
+     * The Moon is left out because it is drawn beside the Earth rather
+     * than on an orbit of its own, and Halley because it is last in the
+     * list for drawing order rather than for distance - its orbit is
+     * long but its *average* is inside Neptune's.
+     */
     @Test
     fun `the order of the orbits is kept`() {
         val epoch = 1_767_225_600_000L
         val radii = SolarSystem.BODIES
-            .filter { it != Planet.MOON }
+            .filter { it != Planet.MOON && it != Planet.HALLEY }
             .map { planet ->
                 planet to SolarSystem.orbitFraction(planet, epoch)
             }
@@ -109,7 +117,14 @@ class OrreryGeometryTest {
             )
         }
         // And Neptune is what the picture is scaled to.
+        assertEquals(Planet.NEPTUNE, radii.last().first)
         assertEquals(1.0f, radii.last().second, 0.02f)
+
+        // Halley's orbit averages well inside Neptune's, even though it
+        // reaches a third as far again at the far end.
+        assertTrue(
+            SolarSystem.orbitFraction(Planet.HALLEY, epoch) < radii.last().second,
+        )
     }
 
     /**

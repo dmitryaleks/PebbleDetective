@@ -136,10 +136,20 @@ a dirty orange one — each with the honest trade between its two tails.
 Both tails stream away from the Sun, wherever the Sun happens to be, which
 is the thing everyone half-remembers about comets and gets wrong.
 
-They are inventions, and the app never pretends otherwise: **no stone is
-ever said to have come from a comet.** A comet decides *where* a pebble
-will be, which is the one thing the real sky cannot be asked for. What it
-came from is still the stone's own colour to answer.
+The eight in the sky have no names, but what falls off one has somewhere
+to have come from, and that somewhere is **Halley's Comet** — which no
+colour can ever produce, only a comet drop. The attribution is for once
+not a fiction at all: the Earth really does pass through Halley's dust
+twice a year, and the Orionids in October and the Eta Aquariids in May
+are both Halley burning up in the air.
+
+Halley is on the map of the solar system too, in both places it is drawn
+— the opening of the flight home and the planetarium — and it is **where
+it actually is**, worked out from its own orbit by the same arithmetic as
+the planets. Which means that right now it is a speck out past Neptune
+and well above the plane the planets share, with barely any tail: a comet
+only grows one near the Sun. Run the planetarium forward and watch it
+start back in.
 
 <br clear="right" />
 

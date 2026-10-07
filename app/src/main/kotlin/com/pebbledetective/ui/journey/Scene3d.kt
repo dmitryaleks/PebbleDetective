@@ -88,6 +88,9 @@ private data class PlanetLook(
 )
 
 private fun lookFor(planet: Planet): PlanetLook = when (planet) {
+    // Only ever a stand-in: the comet is drawn by its own code, which
+    // knows about tails. This is what is left if that never runs.
+    Planet.HALLEY -> PlanetLook(core = Color(0xFFFFFFFF), edge = Color(0xFF6FB8FF))
     Planet.SUN -> PlanetLook(
         core = Color(0xFFFFF3C4), edge = Color(0xFFFF8A1E), corona = Color(0xFFFFB74D),
     )
@@ -222,6 +225,9 @@ fun DrawScope.drawPhotoPlanet(
     if (alpha < 1f && radius < 2f) return
 
     when (planet) {
+        // No rim: a comet has no limb to catch the light on, and the
+        // picture it is drawn from already carries its own glow.
+        Planet.HALLEY -> Unit
         // Air, lit from behind at the limb. Two layers, because a single
         // gradient reads as a blurred edge rather than as an atmosphere.
         Planet.EARTH -> {

@@ -75,6 +75,7 @@ import com.pebbledetective.audio.SoundCue
 import com.pebbledetective.data.PebbleEntry
 import com.pebbledetective.data.PlanetArt
 import com.pebbledetective.data.locale
+import com.pebbledetective.domain.Astronomy
 import com.pebbledetective.domain.Orrery
 import com.pebbledetective.domain.Planet
 import com.pebbledetective.ui.SessionViewModel
@@ -84,6 +85,9 @@ import com.pebbledetective.ui.journey.Placed
 import com.pebbledetective.ui.journey.SolarSystem
 import com.pebbledetective.ui.journey.Starfield
 import com.pebbledetective.ui.journey.drawPhotoPlanet
+import com.pebbledetective.ui.sky.HALLEY_LOOK
+import com.pebbledetective.ui.sky.cometTailScale
+import com.pebbledetective.ui.sky.drawComet
 import com.pebbledetective.ui.result.fromNameRes
 import com.pebbledetective.ui.result.nameRes
 import com.pebbledetective.ui.theme.ScannerGreen
@@ -287,7 +291,28 @@ fun PlanetariumScreen(
 
             for ((planet, where) in placed) {
                 if (planet == focused) drawFocusRing(where)
-                drawPhotoPlanet(discs[planet], where.at, where.radius, planet)
+                if (planet == Planet.HALLEY) {
+                    // Drawn rather than photographed, and with its tails
+                    // pointing directly away from the Sun - which on a
+                    // map of the solar system means straight out from
+                    // the middle of the picture. It is the one body here
+                    // whose orientation says something.
+                    val out = Offset(where.at.x - centre.x, where.at.y - centre.y)
+                    val length = hypot(out.x, out.y).coerceAtLeast(1f)
+                    drawComet(
+                        look = HALLEY_LOOK,
+                        phase = 0f,
+                        at = where.at,
+                        headRadius = where.radius,
+                        awayFromSun = Offset(out.x / length, out.y / length),
+                        seconds = epochMs / 1000f,
+                        tailScale = cometTailScale(
+                            Astronomy.heliocentricDistanceAu(Planet.HALLEY, epochMs),
+                        ),
+                    )
+                } else {
+                    drawPhotoPlanet(discs[planet], where.at, where.radius, planet)
+                }
             }
 
             if (showNames) drawLabels(placed, labels, focused)

@@ -192,4 +192,7 @@
     <string name="orrery_stones_from">Твои камешки с %1$s</string>
     <string name="sky_comet_add">Поиск комет</string>
     <string name="sky_comet_at">Комета %1$d · %2$s</string>
+    <string name="planet_halley_name">комета Галлея</string>
+    <string name="planet_halley_from">кометы Галлея</string>
+    <string name="planet_halley_fact">Гора грязного льда, которая возвращается каждые 75 лет. Дважды в год Земля пролетает сквозь её пыль, и каждая пылинка сгорает падающей звездой.</string>
 </resources>

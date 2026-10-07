@@ -53,6 +53,9 @@ import com.pebbledetective.domain.Projection
 import com.pebbledetective.ui.SessionViewModel
 import com.pebbledetective.ui.common.TopControls
 import com.pebbledetective.ui.common.animationsDisabled
+import com.pebbledetective.ui.sky.HALLEY_LOOK
+import com.pebbledetective.ui.sky.cometTailScale
+import com.pebbledetective.ui.sky.drawComet
 import com.pebbledetective.ui.result.fromNameRes
 import com.pebbledetective.ui.result.nameRes
 
@@ -435,7 +438,23 @@ private fun DrawScope.drawSystemLeg(
             .map { it to placement(it) }
             .sortedBy { (_, p) -> -p.depth }
         for ((planet, at) in others) {
-            drawPhotoPlanet(discs[planet], at.at, at.radius, planet, alpha = fade)
+            if (planet == Planet.HALLEY) {
+                val out = Offset(at.at.x - centre.x, at.at.y - centre.y)
+                val length = kotlin.math.hypot(out.x, out.y).coerceAtLeast(1f)
+                drawComet(
+                    look = HALLEY_LOOK,
+                    phase = 0f,
+                    at = at.at,
+                    headRadius = at.radius,
+                    awayFromSun = Offset(out.x / length, out.y / length),
+                    seconds = elapsedMs / 1000f,
+                    tailScale = cometTailScale(
+                        Astronomy.heliocentricDistanceAu(Planet.HALLEY, epochMillis),
+                    ) * fade,
+                )
+            } else {
+                drawPhotoPlanet(discs[planet], at.at, at.radius, planet, alpha = fade)
+            }
         }
     }
 

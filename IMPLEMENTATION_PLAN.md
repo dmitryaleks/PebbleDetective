@@ -815,3 +815,47 @@ End-to-end pass, run on both the AVD (`pebble_test`, webcam pointed at a pebble)
   server** in the middle of this and looked exactly like an ANR in the
   app. It was not: a fresh emulator ran the same build without a
   complaint. Worth remembering before debugging the wrong thing.
+
+### Post-release - Halley, so a comet has somewhere to be from
+
+- **A comet claims an origin after all.** The first pass left the claim
+  alone on the grounds that an invented comet should not say where a
+  real pebble came from. The answer was to stop inventing: the eight in
+  the sky are nameless positions, and what falls off one is from
+  Halley - which a colour can never produce, only a comet drop. The
+  attribution is the most defensible in the app, because the Earth
+  really does fly through Halley's dust twice a year.
+- **It went into `Planet`**, which is now "the bodies a pebble can be
+  found to have come from" rather than a list of planets, and out of
+  `Planet.sources`, which is the bag the random pick draws from. Six
+  exhaustive `when`s wanted a branch, which is the enum earning its
+  keep.
+- **Real elements, and they are testable.** 1P/Halley solved by the
+  same Kepler machinery as everything else. The mean longitude and its
+  rate are fitted to the two perihelia anyone can check - February 1986
+  and July 2061 - rather than to the osculating period of 75.32 years,
+  which put the 2061 return six weeks early. Six weeks is nothing in a
+  seventy-five year orbit and most of an astronomical unit at
+  perihelion, where the comet is moving fastest. The tests check the
+  perihelion distance at both apparitions, the aphelion past Neptune,
+  that it is steeply out of the plane, and that a month near the Sun
+  covers more than ten times a month near aphelion.
+- **No photograph, so it is drawn.** There is no picture of Halley that
+  looks like the idea of a comet - the only close-up is Giotto's, which
+  is a dark potato. `PlanetArt.disc` special-cases it and renders one
+  with the comet code into a bitmap, so every screen that asks for a
+  world's picture gets one without knowing anything has changed: the
+  result screen, the logbook, the share card, the banner. The two
+  orrery views draw it live instead, because there the tail has to
+  point away from the Sun, which on a map of the solar system means
+  straight out from the middle of the picture.
+- **A spinner hid the one place that missed.** The result screen uses
+  `rememberPlanetImage`, which reads the assets directly rather than
+  going through `PlanetArt`, so Halley's portrait span for ever. That is
+  the shape of bug a loading indicator is built to hide.
+- **And planets were stealing taps aimed at the comet.** The hit test
+  checked planets first and took any within their own slop, so Neptune
+  drifting across the coma won a tap aimed at the middle of something
+  six times its size - which is exactly what happened on the first
+  end-to-end run, and gave a pebble from Neptune. Both are measured as
+  a fraction of their own reach now, and the nearer in those terms wins.

@@ -414,7 +414,36 @@ object Astronomy {
         Planet.SATURN -> SATURN
         Planet.URANUS -> URANUS
         Planet.NEPTUNE -> NEPTUNE
+        Planet.HALLEY -> HALLEY
     }
+
+    /**
+     * 1P/Halley, which is not one of JPL's nine and does not behave like
+     * them.
+     *
+     * An ellipse so long that it reaches from inside Venus to beyond
+     * Neptune, and travelled backwards - the inclination past ninety
+     * degrees is what retrograde looks like in these six numbers. The
+     * same machinery solves it: Kepler's equation does not care how
+     * eccentric the orbit is, only that it is an ellipse.
+     *
+     * The mean longitude at J2000 and its rate are fitted to the two
+     * perihelia anyone can check: February 1986, which a generation
+     * watched, and July 2061, which their children will. That fixes the
+     * period at 75.47 years rather than the 75.32 of the osculating
+     * orbit - the difference is what Jupiter and Saturn do to it on the
+     * way round, and leaving it out put the 2061 return a month and a
+     * half early, which near perihelion is most of an astronomical
+     * unit. The other rates are nothing over the span this app covers.
+     */
+    private val HALLEY = Elements(
+        17.83414429, 0.0,
+        0.96714291, 0.0,
+        162.26269, 0.0,
+        236.01, 477.01,
+        169.75, 0.0,
+        58.42008, 0.0,
+    )
 
     private val MERCURY = Elements(
         0.38709927, 0.00000037,

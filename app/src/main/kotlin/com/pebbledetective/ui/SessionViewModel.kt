@@ -553,17 +553,18 @@ class SessionViewModel(private val container: AppContainer) : ViewModel() {
     }
 
     /**
-     * Drops a stone out of the comet.
+     * Drops a stone out of the comet, and says so.
      *
-     * No claimed origin, unlike a planet. A comet in this app is an
-     * invention and says nothing about where a pebble came from; what it
-     * decides is *where it will be*, which is the one thing the real sky
-     * cannot be asked for. The stone's own colour still answers the
-     * question the child is actually asking.
+     * The eight in the sky are inventions and have no names, but what
+     * falls off a comet has somewhere to have come from: the claim is
+     * Halley, which is the comet everyone has heard of and the one that
+     * genuinely drops material on Earth twice a year. Same contract as a
+     * planet - the detection screen says so, and lets you say otherwise.
      */
     fun launchCometMeteor() {
         val comet = _sky.value.comet ?: return
-        dropMeteor(null, comet.azimuthDegrees, comet.altitudeDegrees)
+        _claimedOrigin.value = Planet.HALLEY
+        dropMeteor(Planet.HALLEY, comet.azimuthDegrees, comet.altitudeDegrees)
     }
 
     private fun dropMeteor(planet: Planet?, azimuthDegrees: Double, altitudeDegrees: Double) {

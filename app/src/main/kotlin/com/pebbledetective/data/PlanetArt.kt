@@ -5,6 +5,16 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.pebbledetective.domain.Planet
 import kotlinx.coroutines.Dispatchers
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import com.pebbledetective.ui.sky.HALLEY_LOOK
+import com.pebbledetective.ui.sky.drawComet
 import kotlinx.coroutines.withContext
 
 /**
@@ -27,7 +37,49 @@ object PlanetArt {
      * the stars the way it does on the banner.
      */
     suspend fun disc(context: Context, planet: Planet, targetPx: Int): Bitmap? =
-        disc(context, planet.assetPath, targetPx)
+        if (planet == Planet.HALLEY) comet(targetPx) else disc(context, planet.assetPath, targetPx)
+
+    /**
+     * Halley, which has no photograph in the assets because it is drawn.
+     *
+     * Every screen that shows where a pebble came from asks this object
+     * for a picture - the result screen, the logbook, the share card,
+     * the banner on the camera. Rather than teach each of them that one
+     * origin is special, the special case lives here and they all get a
+     * bitmap like any other.
+     *
+     * Drawn rather than bundled because there is no photograph of a
+     * comet that looks like the idea of a comet: the one close-up anyone
+     * has of Halley is Giotto's, which is a dark potato, and the famous
+     * long-tailed pictures are of other comets entirely. Reaching into
+     * the drawing code from here crosses a layer, which is the price of
+     * the other eight screens not having to care.
+     */
+    private suspend fun comet(targetPx: Int): Bitmap = withContext(Dispatchers.Default) {
+        val side = targetPx.coerceAtLeast(64)
+        val image = ImageBitmap(side, side)
+        CanvasDrawScope().draw(
+            density = Density(1f),
+            layoutDirection = LayoutDirection.Ltr,
+            canvas = Canvas(image),
+            size = Size(side.toFloat(), side.toFloat()),
+        ) {
+            // Head to the right, tail streaming left across the frame.
+            // A circular badge crops to the head and the brightest part
+            // of the tail, which still reads as a comet; the result
+            // screen, which does not crop, gets the whole thing.
+            drawComet(
+                look = HALLEY_LOOK,
+                phase = 0f,
+                at = Offset(side * 0.74f, side * 0.42f),
+                headRadius = side * 0.085f,
+                awayFromSun = Offset(-0.94f, 0.34f),
+                seconds = 0f,
+                tailScale = 0.62f,
+            )
+        }
+        image.asAndroidBitmap()
+    }
 
     /**
      * The same, for a bundled frame that is not one of the nine.

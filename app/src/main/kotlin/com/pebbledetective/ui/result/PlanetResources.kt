@@ -30,6 +30,7 @@ val Planet.nameRes: Int
         Planet.SATURN -> R.string.planet_saturn_name
         Planet.URANUS -> R.string.planet_uranus_name
         Planet.NEPTUNE -> R.string.planet_neptune_name
+        Planet.HALLEY -> R.string.planet_halley_name
     }
 
 /**
@@ -53,6 +54,7 @@ val Planet.fromNameRes: Int
         Planet.SATURN -> R.string.planet_saturn_from
         Planet.URANUS -> R.string.planet_uranus_from
         Planet.NEPTUNE -> R.string.planet_neptune_from
+        Planet.HALLEY -> R.string.planet_halley_from
     }
 
 /** One kid-sized fact per body. */
@@ -69,6 +71,7 @@ val Planet.factRes: Int
         Planet.SATURN -> R.string.planet_saturn_fact
         Planet.URANUS -> R.string.planet_uranus_fact
         Planet.NEPTUNE -> R.string.planet_neptune_fact
+        Planet.HALLEY -> R.string.planet_halley_fact
     }
 
 /**
@@ -83,12 +86,19 @@ fun rememberPlanetImage(planet: Planet): State<ImageBitmap?> {
     val image = remember(planet) { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(planet) {
-        image.value = withContext(Dispatchers.IO) {
-            runCatching {
-                context.assets.open(planet.assetPath).use { stream ->
-                    BitmapFactory.decodeStream(stream)?.asImageBitmap()
-                }
-            }.getOrNull()
+        image.value = if (planet == Planet.HALLEY) {
+            // There is no photograph in the assets for this one; it is
+            // drawn. Without this the portrait spun for ever, which is
+            // the shape of bug that hides behind a loading indicator.
+            PlanetArt.disc(context, planet, PORTRAIT_PX)?.asImageBitmap()
+        } else {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    context.assets.open(planet.assetPath).use { stream ->
+                        BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                    }
+                }.getOrNull()
+            }
         }
     }
     return image
@@ -120,6 +130,9 @@ fun rememberPlanetDisc(planet: Planet, sizePx: Int = DISC_BADGE_PX): State<Image
     }
     return image
 }
+
+/** The drawn comet, at the size the result screen shows a world. */
+private const val PORTRAIT_PX = 768
 
 /** Big enough for a 54dp badge on a three-times-density screen. */
 const val DISC_BADGE_PX = 192

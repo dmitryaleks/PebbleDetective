@@ -192,4 +192,7 @@
     <string name="orrery_stones_from">Your stones from %1$s</string>
     <string name="sky_comet_add">Comet detection</string>
     <string name="sky_comet_at">Comet %1$d · %2$s</string>
+    <string name="planet_halley_name">Halley’s Comet</string>
+    <string name="planet_halley_from">Halley’s Comet</string>
+    <string name="planet_halley_fact">A mountain of dirty ice that comes back every 75 years. Earth flies through the dust it leaves behind twice every year, and every bit of it burns up as a shooting star.</string>
 </resources>

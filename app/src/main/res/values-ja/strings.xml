@@ -189,4 +189,7 @@
     <string name="orrery_stones_from">%1$sから きた こいし</string>
     <string name="sky_comet_add">すいせい たんさく</string>
     <string name="sky_comet_at">すいせい %1$d · %2$s</string>
+    <string name="planet_halley_name">ハレーすいせい</string>
+    <string name="planet_halley_from">ハレーすいせい</string>
+    <string name="planet_halley_fact">75ねんごとに かえってくる こおりの やま。1ねんに 2かい、ちきゅうは その ちりの なかを とおり、ちりは ながれぼしに なるよ。</string>
 </resources>

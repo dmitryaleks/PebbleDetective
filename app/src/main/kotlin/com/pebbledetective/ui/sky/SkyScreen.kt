@@ -211,26 +211,32 @@ fun SkyScreen(
                         }
                         .filter { (_, at) -> hypot(at.x - tap.x, at.y - tap.y) < TAP_SLOP_PX * density }
                         .minByOrNull { (_, at) -> hypot(at.x - tap.x, at.y - tap.y) }
-                    if (hit != null) {
-                        session.launchMeteor(hit.first.planet)
-                        return@detectTapGestures
-                    }
                     // The comet is a target of its own, and a far bigger
-                    // one: the head alone is half as wide again as a
-                    // planet, and the whole point of it is to be hit.
+                    // one: the head alone is three times a planet, and
+                    // the whole point of it is to be hit.
                     val comet = sky.comet
-                    if (comet != null) {
-                        val head = attitude.value.project(
-                            comet.azimuthDegrees - declination,
-                            comet.altitudeDegrees,
+                    val cometHead = comet?.let {
+                        attitude.value.project(
+                            it.azimuthDegrees - declination,
+                            it.altitudeDegrees,
                             canvas,
                             focal,
                         )
-                        if (head != null &&
-                            hypot(head.x - tap.x, head.y - tap.y) < COMET_TAP_SLOP_PX * density
-                        ) {
-                            session.launchCometMeteor()
-                        }
+                    }
+                    val cometMiss = cometHead
+                        ?.let { hypot(it.x - tap.x, it.y - tap.y) / (COMET_TAP_SLOP_PX * density) }
+                        ?.takeIf { it < 1f }
+                    // Both measured as a fraction of their own reach, so
+                    // a planet drifting across the coma does not steal a
+                    // tap aimed at the middle of a comet six times its
+                    // size - which is exactly what it did.
+                    val planetMiss = hit
+                        ?.let { (_, at) -> hypot(at.x - tap.x, at.y - tap.y) / (TAP_SLOP_PX * density) }
+
+                    when {
+                        planetMiss != null && (cometMiss == null || planetMiss <= cometMiss) ->
+                            session.launchMeteor(hit!!.first.planet)
+                        cometMiss != null -> session.launchCometMeteor()
                     }
                 }
             },

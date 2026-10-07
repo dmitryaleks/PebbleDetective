@@ -30,6 +30,10 @@ object SolarSystem {
     val BODIES: List<Planet> = listOf(
         Planet.MERCURY, Planet.VENUS, Planet.EARTH, Planet.MOON, Planet.MARS,
         Planet.JUPITER, Planet.SATURN, Planet.URANUS, Planet.NEPTUNE,
+        // Last, because it is the one that is usually furthest out:
+        // Halley spends most of its seventy-five years past Neptune and
+        // only a few months of it anywhere interesting.
+        Planet.HALLEY,
     )
 
     /** Where one body sits on screen, and how big to draw it. */
@@ -237,6 +241,9 @@ object SolarSystem {
         Planet.MARS -> 0.024f
         Planet.MERCURY -> 0.020f
         Planet.MOON -> 0.012f
+        // The head only. The tails are drawn off this and reach many
+        // times further, which is the whole look of the thing.
+        Planet.HALLEY -> 0.016f
     }
 
     /**
@@ -265,6 +272,10 @@ object SolarSystem {
         val squash = cos(Math.toRadians(tiltDegrees.toDouble())).toFloat()
         for (planet in BODIES) {
             if (planet == Planet.MOON) continue
+            // A ring for Halley would be a circle drawn through an orbit
+            // that is ninety-seven percent eccentric - a lie so large it
+            // would put the comet nowhere near its own line.
+            if (planet == Planet.HALLEY) continue
             val au = Astronomy.semiMajorAxisAu(planet, epochMillis)
             val radius = (compress(au) * scalePx).toFloat()
             if (radius < 4f) continue
